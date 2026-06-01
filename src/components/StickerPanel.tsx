@@ -14,11 +14,11 @@ interface StickerPanelProps {
   stickerCount?: number
   initialData?: Record<string, InitialDataEntry>
   onCollectionChange?: (
-    countryCode: string,
-    number: number | string,
-    data: InitialDataEntry
+    _countryCode: string,
+    _number: number | string,
+    _data: InitialDataEntry
   ) => void
-  onInteract?: (countryCode: string) => void
+  onInteract?: (_countryCode: string) => void
   highlightNumber?: number | null
   matchedSticker?: { code: string; description: string } | null
   page?: number | null

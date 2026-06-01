@@ -33,7 +33,7 @@ export function useShare(t: (_key: string) => string) {
           navigator.clipboard
             .writeText(`${title}\n${text}\n${url}`)
             .then(() => alert(t('linkCopied')))
-            .catch((err) => console.error('Failed to copy:', err))
+            .catch((err) => console.error('Failed to copy:', err)) // eslint-disable-line no-console
           break
         }
         default:

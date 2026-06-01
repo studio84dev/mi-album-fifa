@@ -29,7 +29,7 @@ export function useAuth() {
             session?.access_token
           )
         } catch (err) {
-          console.error('upsert-user error:', err)
+          console.error('upsert-user error:', err) // eslint-disable-line no-console
         }
       }
     })

@@ -31,7 +31,7 @@ export function useGlobalCollection(user: { id?: string } | null) {
       .eq('user_id', userId)
       .then(({ data, error }) => {
         if (error) {
-          console.error('Error loading global collection:', error)
+          console.error('Error loading global collection:', error) // eslint-disable-line no-console
           setLoading(false)
           return
         }
