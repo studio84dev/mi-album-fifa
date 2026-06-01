@@ -5,6 +5,7 @@ import { useGlobalCollection } from './hooks/useGlobalCollection.ts'
 import { useScroll } from './hooks/useScroll.ts'
 import { useShare } from './hooks/useShare.ts'
 import { useSearchResults } from './hooks/useSearchResults.ts'
+import type { SearchResult } from './hooks/useSearchResults.ts'
 import { useBanners } from './hooks/useBanners.ts'
 import { useTheme } from './hooks/useTheme.ts'
 
@@ -103,11 +104,9 @@ function App() {
     searchInputRef.current?.blur()
   }
 
-  const handleSelectCountry = (sticker: any) => {
+  const handleSelectCountry = (sticker: SearchResult) => {
     if (sticker.kind === 'stickerCard') {
       selectStickerCard(sticker)
-    } else if (sticker.matchedSticker) {
-      selectStickerCard(sticker.matchedSticker)
     } else {
       selectCountry(sticker.code)
     }

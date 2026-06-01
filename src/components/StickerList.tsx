@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
 import TeamCard from './TeamCard.tsx'
 import StickerCard from './StickerCard.tsx'
+import type { SearchResult } from '../hooks/useSearchResults.ts'
 
 interface StickerListProps {
-  results: Array<Record<string, unknown> & { kind: string; code: string; count?: number }>
-  onSelect: (_result: unknown) => void
+  results: SearchResult[]
+  onSelect: (_result: SearchResult) => void
   collection: Record<string, Record<string, { collected: boolean; repeated: number }>>
   selectedCode: string | null
   t: (_key: string) => string
@@ -15,7 +16,7 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
     const completed = new Set<string>()
     const stats: Record<string, { collected: number; total: number; repeated: number }> = {}
     results.forEach((result) => {
-      const total = result.count ?? 20
+      const total = result.kind === 'teamCard' ? (result.count ?? 20) : 20
       const codeMap = collection?.[result.code] ?? {}
       const entries = Object.values(codeMap) as { collected: boolean; repeated: number }[]
       const collectedCount = entries.filter((e) => e.collected).length
@@ -42,7 +43,7 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
         result.kind === 'teamCard' ? (
           <TeamCard
             key={result.code}
-            team={result as any}
+            team={result}
             stats={statsMap[result.code]}
             isComplete={completedCodes.has(result.code)}
             isActive={selectedCode === result.code}
@@ -51,7 +52,7 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
         ) : (
           <StickerCard
             key={result.code}
-            sticker={result as any}
+            sticker={result}
             collection={collection}
             onClick={() => onSelect(result)}
           />

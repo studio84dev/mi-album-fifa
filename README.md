@@ -87,7 +87,7 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contribution guidelines.
 
 | Layer         | Tech                                                          |
 | ------------- | ------------------------------------------------------------- |
-| Frontend      | React 18 + Vite 5                                             |
+| Frontend      | React 18 + TypeScript + Vite 5                                |
 | Styling       | Vanilla CSS + CSS variables                                   |
 | Auth          | Supabase Auth (Google OAuth)                                  |
 | Database      | Supabase PostgreSQL + RLS                                     |
@@ -101,13 +101,14 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contribution guidelines.
 
 ```text
 src/
-├── components/   # Reusable UI components
-├── hooks/        # Custom React hooks
+├── components/   # Reusable UI components (.tsx)
+├── hooks/        # Custom React hooks (.ts)
 ├── data/         # Static album + curiosity data
 ├── styles/       # Design system + modular CSS
 ├── i18n/         # Translation files
 ├── lib/          # External clients/config
-└── main.jsx
+├── App.tsx
+└── main.tsx
 ```
 
 Supabase Edge Functions live under:
@@ -168,10 +169,10 @@ npm run dev
 ## 📦 Available Scripts
 
 ```bash
-npm run dev
-npm run build
-npm run lint
-npm run format
+npm run dev        # Start development server
+npm run build      # Production build (includes type-check)
+npm run lint       # ESLint + TypeScript checks
+npm run format     # Prettier formatting
 ```
 
 ---

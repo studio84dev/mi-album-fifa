@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import allStickers, { Sticker } from '../data/stickers.ts'
+import type { CardType } from '../data/stickers.ts'
 
 /* ── Static helpers ────────────────────────────────────────── */
 
@@ -18,9 +19,32 @@ interface TeamSummary {
   group: string | null
   iso: string | null
   page: number
-  card_type: string
+  card_type: CardType
   description: string
   count: number
+}
+
+export interface TeamCardResult extends TeamSummary {
+  kind: 'teamCard'
+}
+
+export interface StickerCardResult {
+  kind: 'stickerCard'
+  code: string
+  country_code: string
+  number: number
+  description: string
+  page: number
+  group: string | null
+  iso: string | null
+  card_type: CardType
+}
+
+export type SearchResult = TeamCardResult | StickerCardResult
+
+export interface StickerCardLike {
+  code: string
+  country_code: string | null
 }
 
 function buildSearchData(allStickers: Sticker[]) {
@@ -66,8 +90,8 @@ export function useSearchResults() {
   const { teamsData, stickerByCode } = useMemo(() => buildSearchData(allStickers), [])
 
   /* ── Search results (list view) ─────────────────────────── */
-  const searchResults = useMemo(() => {
-    if (!search.trim()) return teamsData.map((s) => ({ ...s, kind: 'teamCard' }))
+  const searchResults = useMemo((): SearchResult[] => {
+    if (!search.trim()) return teamsData.map((s): TeamCardResult => ({ ...s, kind: 'teamCard' }))
     const query = search.trim().toUpperCase()
 
     const matchedTeams = teamsData.filter(
@@ -77,26 +101,37 @@ export function useSearchResults() {
         s.page.toString().includes(query)
     )
 
-    const matchedStickerCards = allStickers
-      .filter((sticker) => {
+    const matchedStickerCards: StickerCardResult[] = allStickers
+      .filter((sticker): sticker is Sticker & { country_code: string; number: number } => {
         const descMatch = sticker.description.toUpperCase().includes(query)
         const notInTeamResults = !matchedTeams.some((t) => t.code === sticker.country_code)
         const isHiddenType = sticker.card_type === 'team_logo' || sticker.card_type === 'team_photo'
-        return descMatch && notInTeamResults && !isHiddenType
+        return (
+          descMatch &&
+          notInTeamResults &&
+          !isHiddenType &&
+          sticker.number != null &&
+          sticker.country_code != null
+        )
       })
-      .map((sticker) => ({
-        kind: 'stickerCard',
-        code: sticker.code,
-        country_code: sticker.country_code,
-        number: sticker.number,
-        description: sticker.description,
-        page: sticker.page,
-        group: sticker.group,
-        iso: sticker.iso,
-        card_type: sticker.card_type,
-      }))
+      .map(
+        (sticker): StickerCardResult => ({
+          kind: 'stickerCard',
+          code: sticker.code,
+          country_code: sticker.country_code,
+          number: sticker.number,
+          description: sticker.description,
+          page: sticker.page,
+          group: sticker.group,
+          iso: sticker.iso,
+          card_type: sticker.card_type,
+        })
+      )
 
-    return [...matchedTeams.map((t) => ({ ...t, kind: 'teamCard' })), ...matchedStickerCards]
+    return [
+      ...matchedTeams.map((t): TeamCardResult => ({ ...t, kind: 'teamCard' })),
+      ...matchedStickerCards,
+    ]
   }, [search, teamsData])
 
   /* ── Exact code match (auto-open) ───────────────────────── */
@@ -145,7 +180,7 @@ export function useSearchResults() {
     setSearch(code)
   }, [])
 
-  const selectStickerCard = useCallback((sticker: Sticker) => {
+  const selectStickerCard = useCallback((sticker: StickerCardLike) => {
     setSelectedCode(sticker.country_code)
     setSearch(sticker.code)
   }, [])

@@ -1,4 +1,5 @@
 import flags from '../data/flags.ts'
+import type { CardType } from '../data/stickers.ts'
 
 const FWC_ICON = (
   <svg
@@ -68,7 +69,7 @@ interface TeamCardProps {
     group: string | null
     iso: string | null
     page: number
-    card_type: string
+    card_type: CardType
     count: number
     matchedSticker?: { code: string; description: string }
   }

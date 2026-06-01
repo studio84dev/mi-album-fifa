@@ -1,4 +1,4 @@
-export type CardType = 'team_logo' | 'team_photo' | 'player' | 'fwc' | 'cc' | 'panini'
+export type CardType = 'team_logo' | 'team_photo' | 'player' | 'fwc_special' | 'cc' | 'panini_logo'
 
 export interface Sticker {
   id: number

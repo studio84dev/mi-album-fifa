@@ -31,6 +31,7 @@ You can help by:
 
 - Node.js 18+
 - npm
+- TypeScript knowledge
 - Supabase project (for auth/database features)
 
 ## Installation
@@ -61,10 +62,10 @@ npm run dev
 # 📦 Useful Commands
 
 ```bash
-npm run dev
-npm run build
-npm run lint
-npm run format
+npm run dev        # Start development server
+npm run build      # Production build (includes type-check)
+npm run lint       # ESLint + TypeScript checks
+npm run format     # Prettier formatting
 ```
 
 ---
@@ -120,6 +121,7 @@ Examples:
 
 This project uses:
 
+- **TypeScript** — strict mode enabled
 - ESLint
 - Prettier
 
@@ -136,6 +138,19 @@ npm run lint
 ```
 
 Format-on-save is recommended in your editor.
+
+---
+
+## 📝 TypeScript Guidelines
+
+The codebase is fully typed. Please keep it that way:
+
+- Prefer explicit types over `any`
+- Use interfaces for component props (`*Props`)
+- Use `useState<Type>` and `useRef<Type>` instead of implicit types
+- Prefer `Record<string, T>` over index signatures when possible
+- Import extensions: use `.ts` / `.tsx` in import paths (Vite handles them)
+- Run `npm run lint` before submitting — it includes TypeScript checks
 
 ---
 
