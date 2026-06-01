@@ -87,7 +87,7 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contribution guidelines.
 
 | Layer         | Tech                                                          |
 | ------------- | ------------------------------------------------------------- |
-| Frontend      | React 18 + TypeScript + Vite 5                                |
+| Frontend      | React 18 + TypeScript (strict) + Vite 5                       |
 | Styling       | Vanilla CSS + CSS variables                                   |
 | Auth          | Supabase Auth (Google OAuth)                                  |
 | Database      | Supabase PostgreSQL + RLS                                     |

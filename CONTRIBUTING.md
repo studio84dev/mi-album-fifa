@@ -143,14 +143,17 @@ Format-on-save is recommended in your editor.
 
 ## 📝 TypeScript Guidelines
 
-The codebase is fully typed. Please keep it that way:
+The codebase is fully typed in strict mode. Please keep it that way:
 
-- Prefer explicit types over `any`
-- Use interfaces for component props (`*Props`)
-- Use `useState<Type>` and `useRef<Type>` instead of implicit types
-- Prefer `Record<string, T>` over index signatures when possible
-- Import extensions: use `.ts` / `.tsx` in import paths (Vite handles them)
-- Run `npm run lint` before submitting — it includes TypeScript checks
+- **`any` is banned** — ESLint enforces `@typescript-eslint/no-explicit-any: 'error'`. No exceptions.
+- Use interfaces for component props (naming convention: `*Props`)
+- Use `useState<Type>` and `useRef<Type | null>` instead of relying on inference
+- Use `Record<string, T>` over index signatures when possible
+- Use **discriminated unions** for data with `kind` fields (e.g. `SearchResult = TeamCardResult | StickerCardResult`)
+- Use **type guards** in `.filter()` calls to narrow types instead of casting
+- Use exported union types (e.g. `CardType`) for fields with a fixed set of values — never `string`
+- Import extensions: use `.ts` / `.tsx` in all import paths
+- Run `npm run lint` before submitting — it enforces both ESLint and TypeScript rules
 
 ---
 
