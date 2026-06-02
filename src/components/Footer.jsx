@@ -1,21 +1,35 @@
 import ShareMenu from './ShareMenu.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 
-function Footer({ t, locale, toggleLocale, onShowAbout, onShowSuggestion, share, shareOptions }) {
+function Footer({
+  t,
+  locale,
+  toggleLocale,
+  onShowAbout,
+  onShowSuggestion,
+  share,
+  shareOptions,
+  user,
+  totalCollected,
+}) {
+  const showKofi = user && totalCollected >= 20
+
   return (
     <footer>
-      <div className="kofi-section">
-        <p className="kofi-message">{t('kofiMessage')}</p>
-        <p className="kofi-sub-message">{t('kofiSubMessage')}</p>
-        <a
-          href="https://link.mercadopago.cl/mialbumfifa"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="kofi-btn"
-        >
-          {t('kofiButton')}
-        </a>
-      </div>
+      {showKofi && (
+        <div className="kofi-section">
+          <p className="kofi-message">{t('kofiMessage')}</p>
+          <p className="kofi-sub-message">{t('kofiSubMessage')}</p>
+          <a
+            href="https://link.mercadopago.cl/mialbumfifa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="kofi-btn"
+          >
+            {t('kofiButton')}
+          </a>
+        </div>
+      )}
 
       <div className="footer-links">
         <button className="footer-link" onClick={onShowAbout}>

@@ -231,6 +231,8 @@ function App() {
         onShowSuggestion={() => setShowSuggestionModal(true)}
         share={share}
         shareOptions={shareOptions}
+        user={user}
+        totalCollected={totalCollected}
       />
 
       <ScrollTopButton show={showScrollTop} isRaised={isAtBottom} onClick={scrollToTop} t={t} />
