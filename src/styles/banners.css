@@ -150,6 +150,26 @@
   background: var(--bg-quaternary);
 }
 
+.share-prompt-btn--linkedin {
+  border-color: rgba(10, 102, 194, 0.3);
+  color: #0a66c2;
+}
+.share-prompt-btn--linkedin:hover {
+  background: rgba(10, 102, 194, 0.1);
+  border-color: #0a66c2;
+}
+
+@media (max-width: 480px) {
+  .share-prompt-buttons {
+    gap: 0.375rem;
+  }
+  .share-prompt-btn {
+    min-width: 5rem;
+    padding: 0.375rem 0.625rem;
+    font-size: var(--text-xs);
+  }
+}
+
 /* ── Login Bar ──────────────────────────────────────────────── */
 .login-bar {
   position: sticky;

@@ -37,6 +37,12 @@ function SharePrompt({ t, share, onDismiss }) {
         <button className="share-prompt-btn share-prompt-btn--x" onClick={() => handleShare('x')}>
           X
         </button>
+        <button
+          className="share-prompt-btn share-prompt-btn--linkedin"
+          onClick={() => handleShare('linkedin')}
+        >
+          LinkedIn
+        </button>
       </div>
     </div>
   )

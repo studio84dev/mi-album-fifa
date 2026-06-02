@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useI18n } from './hooks/useI18n.js'
 import { useAuth } from './hooks/useAuth.js'
 import { useGlobalCollection } from './hooks/useGlobalCollection.js'
@@ -85,19 +85,8 @@ function App() {
   }, [locale, t])
 
   const [showSharePrompt, setShowSharePrompt] = useState(false)
-  const prevSearchRef = useRef('')
   const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
   const totalCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
-
-  useEffect(() => {
-    if (localStorage.getItem(SHARE_PROMPT_KEY)) return
-    if (search.length > 0 && prevSearchRef.current.length === 0 && !user) {
-      const count = parseInt(localStorage.getItem('search-count') || '0') + 1
-      localStorage.setItem('search-count', String(count))
-      if (count >= 10) setShowSharePrompt(true)
-    }
-    prevSearchRef.current = search
-  }, [search, user])
 
   useEffect(() => {
     if (localStorage.getItem(SHARE_PROMPT_KEY)) return
