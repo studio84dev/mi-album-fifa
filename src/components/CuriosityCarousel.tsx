@@ -79,20 +79,20 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
   }
 
   return (
-    <div className="curiosity-carousel">
-      <div className="curiosity-header">
-        <span className="curiosity-icon">💡</span>
-        <span className="curiosity-title">
+    <div className="w-full max-w-[600px] mx-auto mt-5 px-5 py-[1.125rem] bg-card-bg rounded-xl border border-border-color sm:mx-6 sm:p-4">
+      <div className="flex items-center justify-between mb-[0.875rem] pb-3 border-b border-border-color">
+        <span className="text-lg">💡</span>
+        <span className="font-semibold text-base text-text-primary flex-1 ml-2 sm:text-[1rem]">
           {locale === 'en' ? 'Did you know?' : '¿Sabías que...'}
         </span>
-        <span className="curiosity-counter">
+        <span className="text-xs text-text-muted font-medium">
           {currentIndex + 1} / {countryCuriosities.length}
         </span>
       </div>
 
-      <div className="curiosity-content-wrapper">
+      <div className="flex items-center gap-[0.625rem] min-h-[112px] sm:min-h-[140px]">
         <button
-          className="curiosity-nav curiosity-nav-prev"
+          className="w-8 h-8 rounded-full border border-border-color bg-bg-tertiary text-text-muted text-xl cursor-pointer flex items-center justify-center transition-[background,border-color,color] duration-base flex-shrink-0 pb-[3px] hover:bg-bg-quaternary hover:border-border-strong hover:text-text-primary active:opacity-70"
           onClick={goToPrev}
           aria-label={locale === 'en' ? 'Previous' : 'Anterior'}
         >
@@ -100,13 +100,13 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
         </button>
 
         <div
-          className="curiosity-slider"
+          className="flex-1 overflow-hidden relative"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           <div
-            className={`curiosity-slide ${isDragging ? 'dragging' : ''}`}
+            className={`leading-[1.65] text-text-secondary text-base text-center px-2 py-2 will-change-transform sm:text-[0.95rem] animate-slide-in ${isDragging ? '[transition:none]' : 'transition-[transform,opacity] duration-100 ease-out'}`}
             key={currentIndex}
             style={{
               transform: `translateX(${dragOffset}px)`,
@@ -118,7 +118,7 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
         </div>
 
         <button
-          className="curiosity-nav curiosity-nav-next"
+          className="w-8 h-8 rounded-full border border-border-color bg-bg-tertiary text-text-muted text-xl cursor-pointer flex items-center justify-center transition-[background,border-color,color] duration-base flex-shrink-0 pb-[3px] hover:bg-bg-quaternary hover:border-border-strong hover:text-text-primary active:opacity-70"
           onClick={goToNext}
           aria-label={locale === 'en' ? 'Next' : 'Siguiente'}
         >
@@ -126,11 +126,11 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
         </button>
       </div>
 
-      <div className="curiosity-dots">
+      <div className="flex justify-center gap-[0.375rem] mt-[0.875rem]">
         {countryCuriosities.map((_, index) => (
           <button
             key={index}
-            className={`curiosity-dot ${index === currentIndex ? 'active' : ''}`}
+            className={`h-[6px] rounded-full border-none cursor-pointer transition-all duration-base ${index === currentIndex ? 'w-4 bg-accent-blue' : 'w-[6px] bg-border-strong hover:bg-text-muted'}`}
             onClick={() => goToSlide(index)}
             aria-label={`${locale === 'en' ? 'Go to fact' : 'Ir a curiosidad'} ${index + 1}`}
           />

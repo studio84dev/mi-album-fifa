@@ -58,6 +58,7 @@ function StickerPanel({
   const prevCompleteRef = useRef(false)
   const [justCompleted, setJustCompleted] = useState(false)
   const [glowNumber, setGlowNumber] = useState<number | null>(null)
+  const [hoveredNum, setHoveredNum] = useState<number | null>(null)
 
   useEffect(() => {
     const { cMap, rMap } = buildMaps(initialData)
@@ -239,72 +240,132 @@ function StickerPanel({
   if (!user) return null
 
   const repeatedCount = Object.values(repeated).reduce((acc, v) => acc + (v || 0), 0)
-  const panelClass = `sticker-panel${isComplete ? ' sticker-panel--complete' : ''}${justCompleted ? ' sticker-panel--just-completed' : ''}`
+
+  const panelBorder = justCompleted
+    ? 'animate-panel-just-completed border-accent-orange-border transition-none'
+    : isComplete
+      ? 'border-accent-orange-border transition-[border-color] duration-slow'
+      : 'border-border-color transition-[border-color] duration-slow'
 
   return (
-    <div className={panelClass}>
-      <div className="sticker-panel-header">
-        <span className="sticker-panel-title">
+    <div className={`w-full bg-card-bg border rounded-xl px-5 py-[1.125rem] my-6 ${panelBorder}`}>
+      <div className="flex justify-between items-center mb-[0.875rem]">
+        <span className="text-sm text-text-secondary font-medium">
           {t('stickerPanelTitle')} <strong>{countryCode}</strong>
           {page != null && (
-            <span className="sticker-panel-page">{` · ${t('stickerPanelPageLabel')} ${page}`}</span>
+            <span className="text-xs text-text-muted">{` · ${t('stickerPanelPageLabel')} ${page}`}</span>
           )}
         </span>
-        <span className="sticker-panel-count">
+        <span className="text-sm font-semibold text-accent-blue tabular-nums">
           {loading ? '...' : `${collectedCount} / ${stickerCount}${repeatedCount > 0 ? ` · ` : ''}`}
-          {repeatedCount > 0 && <span className="sticker-panel-repeated">{repeatedCount}</span>}
+          {repeatedCount > 0 && <span className="text-accent-orange">{repeatedCount}</span>}
         </span>
       </div>
+
       {matchedSticker && (
-        <div className="search-match-badge">
+        <div className="text-xs font-medium text-accent-blue bg-accent-blue-subtle border border-accent-blue-border rounded-sm px-2 py-[2px] w-fit mx-auto mb-[0.875rem]">
           {matchedSticker.code} — {matchedSticker.description}
         </div>
       )}
-      <div className="sticker-grid">
-        {Array.from({ length: stickerCount }, (_, i) => i + 1).map((num) => (
-          <button
-            key={num}
-            className={`figurita-card ${collected[num] ? 'collected' : ''} ${repeated[num] > 0 ? 'repeated' : ''} ${lastTouched === num ? 'last-touched' : ''} ${glowNumber === num ? 'highlighted' : ''} ${highlightNumber === num ? 'search-matched' : ''}`}
-            onClick={() => toggleSticker(num)}
-            onContextMenu={(e) => handleContextMenu(e, num)}
-            onTouchStart={(e) => handleTouchStart(e, num)}
-            onTouchEnd={handleLongPressEnd}
-            onTouchMove={handleLongPressEnd}
-            disabled={loading}
-            aria-label={`Figurita ${countryCode} ${num}`}
-          >
-            <span className="figurita-number">{num}</span>
-            <span className="figurita-code">{countryCode}</span>
-            {repeated[num] > 0 && <span className="figurita-repeated-badge">+{repeated[num]}</span>}
-          </button>
-        ))}
+
+      <div className="grid [grid-template-columns:repeat(5,1fr)] gap-[0.375rem] max-[600px]:gap-[0.35rem]">
+        {Array.from({ length: stickerCount }, (_, i) => i + 1).map((num) => {
+          const isCollected = !!collected[num]
+          const isRepeated = repeated[num] > 0
+          const isLastTouched = lastTouched === num
+          const isHighlighted = glowNumber === num
+          const isSearchMatched = highlightNumber === num
+
+          const isHovered = hoveredNum === num
+          const canHover = !isCollected && !isRepeated && !loading
+
+          let figuritaClass =
+            'flex flex-col items-center justify-center gap-[0.1rem] border rounded-md py-2 px-1 cursor-pointer relative touch-pan-y select-none focus:outline-none focus:shadow-none disabled:opacity-40 disabled:cursor-not-allowed [touch-callout:none] [-webkit-tap-highlight-color:transparent]'
+
+          if (isCollected && isRepeated) {
+            figuritaClass += ' bg-accent-blue-hover border-accent-blue text-white'
+          } else if (isCollected) {
+            figuritaClass += ' bg-accent-blue border-accent-blue text-white'
+          } else if (isRepeated) {
+            figuritaClass +=
+              ' bg-accent-orange-subtle border-accent-orange-border text-accent-orange'
+          } else if (canHover && isHovered) {
+            figuritaClass += ' bg-bg-quaternary border-border-strong text-text-primary'
+          } else {
+            figuritaClass += ' bg-bg-tertiary border-border-color text-text-muted'
+          }
+
+          if (isLastTouched)
+            figuritaClass += ' !border-accent-blue !shadow-[0_0_0_2px_var(--accent-blue-subtle)]'
+          if (isHighlighted) figuritaClass += ' animate-highlight-glow z-[1]'
+          if (isSearchMatched) figuritaClass += ' border-2 !border-text-secondary z-[1]'
+
+          return (
+            <button
+              key={num}
+              className={figuritaClass}
+              onClick={() => toggleSticker(num)}
+              onContextMenu={(e) => handleContextMenu(e, num)}
+              onTouchStart={(e) => handleTouchStart(e, num)}
+              onTouchEnd={handleLongPressEnd}
+              onTouchMove={handleLongPressEnd}
+              onMouseEnter={() => setHoveredNum(num)}
+              onMouseLeave={() => setHoveredNum(null)}
+              disabled={loading}
+              aria-label={`Figurita ${countryCode} ${num}`}
+            >
+              <span className="text-[0.9375rem] font-bold leading-none tracking-[-0.01em] pointer-events-none select-none">
+                {num}
+              </span>
+              <span className="text-[0.5625rem] font-medium tracking-[0.04em] opacity-75 pointer-events-none select-none">
+                {countryCode}
+              </span>
+              {isRepeated && (
+                <span className="absolute top-[2px] right-[2px] text-[0.5625rem] font-bold text-white bg-accent-orange rounded-[3px] px-[2px] leading-[1.4] pointer-events-none">
+                  +{repeated[num]}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
-      <p className="sticker-grid-hint">
+
+      <p className="text-xs text-text-muted text-center mt-[0.875rem]">
         {window.matchMedia('(pointer: fine)').matches ? t('hintMouse') : t('hintTouch')}
       </p>
 
       {modal !== null && (
-        <div className="sticker-modal-overlay" onClick={closeModal}>
-          <div className="sticker-modal" onClick={(e) => e.stopPropagation()}>
-            <p className="sticker-modal-title">
+        <div
+          className="fixed inset-0 bg-overlay-bg flex items-center justify-center z-[1000] p-4 overscroll-contain backdrop-blur-[4px] select-none"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-modal-bg border border-border-color rounded-xl p-[1.375rem] w-full max-w-[300px] flex flex-col gap-[0.875rem] shadow-xl animate-modal-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-center text-base font-semibold text-text-primary m-0">
               {t('modalTitle')}{' '}
               <strong>
                 {countryCode} #{modal}
               </strong>
             </p>
-            <div className="sticker-modal-repeated-row">
-              <span className="sticker-modal-repeated-label">{t('modalRepeatedLabel')}</span>
-              <div className="sticker-modal-counter">
+            <div className="flex items-center justify-between bg-accent-orange-subtle border border-accent-orange-border rounded-md px-[0.875rem] py-2">
+              <span className="text-sm text-accent-orange font-semibold">
+                {t('modalRepeatedLabel')}
+              </span>
+              <div className="flex items-center gap-3">
                 <button
-                  className="sticker-counter-btn"
+                  className="w-8 h-8 rounded-full border border-accent-orange-border bg-accent-orange-subtle text-accent-orange text-base font-bold cursor-pointer flex items-center justify-center transition-[background] duration-fast hover:bg-[rgba(232,116,42,0.25)] leading-none"
                   onClick={() => setModalRepeated((v) => Math.max(0, v - 1))}
                   aria-label={t('ariaLess')}
                 >
                   −
                 </button>
-                <span className="sticker-counter-value">{modalRepeated}</span>
+                <span className="text-xl font-bold text-text-primary min-w-[1.5rem] text-center tabular-nums">
+                  {modalRepeated}
+                </span>
                 <button
-                  className="sticker-counter-btn"
+                  className="w-8 h-8 rounded-full border border-accent-orange-border bg-accent-orange-subtle text-accent-orange text-base font-bold cursor-pointer flex items-center justify-center transition-[background] duration-fast hover:bg-[rgba(232,116,42,0.25)] leading-none"
                   onClick={() => setModalRepeated((v) => v + 1)}
                   aria-label={t('ariaMore')}
                 >
@@ -312,10 +373,14 @@ function StickerPanel({
                 </button>
               </div>
             </div>
-            {modalRepeated === 0 && <p className="sticker-modal-hint">{t('modalHintRemove')}</p>}
-            <div className="sticker-modal-actions">
+            {modalRepeated === 0 && (
+              <p className="text-xs text-text-muted text-center -mt-1 m-0">
+                {t('modalHintRemove')}
+              </p>
+            )}
+            <div className="flex gap-2">
               <button
-                className="sticker-modal-btn btn-collected"
+                className="flex-1 py-[0.6rem] px-[0.4rem] border-none rounded-md text-sm font-semibold cursor-pointer transition-[opacity] duration-fast font-[inherit] bg-accent-blue text-white hover:opacity-85"
                 onClick={() => applyModalAction('collected')}
               >
                 {modalRepeated === 0
@@ -323,13 +388,16 @@ function StickerPanel({
                   : t('modalBtnCollectedRep').replace('{count}', String(modalRepeated))}
               </button>
               <button
-                className="sticker-modal-btn btn-none"
+                className="flex-1 py-[0.6rem] px-[0.4rem] border border-[rgba(239,68,68,0.25)] rounded-md text-sm font-semibold cursor-pointer transition-[opacity] duration-fast font-[inherit] bg-[rgba(239,68,68,0.1)] text-[#ef4444] hover:opacity-85"
                 onClick={() => applyModalAction('none')}
               >
                 {t('modalBtnNone')}
               </button>
             </div>
-            <button className="sticker-modal-cancel" onClick={closeModal}>
+            <button
+              className="bg-none border-none text-text-muted text-sm cursor-pointer text-center py-1 font-[inherit] transition-[color] duration-fast hover:text-text-primary"
+              onClick={closeModal}
+            >
               {t('modalCancel')}
             </button>
           </div>

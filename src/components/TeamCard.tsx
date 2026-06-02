@@ -1,9 +1,26 @@
 import flags from '../data/flags.ts'
 import type { CardType } from '../data/stickers.ts'
 
+const GROUP_COLORS: Record<string, string> = {
+  a: '#2d7a35',
+  b: '#c53030',
+  c: '#b7791f',
+  d: '#2b6cb0',
+  e: '#c05621',
+  f: '#276749',
+  g: '#6b46c1',
+  h: '#086f83',
+  i: '#553c9a',
+  j: '#b7445a',
+  k: '#97266d',
+  l: '#744210',
+}
+
+const ICON_CLASS = 'w-[1.625rem] h-auto flex-shrink-0 block'
+
 const FWC_ICON = (
   <svg
-    className="special-icon"
+    className={ICON_CLASS}
     viewBox="0 0 512 512"
     xmlns="http://www.w3.org/2000/svg"
     fill="#FFD700"
@@ -34,7 +51,7 @@ const FWC_ICON = (
 )
 
 const CC_ICON = (
-  <svg className="special-icon" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+  <svg className={ICON_CLASS} viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
     <circle cx="14" cy="14" r="13" fill="#E8000E" />
     <text
       x="14"
@@ -53,7 +70,7 @@ const CC_ICON = (
 
 const PANINI_ICON = (
   <svg
-    className="special-icon"
+    className={ICON_CLASS}
     viewBox="-6.5 0 32 32"
     xmlns="http://www.w3.org/2000/svg"
     fill="#6366F1"
@@ -77,10 +94,39 @@ interface TeamCardProps {
   isComplete: boolean
   isActive: boolean
   onClick: () => void
+  single?: boolean
 }
 
-function TeamCard({ team, stats, isComplete, isActive, onClick }: TeamCardProps) {
-  const stateClass = isActive ? 'sticker-card--active' : isComplete ? 'sticker-card--complete' : ''
+function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCardProps) {
+  const cardBase = `bg-card-bg rounded-lg p-4 flex items-center gap-[0.875rem] border border-border-color cursor-pointer transition-[background,border-color,box-shadow] duration-base hover:bg-bg-tertiary hover:border-border-strong hover:shadow-sm max-[600px]:p-4 max-[600px]:w-full max-[600px]:box-border max-[600px]:min-w-0${single ? ' max-w-[400px] w-full' : ''}`
+  const cardActive =
+    'border-accent-blue-border bg-accent-blue-subtle hover:bg-accent-blue-subtle hover:border-accent-blue-border'
+  const cardComplete =
+    'border-accent-orange-border bg-accent-orange-subtle hover:bg-accent-orange-subtle hover:border-accent-orange-border'
+  const cardStateClass = isActive ? cardActive : isComplete ? cardComplete : ''
+
+  const pageNumClass =
+    'text-[1.375rem] font-bold text-text-muted min-w-[44px] text-center tracking-[-0.02em] tabular-nums max-[600px]:text-[1.5rem] max-[600px]:min-w-[50px]'
+
+  const statsBlock = (collected: number, total: number, repeated: number) => {
+    const complete = collected >= total
+    return (
+      <div className="flex flex-col items-end gap-[0.2rem] flex-shrink-0">
+        <div
+          className={`text-sm font-semibold leading-[1.2] tabular-nums${
+            complete ? ' text-accent-blue' : ''
+          }`}
+        >
+          <span className={complete ? 'text-inherit' : 'text-accent-blue'}>{collected}</span>
+          <span className={complete ? 'text-inherit' : 'text-text-muted font-medium'}>/</span>
+          <span className={complete ? 'text-inherit' : 'text-text-muted font-medium'}>{total}</span>
+        </div>
+        {repeated > 0 && (
+          <div className="text-xs text-accent-orange leading-[1.2] tabular-nums">{repeated}</div>
+        )}
+      </div>
+    )
+  }
 
   const isSpecial =
     team.card_type === 'panini_logo' || team.card_type === 'fwc_special' || team.card_type === 'cc'
@@ -90,68 +136,67 @@ function TeamCard({ team, stats, isComplete, isActive, onClick }: TeamCardProps)
       team.card_type === 'fwc_special' ? FWC_ICON : team.card_type === 'cc' ? CC_ICON : PANINI_ICON
     const label =
       team.card_type === 'fwc_special' ? 'FWC' : team.card_type === 'cc' ? 'CC' : '00 PANINI'
+    const codeColor =
+      team.card_type === 'fwc_special' ? '#3b82f6' : team.card_type === 'cc' ? '#e84040' : undefined
     const total = team.count
     return (
-      <div
-        className={`sticker-card sticker-card--special sticker-card--${label.toLowerCase()} ${stateClass}`.trim()}
-        style={{ cursor: 'pointer' }}
-        onClick={onClick}
-      >
-        <div className="page-number">{team.page}</div>
+      <div className={`${cardBase} justify-start ${cardStateClass}`.trim()} onClick={onClick}>
+        <div className={pageNumClass}>{team.page}</div>
         {icon}
-        <div className="country-info">
-          <div className="country-code">{team.code}</div>
-          <div className="country-name">{label}</div>
-        </div>
-        {stats ? (
-          <div className="sticker-stats">
-            <div className={`sticker-stats-count${stats.collected >= total ? ' is-complete' : ''}`}>
-              <span className="sticker-stats-num">{stats.collected}</span>
-              <span className="sticker-stats-sep">/</span>
-              <span className="sticker-stats-total">{total}</span>
-            </div>
-            {stats.repeated > 0 && <div className="sticker-stats-repeated">{stats.repeated}</div>}
+        <div className="flex-1 min-w-0">
+          <div
+            className="text-xs font-semibold uppercase tracking-[0.08em] mb-[0.2rem]"
+            style={codeColor ? { color: codeColor } : undefined}
+          >
+            {team.code}
           </div>
-        ) : null}
+          <div className="text-base font-semibold text-country-name whitespace-nowrap overflow-hidden text-ellipsis max-[600px]:text-[1.1rem]">
+            {label}
+          </div>
+        </div>
+        {stats ? statsBlock(stats.collected, total, stats.repeated) : null}
       </div>
     )
   }
 
+  const groupKey = team.group?.toLowerCase() ?? ''
+  const groupColor = GROUP_COLORS[groupKey] ?? '#888'
+
   return (
-    <div
-      className={`sticker-card ${stateClass}`.trim()}
-      onClick={onClick}
-      style={{ cursor: 'pointer' }}
-    >
-      <div className="page-number">{team.page}</div>
-      <img src={flags[team.iso ?? '']} alt={team.team_name ?? ''} className="country-flag" />
-      <div className="country-info">
-        <div className="country-code-row">
-          <span className="country-code">{team.code}</span>
-          <span className={`group-badge-small group-${team.group?.toLowerCase() ?? ''}`}>
+    <div className={`${cardBase} ${cardStateClass}`.trim()} onClick={onClick}>
+      <div className={pageNumClass}>{team.page}</div>
+      <img
+        src={flags[team.iso ?? '']}
+        alt={team.team_name ?? ''}
+        className="w-[1.625rem] h-auto flex-shrink-0 rounded-[3px] block"
+      />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs text-text-muted font-semibold uppercase tracking-[0.08em] leading-none">
+            {team.code}
+          </span>
+          <span
+            className="w-4 h-4 rounded-full inline-flex items-center justify-center font-bold text-[0.6rem] text-white flex-shrink-0 opacity-85"
+            style={{ backgroundColor: groupColor }}
+          >
             {team.group}
           </span>
         </div>
-        <div className="country-name">{team.team_name}</div>
+        <div className="text-base font-semibold text-country-name whitespace-nowrap overflow-hidden text-ellipsis max-[600px]:text-[1.1rem]">
+          {team.team_name}
+        </div>
         {team.matchedSticker && (
-          <div className="search-match-badge">
+          <div className="text-xs font-medium text-accent-blue bg-accent-blue-subtle border border-accent-blue-border rounded-sm px-2 py-[2px] w-fit mt-1">
             {team.matchedSticker.code} — {team.matchedSticker.description}
           </div>
         )}
       </div>
       {stats ? (
-        <div className="sticker-stats">
-          <div
-            className={`sticker-stats-count${stats.collected >= stats.total ? ' is-complete' : ''}`}
-          >
-            <span className="sticker-stats-num">{stats.collected}</span>
-            <span className="sticker-stats-sep">/</span>
-            <span className="sticker-stats-total">{stats.total}</span>
-          </div>
-          {stats.repeated > 0 && <div className="sticker-stats-repeated">{stats.repeated}</div>}
-        </div>
+        statsBlock(stats.collected, stats.total, stats.repeated)
       ) : (
-        <div className={`group-badge group-${team.group?.toLowerCase() ?? ''}`}>{team.group}</div>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-text-muted bg-bg-quaternary border border-border-color flex-shrink-0">
+          {team.group}
+        </div>
       )}
     </div>
   )

@@ -8,9 +8,13 @@ function ThemeToggle({ t }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <button className="theme-toggle" onClick={toggleTheme} aria-label={t('themeToggleLabel')}>
+    <button
+      className="flex items-center gap-1.5 bg-bg-tertiary border border-border-color rounded-full py-[0.2rem] pr-2 pl-[0.3rem] cursor-pointer transition-[background,border-color] duration-base hover:bg-bg-quaternary hover:border-border-strong"
+      onClick={toggleTheme}
+      aria-label={t('themeToggleLabel')}
+    >
       <svg
-        className={`theme-toggle-icon ${theme === 'light' ? 'active' : ''}`}
+        className={`w-3.5 h-3.5 flex-shrink-0 transition-opacity duration-base ${theme === 'light' ? 'opacity-100' : 'opacity-60'}`}
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -24,10 +28,14 @@ function ThemeToggle({ t }: ThemeToggleProps) {
         />
       </svg>
 
-      <div className="theme-toggle-slider" />
+      <div className="relative w-9 h-5 bg-bg-quaternary rounded-full border border-border-strong transition-[background] duration-base">
+        <div
+          className={`absolute top-[2px] left-[2px] w-[14px] h-[14px] rounded-full transition-[transform,background] duration-base ${theme === 'light' ? 'translate-x-4 bg-accent-blue' : 'translate-x-0 bg-text-muted'}`}
+        />
+      </div>
 
       <svg
-        className={`theme-toggle-icon ${theme === 'dark' ? 'active' : ''}`}
+        className={`w-3.5 h-3.5 flex-shrink-0 transition-opacity duration-base ${theme === 'dark' ? 'opacity-100' : 'opacity-60'}`}
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

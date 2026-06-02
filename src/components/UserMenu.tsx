@@ -31,26 +31,28 @@ function UserMenu({ user, onSignOut, onImport, t, totals, collectionLoading }: U
   const showAvatar = avatarUrl && !imgError
 
   return (
-    <div className="user-avatar-container" ref={containerRef}>
+    <div className="relative" ref={containerRef}>
       <button
-        className="user-avatar-btn"
+        className="flex items-center gap-1 bg-transparent border-none cursor-pointer p-0 text-text-muted transition-[color] duration-fast hover:text-text-secondary"
         onClick={() => setShowMenu(!showMenu)}
         aria-label={t('userMenuAriaLabel')}
       >
-        <span className="user-avatar-wrap">
-          <span className="user-avatar-initial">{initial}</span>
+        <span className="relative w-8 h-8 flex-shrink-0">
+          <span className="w-8 h-8 rounded-full bg-accent-blue text-white flex items-center justify-center text-[0.82rem] font-bold">
+            {initial}
+          </span>
           {showAvatar && (
             <img
               src={avatarUrl}
               alt=""
-              className="user-avatar-img"
+              className="absolute top-0 left-0 w-8 h-8 rounded-full object-cover"
               referrerPolicy="no-referrer"
               onError={() => setImgError(true)}
             />
           )}
         </span>
         <svg
-          className="user-avatar-chevron"
+          className="w-3 h-3 flex-shrink-0 opacity-60"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -62,20 +64,21 @@ function UserMenu({ user, onSignOut, onImport, t, totals, collectionLoading }: U
         </svg>
       </button>
       {showMenu && (
-        <div className="user-dropdown">
-          <div className="user-dropdown-stats">
-            <GlobalStatsBar totals={totals} loading={collectionLoading} t={t} />
+        <div className="absolute top-[calc(100%+8px)] right-0 bg-modal-bg backdrop-blur-md border border-border-color rounded-lg p-1.5 min-w-[240px] max-w-[320px] z-[1002] shadow-lg animate-fade-in-down">
+          <div className="p-1">
+            <GlobalStatsBar totals={totals} loading={collectionLoading} t={t} compact />
           </div>
-          <div className="user-dropdown-divider" />
-          <div className="user-dropdown-email">{user.email}</div>
+          <div className="h-px bg-border-color my-1" />
+          <div className="text-[0.8rem] text-text-muted px-3 py-2 break-all">{user.email}</div>
           <button
-            className="user-dropdown-import"
+            className="w-full text-left bg-transparent border-none text-text-secondary text-sm px-3 py-2 rounded-md cursor-pointer transition-[background,color] duration-fast flex items-center gap-2 font-[inherit] hover:bg-bg-tertiary hover:text-text-primary"
             onClick={() => {
               onImport()
               setShowMenu(false)
             }}
           >
             <svg
+              className="w-3.5 h-3.5 flex-shrink-0 opacity-70"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -90,7 +93,7 @@ function UserMenu({ user, onSignOut, onImport, t, totals, collectionLoading }: U
             {t('importMenuItem')}
           </button>
           <button
-            className="user-dropdown-logout"
+            className="w-full text-left bg-transparent border-none text-text-secondary text-sm px-3 py-2 rounded-md cursor-pointer transition-[background,color] duration-fast font-[inherit] hover:bg-[rgba(239,68,68,0.08)] hover:text-[#ef4444]"
             onClick={() => {
               onSignOut()
               setShowMenu(false)
