@@ -6,4 +6,7 @@ export default defineConfig({
   server: {
     host: true,
   },
+  build: {
+    sourcemap: true,
+  },
 })
