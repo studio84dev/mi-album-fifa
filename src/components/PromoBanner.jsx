@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 const GOOGLE_SVG = (
   <svg className="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -21,48 +19,16 @@ const GOOGLE_SVG = (
   </svg>
 )
 
-export function PromoBanner({
-  title,
-  body,
-  icon = '✨',
-  onLogin,
-  onDismiss,
-  storageKey,
-  className,
-}) {
-  const [dismissed, setDismissed] = useState(() =>
-    storageKey ? !!localStorage.getItem(storageKey) : false
-  )
-
-  if (dismissed) return null
-
-  const handleDismiss = () => {
-    if (storageKey) localStorage.setItem(storageKey, '1')
-    setDismissed(true)
-    onDismiss?.()
-  }
-
+export function PromoBanner({ title, body, icon = '✨', onLogin, className }) {
   return (
     <div className={`promo-banner${className ? ` ${className}` : ''}`}>
       <div className="promo-banner-glow" />
-      <button className="promo-dismiss" onClick={handleDismiss} aria-label="Cerrar">
-        ×
-      </button>
       <div className="promo-icon">{icon}</div>
       <h3 className="promo-title">{title}</h3>
       <p className="promo-body">{body}</p>
-      <button
-        className="promo-cta"
-        onClick={() => {
-          handleDismiss()
-          onLogin()
-        }}
-      >
+      <button className="promo-cta" onClick={onLogin}>
         {GOOGLE_SVG}
         Iniciar sesión con Google
-      </button>
-      <button className="promo-dismiss-text" onClick={handleDismiss}>
-        Ya lo sé, no mostrar más
       </button>
     </div>
   )

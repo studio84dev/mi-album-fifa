@@ -19,7 +19,6 @@ export function useBanners(user) {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('promo-banner-country', '1')
       if (!localStorage.getItem('welcome-modal-dismissed')) {
         setShowWelcomeModal(true)
       }
