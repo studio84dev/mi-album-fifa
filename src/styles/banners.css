@@ -66,20 +66,29 @@
 
 .share-prompt-close {
   position: absolute;
-  top: 0.625rem;
-  right: 0.75rem;
-  background: none;
+  top: 0.5rem;
+  right: 0.625rem;
+  background: var(--bg-quaternary);
   border: none;
+  border-radius: 50%;
   color: var(--text-muted);
-  font-size: 1rem;
+  font-size: 1.25rem;
   cursor: pointer;
   line-height: 1;
-  padding: 0.25rem;
-  transition: color var(--transition-fast);
+  padding: 0.375rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .share-prompt-close:hover {
   color: var(--text-primary);
+  background: var(--border-color);
 }
 
 .share-prompt-title {
