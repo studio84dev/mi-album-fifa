@@ -31,6 +31,7 @@ You can help by:
 
 - Node.js 18+
 - npm
+- TypeScript knowledge
 - Supabase project (for auth/database features)
 
 ## Installation
@@ -61,10 +62,10 @@ npm run dev
 # 📦 Useful Commands
 
 ```bash
-npm run dev
-npm run build
-npm run lint
-npm run format
+npm run dev        # Start development server
+npm run build      # Production build (includes type-check)
+npm run lint       # ESLint + TypeScript checks
+npm run format     # Prettier formatting
 ```
 
 ---
@@ -120,6 +121,7 @@ Examples:
 
 This project uses:
 
+- **TypeScript** — strict mode enabled
 - ESLint
 - Prettier
 
@@ -136,6 +138,22 @@ npm run lint
 ```
 
 Format-on-save is recommended in your editor.
+
+---
+
+## 📝 TypeScript Guidelines
+
+The codebase is fully typed in strict mode. Please keep it that way:
+
+- **`any` is banned** — ESLint enforces `@typescript-eslint/no-explicit-any: 'error'`. No exceptions.
+- Use interfaces for component props (naming convention: `*Props`)
+- Use `useState<Type>` and `useRef<Type | null>` instead of relying on inference
+- Use `Record<string, T>` over index signatures when possible
+- Use **discriminated unions** for data with `kind` fields (e.g. `SearchResult = TeamCardResult | StickerCardResult`)
+- Use **type guards** in `.filter()` calls to narrow types instead of casting
+- Use exported union types (e.g. `CardType`) for fields with a fixed set of values — never `string`
+- Import extensions: use `.ts` / `.tsx` in all import paths
+- Run `npm run lint` before submitting — it enforces both ESLint and TypeScript rules
 
 ---
 
