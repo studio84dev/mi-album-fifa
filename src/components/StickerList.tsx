@@ -27,18 +27,25 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
     return { completedCodes: completed, statsMap: stats }
   }, [results, collection])
 
+  const isSingle = results.length === 1
+  const gridClass = isSingle
+    ? 'w-full grid gap-[0.625rem] min-w-0 overflow-x-hidden grid-cols-1 place-items-center'
+    : 'w-full grid gap-[0.625rem] min-w-0 overflow-x-hidden [grid-template-columns:repeat(auto-fill,minmax(290px,1fr))] max-[600px]:grid-cols-1'
+
   if (results.length === 0) {
     return (
-      <div className="no-results">
-        <div className="no-results-emoji">🤷‍♂️</div>
-        <p>{t('noResults')}</p>
-        <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('sureNotPasted')}</p>
+      <div className={gridClass}>
+        <div className="max-w-[400px] w-full text-center px-4 py-12 text-text-muted text-base">
+          <div className="text-[2.5rem] mb-3">🤷‍♂️</div>
+          <p>{t('noResults')}</p>
+          <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('sureNotPasted')}</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="stickers-list">
+    <div className={gridClass}>
       {results.map((result) =>
         result.kind === 'teamCard' ? (
           <TeamCard
@@ -48,6 +55,7 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
             isComplete={completedCodes.has(result.code)}
             isActive={selectedCode === result.code}
             onClick={() => onSelect(result)}
+            single={isSingle}
           />
         ) : (
           <StickerCard
@@ -55,6 +63,7 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
             sticker={result}
             collection={collection}
             onClick={() => onSelect(result)}
+            single={isSingle}
           />
         )
       )}

@@ -35,17 +35,25 @@ function Header({
   collectionLoading,
 }: HeaderProps) {
   return (
-    <div className="top-bar">
-      <div className="top-bar-left">
+    <div className="flex justify-end items-center w-full mb-4 pt-3 gap-2 sticky top-0 z-[100] bg-bg-primary">
+      <div className="flex gap-2 items-center mr-auto">
         {whatsNewUnread && (
-          <button className="about-link whats-new-btn" onClick={onOpenWhatsNew}>
+          <button
+            className="relative bg-transparent border-none text-text-muted text-sm font-medium cursor-pointer px-3 py-[0.4rem] transition-[color] duration-base rounded-md font-[inherit] hover:text-text-primary hover:bg-bg-tertiary"
+            onClick={onOpenWhatsNew}
+          >
             {t('whatsNewButton')}
-            <span className="whats-new-badge" />
+            <span className="absolute top-[3px] right-[3px] w-[7px] h-[7px] rounded-full bg-accent-orange block animate-badge-pulse" />
           </button>
         )}
       </div>
-      <div className="user-auth-area">
-        {authLoading && <div className="user-avatar-skeleton" aria-hidden="true" />}
+      <div className="flex items-center gap-2 mr-2">
+        {authLoading && (
+          <div
+            className="w-8 h-8 rounded-full bg-[linear-gradient(90deg,var(--shimmer-start)_25%,var(--shimmer-middle)_50%,var(--shimmer-end)_75%)] bg-[length:200%_100%] animate-skeleton-shimmer"
+            aria-hidden="true"
+          />
+        )}
         {!authLoading && user && (
           <UserMenu
             user={user}

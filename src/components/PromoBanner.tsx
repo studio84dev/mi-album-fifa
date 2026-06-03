@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const GOOGLE_SVG = (
-  <svg className="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
       fill="#4285F4"
@@ -52,17 +52,27 @@ export function PromoBanner({
     onDismiss?.()
   }
   return (
-    <div className={`promo-banner${className ? ` ${className}` : ''}`}>
-      <div className="promo-banner-glow" />
+    <div
+      className={`relative w-full bg-bg-tertiary rounded-xl px-5 pt-5 pb-4 mb-6 text-center border border-border-color${className ? ` ${className}` : ''}`}
+    >
       {onDismiss && (
-        <button className="promo-dismiss" onClick={handleDismiss} aria-label="Dismiss">
+        <button
+          className="absolute top-[0.6rem] right-3 bg-transparent border-none text-text-muted text-[1rem] cursor-pointer leading-none p-1 rounded-sm transition-[color] duration-fast hover:text-text-primary"
+          onClick={handleDismiss}
+          aria-label="Dismiss"
+        >
           ×
         </button>
       )}
-      <div className="promo-icon">{icon}</div>
-      <h3 className="promo-title">{title}</h3>
-      <p className="promo-body">{body}</p>
-      <button className="promo-cta" onClick={onLogin}>
+      <div className="text-[1.5rem] mb-2">{icon}</div>
+      <h3 className="text-base font-semibold text-text-primary m-0 mb-2 leading-[1.4]">{title}</h3>
+      <p className="text-sm text-text-muted leading-[1.55] m-0 mb-4 max-w-[440px] mx-auto">
+        {body}
+      </p>
+      <button
+        className="inline-flex items-center gap-2 bg-bg-secondary text-text-primary border border-border-strong rounded-md px-5 py-[0.55rem] text-sm font-semibold cursor-pointer transition-[background,border-color] duration-base mb-2 font-[inherit] hover:bg-bg-quaternary hover:border-accent-orange-border"
+        onClick={onLogin}
+      >
         {GOOGLE_SVG}
         Iniciar sesión con Google
       </button>

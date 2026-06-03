@@ -33,29 +33,46 @@ interface WhatsNewModalProps {
 
 function WhatsNewModal({ onClose, t, locale = 'es' }: WhatsNewModalProps) {
   return (
-    <div className="about-modal-overlay" onClick={onClose}>
-      <div className="about-modal whats-new-modal" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed top-0 left-0 right-0 bottom-0 bg-overlay-bg flex items-center justify-center z-[1000] p-4 backdrop-blur-[6px]"
+      onClick={onClose}
+    >
+      <div
+        className="bg-modal-bg border border-border-color rounded-xl max-w-[500px] w-full max-h-[82vh] overflow-hidden relative p-8 pb-0 animate-modal-fade-in shadow-xl flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
-          className="about-close-btn"
+          className="absolute top-[0.875rem] right-[0.875rem] w-7 h-7 rounded-full bg-bg-tertiary border border-border-color text-text-muted text-base cursor-pointer flex items-center justify-center transition-[background,color] duration-fast hover:bg-bg-quaternary hover:text-text-primary"
           onClick={onClose}
           aria-label={t('whatsNewCloseAriaLabel')}
         >
           ×
         </button>
-        <div className="whats-new-header">
-          <span className="whats-new-title-icon">✨</span>
-          <h2 className="whats-new-title">{t('whatsNewTitle')}</h2>
+        <div className="flex items-center gap-2 mb-5 flex-shrink-0">
+          <span className="text-[1.2rem]">✨</span>
+          <h2 className="text-xl font-bold text-text-primary m-0 tracking-[-0.02em]">
+            {t('whatsNewTitle')}
+          </h2>
         </div>
-        <div className="whats-new-list">
+        <div className="flex flex-col gap-3 overflow-y-auto pb-6 pr-[2px]">
           {FEATURES.map((f) => (
-            <div key={f.id} className="whats-new-item">
-              <div className="whats-new-item-icon">{f.icon}</div>
-              <div className="whats-new-item-body">
-                <div className="whats-new-item-meta">
-                  <span className="whats-new-item-title">{t(`feature.${f.id}.title`)}</span>
-                  <span className="whats-new-item-date">{formatDate(f.date, locale)}</span>
+            <div
+              key={f.id}
+              className="flex gap-[0.875rem] px-4 py-[0.875rem] bg-bg-tertiary border border-border-color rounded-lg"
+            >
+              <div className="text-[1.25rem] flex-shrink-0 leading-none mt-[2px]">{f.icon}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-baseline gap-2 mb-[0.3rem]">
+                  <span className="text-sm font-semibold text-text-primary">
+                    {t(`feature.${f.id}.title`)}
+                  </span>
+                  <span className="text-xs text-text-muted whitespace-nowrap flex-shrink-0">
+                    {formatDate(f.date, locale)}
+                  </span>
                 </div>
-                <p className="whats-new-item-desc">{t(`feature.${f.id}.description`)}</p>
+                <p className="text-sm text-text-muted leading-[1.55] m-0">
+                  {t(`feature.${f.id}.description`)}
+                </p>
               </div>
             </div>
           ))}

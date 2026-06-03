@@ -60,6 +60,14 @@ interface ShareMenuProps {
   className?: string
 }
 
+const PLATFORM_STYLES: Record<string, string> = {
+  whatsapp: 'text-[#25d366] hover:bg-[rgba(37,211,102,0.1)]',
+  facebook: 'text-[#1877f2] hover:bg-[rgba(24,119,242,0.1)]',
+  x: 'text-x-color hover:bg-bg-quaternary',
+  linkedin: 'text-[#0a66c2] hover:bg-[rgba(10,102,194,0.1)]',
+  copy: 'text-text-muted hover:bg-bg-tertiary hover:text-text-primary border-t border-border-color mt-1 pt-[0.625rem] rounded-none rounded-b-md',
+}
+
 function ShareMenu({ t, share, shareOptions, className = '' }: ShareMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -74,23 +82,28 @@ function ShareMenu({ t, share, shareOptions, className = '' }: ShareMenuProps) {
   }
 
   return (
-    <div className={`share-container ${className}`} ref={containerRef}>
-      <button className="share-btn" onClick={() => setIsOpen(!isOpen)} aria-label={t('share')}>
-        {ICONS.share}
+    <div className={`relative ${className}`} ref={containerRef}>
+      <button
+        className="w-9 h-9 p-0 flex items-center justify-center bg-bg-tertiary border border-border-color rounded-full cursor-pointer transition-[background,border-color] duration-base hover:bg-bg-quaternary hover:border-border-strong active:opacity-80"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={t('share')}
+      >
+        <span className="w-4 h-4 text-text-muted [&>svg]:w-4 [&>svg]:h-4">{ICONS.share}</span>
       </button>
       {isOpen && (
-        <div className="share-menu">
+        <div className="absolute bottom-[calc(100%+8px)] top-auto right-0 bg-modal-bg backdrop-blur-md rounded-lg p-1.5 min-w-[172px] shadow-lg border border-border-color z-[1001] animate-fade-in-up">
+          <div className="absolute bottom-[-5px] top-auto right-3 w-[10px] h-[10px] bg-modal-bg rotate-45 border-r border-b border-border-color" />
           {shareOptions.map(({ id, label }, index) => (
             <React.Fragment key={id}>
               <button
-                className={`share-option ${id}`}
+                className={`flex items-center gap-[0.625rem] w-full px-3 py-2 border-none bg-transparent text-sm cursor-pointer rounded-md transition-[background,color] duration-fast font-[inherit] [&>svg]:w-4 [&>svg]:h-4 [&>svg]:flex-shrink-0 ${PLATFORM_STYLES[id] ?? 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'}`}
                 onClick={() => handleShare(id)}
                 aria-label={label}
               >
                 {ICONS[id]}
                 <span>{label}</span>
               </button>
-              {index < shareOptions.length - 1 && <div className="share-separator"></div>}
+              {index < shareOptions.length - 1 && <div className="h-px bg-border-color my-1" />}
             </React.Fragment>
           ))}
         </div>

@@ -11,8 +11,8 @@ function CommunityStats({ t }: CommunityStatsProps) {
 
   if (loading) {
     return (
-      <div className="community-stats">
-        <span className="community-stat-skeleton-inline" />
+      <div className="flex items-center justify-center py-3 pb-2 mb-2">
+        <span className="inline-block w-56 h-4 rounded-sm bg-[linear-gradient(90deg,var(--bg-tertiary)_25%,var(--bg-quaternary)_50%,var(--bg-tertiary)_75%)] bg-[length:200%_100%] animate-skeleton-shimmer max-[480px]:w-40" />
       </div>
     )
   }
@@ -22,16 +22,25 @@ function CommunityStats({ t }: CommunityStatsProps) {
   const repeated = stats?.repeated ?? 0
 
   return (
-    <div className="community-stats">
-      <span className="community-stat-text">
-        <span className="community-stat-num">{collectors}</span>
-        <span className="community-stat-label"> {t('communityStatCollectors')}</span>
-        <span className="community-stat-sep"> · </span>
-        <span className="community-stat-num">{stickers}</span>
-        <span className="community-stat-label"> {t('communityStatStickers')}</span>
-        <span className="community-stat-sep"> · </span>
-        <span className="community-stat-num">{repeated}</span>
-        <span className="community-stat-label"> {t('communityStatRepeated')}</span>
+    <div className="flex items-center justify-center py-3 pb-2 mb-2">
+      <span className="text-sm text-text-muted text-center whitespace-nowrap tabular-nums max-[480px]:text-xs max-[480px]:whitespace-normal max-[480px]:leading-[1.4]">
+        <span className="text-text-secondary font-semibold">{collectors}</span>
+        <span className="text-xs text-text-muted uppercase tracking-[0.04em]">
+          {' '}
+          {t('communityStatCollectors')}
+        </span>
+        <span className="text-text-muted opacity-60"> · </span>
+        <span className="text-text-secondary font-semibold">{stickers}</span>
+        <span className="text-xs text-text-muted uppercase tracking-[0.04em]">
+          {' '}
+          {t('communityStatStickers')}
+        </span>
+        <span className="text-text-muted opacity-60"> · </span>
+        <span className="text-text-secondary font-semibold">{repeated}</span>
+        <span className="text-xs text-text-muted uppercase tracking-[0.04em]">
+          {' '}
+          {t('communityStatRepeated')}
+        </span>
       </span>
     </div>
   )
