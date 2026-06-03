@@ -26,8 +26,8 @@ interface LoginBarProps {
 
 function LoginBar({ onLogin, t }: LoginBarProps) {
   return (
-    <div className="sticky top-0 z-[100] flex items-center justify-center gap-3 px-4 py-2 bg-bg-secondary border-b border-border-color backdrop-blur-md flex-wrap w-full sm:gap-2 sm:px-3">
-      <span className="text-text-muted text-sm sm:text-[0.8rem] sm:text-center">
+    <div className="sticky top-0 z-[100] flex items-center justify-center gap-3 px-4 py-2 bg-bg-secondary border-b border-border-color backdrop-blur-md flex-wrap w-full min-[601px]:gap-2 min-[601px]:px-3">
+      <span className="text-text-muted text-sm min-[601px]:text-[0.8rem] min-[601px]:text-center">
         {t('loginBarText')}
       </span>
       <button

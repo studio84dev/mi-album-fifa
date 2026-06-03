@@ -11,9 +11,9 @@ function AboutModal({ onClose, t, share, shareOptions }: AboutModalProps) {
   const overlayClass =
     'fixed top-0 left-0 right-0 bottom-0 bg-overlay-bg flex items-center justify-center z-[1000] p-4 backdrop-blur-[6px]'
   const modalClass =
-    'bg-modal-bg border border-border-color rounded-xl max-w-[580px] w-full max-h-[82vh] overflow-y-auto relative p-8 animate-modal-fade-in shadow-xl max-[600px]:p-6 max-[600px]:pt-12 max-[600px]:max-h-[85vh] max-[600px]:mx-4'
+    'bg-modal-bg border border-border-color rounded-xl max-w-[580px] w-full max-h-[85vh] min-[601px]:max-h-[82vh] overflow-y-auto relative p-6 pt-12 min-[601px]:p-8 animate-modal-fade-in shadow-xl mx-4 min-[601px]:mx-0'
   const closeBtnClass =
-    'absolute top-[0.875rem] right-[0.875rem] w-7 h-7 rounded-full bg-bg-tertiary border border-border-color text-text-muted text-base cursor-pointer flex items-center justify-center transition-[background,color] duration-fast hover:bg-bg-quaternary hover:text-text-primary max-[600px]:text-[1.25rem]'
+    'absolute top-[0.875rem] right-[0.875rem] w-7 h-7 rounded-full bg-bg-tertiary border border-border-color text-text-muted text-[1.25rem] min-[601px]:text-base cursor-pointer flex items-center justify-center transition-[background,color] duration-fast hover:bg-bg-quaternary hover:text-text-primary'
 
   return (
     <div className={overlayClass} onClick={onClose}>
@@ -22,22 +22,22 @@ function AboutModal({ onClose, t, share, shareOptions }: AboutModalProps) {
           ×
         </button>
         <div>
-          <h2 className="text-text-primary text-xl font-bold mb-5 text-center tracking-[-0.02em] max-[600px]:text-[1.25rem] max-[600px]:mb-4">
+          <h2 className="text-text-primary text-[1.25rem] min-[601px]:text-xl font-bold mb-4 min-[601px]:mb-5 text-center tracking-[-0.02em]">
             {t('aboutTitle')}
           </h2>
-          <p className="text-text-secondary text-base leading-[1.65] mb-4 max-[600px]:text-[0.9rem] max-[600px]:leading-[1.5] max-[600px]:text-justify">
+          <p className="text-text-secondary text-[0.9rem] min-[601px]:text-base leading-[1.5] min-[601px]:leading-[1.65] mb-4 text-justify min-[601px]:text-left">
             {t('aboutParagraph1')}
           </p>
-          <p className="text-text-secondary text-base leading-[1.65] mb-4 max-[600px]:text-[0.9rem] max-[600px]:leading-[1.5] max-[600px]:text-justify">
+          <p className="text-text-secondary text-[0.9rem] min-[601px]:text-base leading-[1.5] min-[601px]:leading-[1.65] mb-4 text-justify min-[601px]:text-left">
             {t('aboutParagraph2')}
           </p>
-          <p className="text-text-secondary text-base leading-[1.65] mb-4 max-[600px]:text-[0.9rem] max-[600px]:leading-[1.5] max-[600px]:text-justify">
+          <p className="text-text-secondary text-[0.9rem] min-[601px]:text-base leading-[1.5] min-[601px]:leading-[1.65] mb-4 text-justify min-[601px]:text-left">
             {t('aboutParagraph2b')}
           </p>
-          <p className="text-text-secondary text-base leading-[1.65] mb-4 max-[600px]:text-[0.9rem] max-[600px]:leading-[1.5] max-[600px]:text-justify">
+          <p className="text-text-secondary text-[0.9rem] min-[601px]:text-base leading-[1.5] min-[601px]:leading-[1.65] mb-4 text-justify min-[601px]:text-left">
             {t('aboutParagraph3')}
           </p>
-          <p className="text-text-secondary text-base leading-[1.65] mb-4 max-[600px]:text-[0.9rem] max-[600px]:leading-[1.5] max-[600px]:text-justify">
+          <p className="text-text-secondary text-[0.9rem] min-[601px]:text-base leading-[1.5] min-[601px]:leading-[1.65] mb-4 text-justify min-[601px]:text-left">
             {t('aboutParagraph4a')}{' '}
             <a
               href="https://link.mercadopago.cl/mialbumfifa"
@@ -49,7 +49,7 @@ function AboutModal({ onClose, t, share, shareOptions }: AboutModalProps) {
             </a>
             {'. '}
           </p>
-          <p className="text-text-secondary text-base leading-[1.65] mb-4 max-[600px]:text-[0.9rem] max-[600px]:leading-[1.5] max-[600px]:text-justify">
+          <p className="text-text-secondary text-[0.9rem] min-[601px]:text-base leading-[1.5] min-[601px]:leading-[1.65] mb-4 text-justify min-[601px]:text-left">
             {t('aboutParagraph4d')}
           </p>
 

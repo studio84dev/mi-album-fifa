@@ -36,7 +36,7 @@ function CommunityStats({ t }: CommunityStatsProps) {
           {t('communityStatStickers')}
         </span>
         <span className="text-text-muted opacity-60"> · </span>
-        <span className="text-accent-orange font-semibold">{repeated}</span>
+        <span className="text-text-secondary font-semibold">{repeated}</span>
         <span className="text-xs text-text-muted uppercase tracking-[0.04em]">
           {' '}
           {t('communityStatRepeated')}

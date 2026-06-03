@@ -98,7 +98,7 @@ interface TeamCardProps {
 }
 
 function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCardProps) {
-  const cardBase = `bg-card-bg rounded-lg p-4 flex items-center gap-[0.875rem] border border-border-color cursor-pointer transition-[background,border-color,box-shadow] duration-base hover:bg-bg-tertiary hover:border-border-strong hover:shadow-sm max-[600px]:p-4 max-[600px]:w-full max-[600px]:box-border max-[600px]:min-w-0${single ? ' max-w-[400px] w-full' : ''}`
+  const cardBase = `bg-card-bg rounded-lg p-4 w-full box-border min-w-0 flex items-center gap-[0.875rem] border border-border-color cursor-pointer transition-[background,border-color,box-shadow] duration-base hover:bg-bg-tertiary hover:border-border-strong hover:shadow-sm${single ? ' max-w-[400px]' : ''}`
   const cardActive =
     'border-accent-blue-border bg-accent-blue-subtle hover:bg-accent-blue-subtle hover:border-accent-blue-border'
   const cardComplete =
@@ -106,7 +106,7 @@ function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCa
   const cardStateClass = isActive ? cardActive : isComplete ? cardComplete : ''
 
   const pageNumClass =
-    'text-[1.375rem] font-bold text-text-muted min-w-[44px] text-center tracking-[-0.02em] tabular-nums max-[600px]:text-[1.5rem] max-[600px]:min-w-[50px]'
+    'text-[1.5rem] min-[601px]:text-[1.375rem] font-bold text-text-muted min-w-[50px] min-[601px]:min-w-[44px] text-center tracking-[-0.02em] tabular-nums'
 
   const statsBlock = (collected: number, total: number, repeated: number) => {
     const complete = collected >= total
@@ -150,7 +150,7 @@ function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCa
           >
             {team.code}
           </div>
-          <div className="text-base font-semibold text-country-name whitespace-nowrap overflow-hidden text-ellipsis max-[600px]:text-[1.1rem]">
+          <div className="text-[1.1rem] min-[601px]:text-base font-semibold text-country-name whitespace-nowrap overflow-hidden text-ellipsis">
             {label}
           </div>
         </div>
@@ -182,7 +182,7 @@ function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCa
             {team.group}
           </span>
         </div>
-        <div className="text-base font-semibold text-country-name whitespace-nowrap overflow-hidden text-ellipsis max-[600px]:text-[1.1rem]">
+        <div className="text-[1.1rem] min-[601px]:text-base font-semibold text-country-name whitespace-nowrap overflow-hidden text-ellipsis">
           {team.team_name}
         </div>
         {team.matchedSticker && (

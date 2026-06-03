@@ -27,27 +27,27 @@ function SharePrompt({ t, share, onDismiss }: SharePromptProps) {
       </button>
       <p className="text-base font-semibold text-text-primary mb-1.5">{t('sharePromptTitle')}</p>
       <p className="text-sm text-text-muted leading-relaxed mb-3.5">{t('sharePromptBody')}</p>
-      <div className="flex justify-center gap-2 flex-wrap sm:gap-1.5">
+      <div className="flex justify-center gap-2 flex-wrap min-[601px]:gap-1.5">
         <button
-          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-[rgba(37,211,102,0.3)] text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-[#25d366] bg-bg-secondary font-[inherit] hover:bg-[rgba(37,211,102,0.1)] hover:border-[#25d366] sm:min-w-[5rem] sm:px-[0.625rem]"
+          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-[rgba(37,211,102,0.3)] text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-[#25d366] bg-bg-secondary font-[inherit] hover:bg-[rgba(37,211,102,0.1)] hover:border-[#25d366] min-[601px]:min-w-[5rem] min-[601px]:px-[0.625rem]"
           onClick={() => handleShare('whatsapp')}
         >
           WhatsApp
         </button>
         <button
-          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-[rgba(24,119,242,0.3)] text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-[#1877f2] bg-bg-secondary font-[inherit] hover:bg-[rgba(24,119,242,0.1)] hover:border-[#1877f2] sm:min-w-[5rem] sm:px-[0.625rem]"
+          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-[rgba(24,119,242,0.3)] text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-[#1877f2] bg-bg-secondary font-[inherit] hover:bg-[rgba(24,119,242,0.1)] hover:border-[#1877f2] min-[601px]:min-w-[5rem] min-[601px]:px-[0.625rem]"
           onClick={() => handleShare('facebook')}
         >
           Facebook
         </button>
         <button
-          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-border-color text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-x-color bg-bg-secondary font-[inherit] hover:bg-bg-quaternary sm:min-w-[5rem] sm:px-[0.625rem]"
+          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-border-color text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-x-color bg-bg-secondary font-[inherit] hover:bg-bg-quaternary min-[601px]:min-w-[5rem] min-[601px]:px-[0.625rem]"
           onClick={() => handleShare('x')}
         >
           X
         </button>
         <button
-          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-[rgba(10,102,194,0.3)] text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-[#0a66c2] bg-bg-secondary font-[inherit] hover:bg-[rgba(10,102,194,0.1)] hover:border-[#0a66c2] sm:min-w-[5rem] sm:px-[0.625rem]"
+          className="min-w-[6rem] px-[0.875rem] py-1.5 rounded-full border border-[rgba(10,102,194,0.3)] text-xs font-semibold cursor-pointer transition-[background,border-color] duration-fast text-[#0a66c2] bg-bg-secondary font-[inherit] hover:bg-[rgba(10,102,194,0.1)] hover:border-[#0a66c2] min-[601px]:min-w-[5rem] min-[601px]:px-[0.625rem]"
           onClick={() => handleShare('linkedin')}
         >
           LinkedIn

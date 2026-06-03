@@ -63,7 +63,7 @@ function SuggestionModal({ onClose }: SuggestionModalProps) {
       onClick={handleClose}
     >
       <div
-        className="bg-modal-bg border border-border-color rounded-xl max-w-[600px] w-full max-h-[80vh] overflow-y-auto relative px-7 pt-8 pb-7 animate-modal-fade-in shadow-xl max-[600px]:px-6 max-[600px]:pt-12 max-[600px]:pb-6"
+        className="bg-modal-bg border border-border-color rounded-xl max-w-[600px] w-full max-h-[80vh] overflow-y-auto relative px-6 pt-12 pb-6 min-[601px]:px-7 min-[601px]:pt-8 min-[601px]:pb-7 animate-modal-fade-in shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button

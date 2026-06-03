@@ -89,7 +89,9 @@ function Footer({
         </button>
       </div>
 
-      <ShareMenu t={t} share={share} shareOptions={shareOptions} />
+      <div className="flex justify-center mt-4">
+        <ShareMenu t={t} share={share} shareOptions={shareOptions} />
+      </div>
 
       <p className="mt-6 text-[0.7rem] text-text-muted text-center max-w-[480px] mx-auto leading-relaxed opacity-70">
         {t('footerDisclaimer')}

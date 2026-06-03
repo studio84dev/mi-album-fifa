@@ -136,12 +136,12 @@ function App() {
 
       <header className="text-center mt-8 transition-[margin,opacity,max-height] duration-slow">
         <h1
-          className={`text-[2rem] font-extrabold transition-all duration-slow text-text-primary tracking-[-0.03em] mb-2 leading-[1.2] max-[600px]:text-[1.8rem]${searchFocused ? ' max-[600px]:max-h-0 max-[600px]:overflow-hidden max-[600px]:opacity-0 max-[600px]:m-0 max-[600px]:p-0' : ''}`}
+          className={`text-[1.8rem] min-[601px]:text-[2rem] font-extrabold transition-all duration-slow text-text-primary tracking-[-0.03em] mb-2 leading-[1.2]${searchFocused ? ' max-[600px]:max-h-0 max-[600px]:overflow-hidden max-[600px]:opacity-0 max-[600px]:m-0 max-[600px]:p-0' : ''}`}
         >
           <span>⚽</span> {t('title')}
         </h1>
         <p
-          className={`transition-all duration-slow text-text-muted text-base max-w-[460px] leading-[1.6] mx-auto text-center font-normal max-[600px]:text-[1rem]${searchFocused ? ' max-[600px]:max-h-0 max-[600px]:overflow-hidden max-[600px]:opacity-0 max-[600px]:m-0 max-[600px]:p-0' : ''}`}
+          className={`transition-all duration-slow text-text-muted text-[1rem] min-[601px]:text-base max-w-[460px] leading-[1.6] mx-auto text-center font-normal${searchFocused ? ' max-[600px]:max-h-0 max-[600px]:overflow-hidden max-[600px]:opacity-0 max-[600px]:m-0 max-[600px]:p-0' : ''}`}
         >
           {t('description')}
         </p>

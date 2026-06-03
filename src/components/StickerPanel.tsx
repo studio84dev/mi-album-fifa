@@ -268,7 +268,7 @@ function StickerPanel({
         </div>
       )}
 
-      <div className="grid [grid-template-columns:repeat(5,1fr)] gap-[0.375rem] max-[600px]:gap-[0.35rem]">
+      <div className="grid [grid-template-columns:repeat(5,1fr)] gap-[0.35rem] min-[601px]:gap-[0.375rem]">
         {Array.from({ length: stickerCount }, (_, i) => i + 1).map((num) => {
           const isCollected = !!collected[num]
           const isRepeated = repeated[num] > 0

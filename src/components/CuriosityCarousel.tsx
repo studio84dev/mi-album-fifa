@@ -79,10 +79,10 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
   }
 
   return (
-    <div className="w-full max-w-[600px] mx-auto mt-5 px-5 py-[1.125rem] bg-card-bg rounded-xl border border-border-color sm:mx-6 sm:p-4">
+    <div className="w-full max-w-[600px] mx-auto mt-5 px-5 py-[1.125rem] bg-card-bg rounded-xl border border-border-color min-[601px]:mx-6 min-[601px]:p-4">
       <div className="flex items-center justify-between mb-[0.875rem] pb-3 border-b border-border-color">
         <span className="text-lg">💡</span>
-        <span className="font-semibold text-base text-text-primary flex-1 ml-2 sm:text-[1rem]">
+        <span className="font-semibold text-base text-text-primary flex-1 ml-2 min-[601px]:text-[1rem]">
           {locale === 'en' ? 'Did you know?' : '¿Sabías que...'}
         </span>
         <span className="text-xs text-text-muted font-medium">
@@ -90,7 +90,7 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
         </span>
       </div>
 
-      <div className="flex items-center gap-[0.625rem] min-h-[112px] sm:min-h-[140px]">
+      <div className="flex items-center gap-[0.625rem] min-h-[112px] min-[601px]:min-h-[140px]">
         <button
           className="w-8 h-8 rounded-full border border-border-color bg-bg-tertiary text-text-muted text-xl cursor-pointer flex items-center justify-center transition-[background,border-color,color] duration-base flex-shrink-0 pb-[3px] hover:bg-bg-quaternary hover:border-border-strong hover:text-text-primary active:opacity-70"
           onClick={goToPrev}
@@ -106,7 +106,7 @@ function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProp
           onTouchEnd={handleTouchEnd}
         >
           <div
-            className={`leading-[1.65] text-text-secondary text-base text-center px-2 py-2 will-change-transform sm:text-[0.95rem] animate-slide-in ${isDragging ? '[transition:none]' : 'transition-[transform,opacity] duration-100 ease-out'}`}
+            className={`leading-[1.65] text-text-secondary text-base text-center px-2 py-2 will-change-transform min-[601px]:text-[0.95rem] animate-slide-in ${isDragging ? '[transition:none]' : 'transition-[transform,opacity] duration-100 ease-out'}`}
             key={currentIndex}
             style={{
               transform: `translateX(${dragOffset}px)`,

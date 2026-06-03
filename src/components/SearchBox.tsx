@@ -48,7 +48,7 @@ function SearchBox({
         <input
           ref={inputRef}
           type="text"
-          className="w-full py-3 px-5 text-base border border-border-color rounded-full bg-input-bg text-text-primary outline-none transition-[border-color,box-shadow] duration-base text-center uppercase font-medium tracking-[0.04em] placeholder:text-text-muted placeholder:normal-case placeholder:font-normal placeholder:tracking-normal focus:border-accent-blue-border focus:shadow-[0_0_0_3px_var(--accent-blue-subtle)] sm:text-[1rem] sm:py-[0.875rem]"
+          className="w-full py-[0.875rem] px-5 text-base border border-border-color rounded-full bg-input-bg text-text-primary outline-none transition-[border-color,box-shadow] duration-base text-center uppercase font-medium tracking-[0.04em] placeholder:text-text-muted placeholder:normal-case placeholder:font-normal placeholder:tracking-normal focus:border-accent-blue-border focus:shadow-[0_0_0_3px_var(--accent-blue-subtle)]"
           placeholder={placeholder}
           value={search}
           onChange={(e) => onChange(e.target.value)}
@@ -57,13 +57,13 @@ function SearchBox({
         />
         {search && (
           <button
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-none bg-bg-tertiary text-text-muted leading-none cursor-pointer flex items-center justify-center p-0 transition-[background,color] duration-fast hover:bg-bg-quaternary hover:text-text-primary hover:-translate-y-1/2 active:-translate-y-1/2 active:scale-95 sm:w-11 sm:h-11 sm:right-1"
+            className="absolute right-[4px] min-[601px]:right-2 top-1/2 -translate-y-1/2 w-11 h-11 min-[601px]:w-8 min-[601px]:h-8 rounded-full border-none bg-bg-tertiary text-text-muted leading-none cursor-pointer flex items-center justify-center p-0 transition-[background,color] duration-fast hover:bg-bg-quaternary hover:text-text-primary active:scale-95"
             onMouseDown={(e) => e.preventDefault()}
             onClick={onClear}
             aria-label={t('searchClearAriaLabel')}
           >
             <svg
-              className="w-3.5 h-3.5 block sm:w-[18px] sm:h-[18px]"
+              className="w-[18px] h-[18px] min-[601px]:w-3.5 min-[601px]:h-3.5 block"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
