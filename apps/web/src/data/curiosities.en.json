@@ -1,0 +1,820 @@
+[
+  {
+    "pais": "Estados Unidos",
+    "confederacion": "CONCACAF",
+    "datos_curiosos": [
+      "The United States is one of the three host countries for the 2026 World Cup, meaning it did not have to play qualifiers to qualify.",
+      "The men's national team is known as 'The Stars and Stripes' due to the design of its flag.",
+      "Although the sport is called 'football' in almost the entire world, children and adults in the United States uniquely call it 'soccer'.",
+      "The team's star player, Christian Pulisic, is nicknamed 'Captain America' by fans, just like the famous comic book superhero!",
+      "The record for the fastest goal in the national team's World Cup history is held by Clint Dempsey, who scored at 29 seconds against Ghana in 2014.",
+      "The country's national animal is the bald eagle, which is why the team's mascot is often an eagle wearing football gear.",
+      "The United States won third place in the first World Cup in history in 1930, which remains its best result to this day.",
+      "Christian Pulisic is the undisputed leader of Milan in Italy, where he has become one of the best attackers in Serie A.",
+      "The country has some of the most technological stadiums in the world, featuring giant screens that cross the entire roof from side to side.",
+      "Football has grown so much in the United States that many global stars, such as Lionel Messi, currently play in its local league (MLS)."
+    ],
+    "code": "USA"
+  },
+  {
+    "pais": "México",
+    "confederacion": "CONCACAF",
+    "datos_curiosos": [
+      "Mexico makes history! In 2026, it becomes the first country in the world to organize three different World Cups (1970, 1986, and 2026).",
+      "The Azteca Stadium in Mexico City is a football legend: it is the only stadium where two kings of football, Pelé and Maradona, were crowned world champions!",
+      "The Mexican national team is called 'El Tri' because its jersey features the three colors of its beautiful flag: green, white, and red.",
+      "The favorite player for children in recent years is Hirving Lozano, whom everyone calls 'El Chucky' because he was very mischievous as a child and liked to scare his friends.",
+      "The national team's crest features a Mexican eagle perched on a nopal cactus, inspired by the Aztec legend of the foundation of their capital.",
+      "Mexican fans are famous for filling stadiums with joy, wearing giant mariachi hats and colorful lucha libre masks.",
+      "Did you know that a Mexican player named Antonio Carbajal was the first in history to play in 5 different World Cups? They called him 'El Cinco Copas'!",
+      "The food that gives Mexican players superpowers is tacos, but when they are in the tournament, they bring their own chef to prepare them healthily.",
+      "Mexico's most beautiful goal in the World Cups was scored by Manuel Negrete in 1986, delivering a spectacular mid-air scissor kick that is still remembered today!",
+      "Mexico fans love to sing the traditional song 'Cielito Lindo' at the top of their lungs in the stands to cheer on their team."
+    ],
+    "code": "MEX"
+  },
+  {
+    "pais": "Canadá",
+    "confederacion": "CONCACAF",
+    "datos_curiosos": [
+      "Canada is the third host country of the 2026 World Cup, and this will be only the fourth time in its entire history playing in a World Cup.",
+      "The Canadian national team is called 'The Les Rouges' (The Reds) or also 'The Maple Leafs' due to the famous red maple leaf on its flag.",
+      "Its fastest and most famous player is Alphonso Davies, who was born in a refugee camp in Africa and arrived in Canada as a child; today he is one of the best on the planet!",
+      "In Canada, the most popular sport is ice hockey, but thanks to this generation of footballers, thousands of children now prefer to wear football boots.",
+      "Canada's symbol animal is the beaver, an expert builder, so you will sometimes see stuffed beavers dressed in the national team's jersey.",
+      "Alphonso Davies made history in the Qatar 2022 World Cup by scoring Canada's first-ever goal in the history of the World Cups.",
+      "The country is famous for maple syrup, a delicious sweet extracted from trees that players love to pour over their pancakes.",
+      "Canada is a bilingual country, so players speak to each other in both English and French during training sessions.",
+      "To train during the cold Canadian winter, the national team sometimes uses completely enclosed and heated stadiums to avoid freezing.",
+      "The unofficial mascot that fans bring to matches is called 'Canuck', a friendly doll dressed in Canadian explorer attire."
+    ],
+    "code": "CAN"
+  },
+  {
+    "pais": "Argentina",
+    "confederacion": "CONMEBOL",
+    "datos_curiosos": [
+      "Did you know that Lionel Messi is the player with the most matches played in the entire history of the World Cups? (26)",
+      "The Argentine national team's crest features three golden stars, representing the three World Cups they have won: 1978, 1986, and 2022.",
+      "The Argentina national team is known worldwide as 'La Albiceleste' due to the white and sky-blue vertical stripes on its jersey.",
+      "The anthem of the Argentine fans in the last World Cup was the song 'Muchachos'; they sang it so much that it became famous across the entire planet!",
+      "The largest stadium in Argentina is the Monumental de River Plate, where the national team plays most of its matches and holds more than 84,000 people.",
+      "Diego Maradona, one of their greatest idols, scored a goal in 1986 known as 'The Goal of the Century' because he left five rivals in his wake.",
+      "The animal sometimes used to represent Argentine fans is the hornero (rufous hornero), which is the country's national bird.",
+      "Argentina was one of the 13 national teams that played in the very first World Cup in history in the year 1930.",
+      "Lionel Messi holds an incredible record: he is the only player to have won the Tournament's Best Player award (Golden Ball) in two different World Cups!",
+      "The official mascot of the 1978 Argentina World Cup was a football-playing boy named 'Gauchito', who wore a traditional hat and a neckerchief.",
+      "Lionel Messi has scored a total of 13 goals across all the World Cups he has participated in."
+    ],
+    "code": "ARG"
+  },
+  {
+    "pais": "Brasil",
+    "confederacion": "CONMEBOL",
+    "datos_curiosos": [
+      "The kings of the cup! Brazil is the only country in the world to have won 5 World Cups and the only one to have played in EVERY edition in history.",
+      "The Brazilian national team is called 'La Canarinha' (The Canary) because its jersey is a bright yellow color identical to that small bird.",
+      "Brazil's most legendary player was Pelé, who won three World Cups and is considered by many to be the greatest footballer of all time.",
+      "Brazil's style of play is famous across the planet as 'O Jogo Bonito' (The Beautiful Game), full of dribbles, dances, and a lot of fun.",
+      "Vinícius Júnior is one of their current top figures; he loves to celebrate his goals by doing steps of 'samba', the traditional dance of his country.",
+      "The most famous stadium in Brazil is the Maracanã in Rio de Janeiro, a giant temple of football where two World Cup finals have been played.",
+      "Did you know that the player Ronaldo Nazário used a very strange haircut in the 2002 World Cup (leaving only a tuft at the front) so that children wouldn't talk about his injury?",
+      "Brazil's crest features 5 golden stars above the bird and the initials 'CBF' (Brazilian Football Confederation).",
+      "The fastest animal in Brazil is the jaguar, and the players say they try to run as fast as it does when they go on the attack.",
+      "Brazilian players love to warm up before matches by playing musical instruments like the pandero and the drum inside the locker room."
+    ],
+    "code": "BRA"
+  },
+  {
+    "pais": "Uruguay",
+    "confederacion": "CONMEBOL",
+    "datos_curiosos": [
+      "Uruguay was the country where the first World Cup in history was invented in 1930, and they were also the first world champions!",
+      "The Uruguay national team is called 'La Celeste' because its jersey is the color of a clear sky.",
+      "Uruguay starred in the biggest surprise in history in 1950 when they beat Brazil in the final at their own stadium; that day is called 'El Maracanazo'.",
+      "Uruguay's crest has a secret: it features 4 stars, even though they have won 2 World Cups. The other two are for winning two ancient Olympic tournaments that were valued as world championships.",
+      "Uruguayan players are known for having the 'Garra Charrúa', which means they never give up and play with all their heart until the last second.",
+      "Their favorite drink for before and after matches is 'mate', an herbal infusion they drink with a thermos of hot water tucked under their arm.",
+      "The national animal of Uruguay is the tero (southern lapwing), a very watchful bird that defends its territory with great strength, just like the team's defenders.",
+      "The Centenario Stadium in Montevideo was built in just 9 months for the 1930 World Cup and is considered a historical monument of football.",
+      "Federico Valverde, one of their star midfielders, is nicknamed 'El Halcón' (The Falcon) because he flies across the entire pitch and has incredible vision for delivering pases.",
+      "Despite being a very small country with few inhabitants, Uruguay produces some of the best goalscoring forwards in the entire world."
+    ],
+    "code": "URU"
+  },
+  {
+    "pais": "Colombia",
+    "confederacion": "CONMEBOL",
+    "datos_curiosos": [
+      "The Colombia national team is called 'Los Cafeteros' (The Coffee Growers) because their country produces one of the richest and most famous coffees on planet Earth.",
+      "The current star of the team is Luis Díaz, nicknamed 'Lucho', a super-fast forward who learned to play barefoot on the beaches of his homeland.",
+      "Colombia's uniform carries the colors yellow, blue, and red, reflecting the wealth of its soil, its two seas, and the bravery of its people.",
+      "One of their most entertaining players in history was goalkeeper René Higuita, who invented a move called 'The Scorpion' where he blocked the ball by jumping and using his heels.",
+      "In the 2014 Brazil World Cup, Colombian James Rodríguez won the award for the most beautiful goal of the tournament and became the top scorer of the World Cup.",
+      "Colombian players love to celebrate goals by forming a line and performing highly coordinated choreographies of 'salsa' or 'reggeton' music.",
+      "The most colorful bird in Colombia is the mockingbird, but in football, their symbol is the Andean condor, which flies very high.",
+      "The historic player Carlos 'El Pibe' Valderrama was famous worldwide not only for his perfect pases, but for his huge and fluffy blonde hair!",
+      "Colombia holds a fun record: in the 1962 World Cup, they scored the only 'olympic goal' (scored directly from a corner kick) in the history of the World Cups.",
+      "Colombian fans are considered among the most joyful in the world, filling the stands with yellow and dancing throughout the 90 minutes of the match."
+    ],
+    "code": "COL"
+  },
+  {
+    "pais": "Ecuador",
+    "confederacion": "CONMEBOL",
+    "datos_curiosos": [
+      "The Ecuador national team is called 'La Tri' due to the three colors of its flag, with yellow predominating on its home jersey.",
+      "The country is named Ecuador because the imaginary line that divides the planet into two equal parts (North and South) passes right through the middle of its territory.",
+      "Because of this, the national team plays its home matches in Quito, a city that is so high up in the mountains that rival teams tire very quickly.",
+      "Their great historic captain from recent World Cups is Enner Valencia, whom children call 'Superman' because he seems to fly to score goals with his head.",
+      "The most famous animal in Ecuador is the giant tortoise of the Galápagos Islands, but the team's footballers are known for being super fast—quite the opposite.",
+      "Ecuador qualifies for a World Cup for the fifth time this 2026, having achieved its best participation in the year 2006 by reaching the round of 16.",
+      "Ecuadorian players love to eat a traditional dish called 'encebollado' (a delicious fish soup) to recover energy.",
+      "One of their young stars is Kendry Páez, a boy who debuted with the senior national team when he was just 16 years old—a true child prodigy!",
+      "The Ecuadorian national team's crest features a condor with open wings at the top, symbolizing the power, courage, and pride of the country.",
+      "Ecuadorian fans have a very famous battle cry in the stands to support their players: ¡Sí se puede, sí se puede! (Yes we can!)"
+    ],
+    "code": "ECU"
+  },
+  {
+    "pais": "Paraguay",
+    "confederacion": "CONMEBOL",
+    "datos_curiosos": [
+      "The great return! The Paraguay national team returns to the World Cup this 2026 after having missed the last few editions.",
+      "The Paraguay national team is called 'La Albirroja' due to the red and white vertical stripes on its match jersey.",
+      "Paraguay has two official languages, and the players usually speak to each other in 'Guaraní' (an indigenous language) so that rivals do not understand their strategies.",
+      "To gain energy and cool off during hot training sessions, the players drink 'tereré', an ice-cold beverage made of yerba mate and medicinal yuyo herbs.",
+      "Their most famous goalkeeper in history was José Luis Chilavert, who was unique because besides blocking balls, he scored goals from free kicks and penalties!",
+      "The national animal of the country is the bare-throated bellbird (pájaro campana), which makes a sound identical to a church bell striking metal.",
+      "Paraguay's best participation in a World Cup was in South Africa 2010, where they reached the quarter-finals and almost eliminated the champion, Spain.",
+      "Paraguayan players are known for their incredible aerial game: they are experts at jumping very high and winning balls with their heads in the rival area!",
+      "The traditional mascot used by Paraguayan fans in stadiums is a friendly lion named 'Albi', dressed in the team's uniform.",
+      "The Paraguayan national team's crest features a yellow star surrounded by palm and olive branches, just like the coat of arms on its national flag."
+    ],
+    "code": "PAR"
+  },
+  {
+    "pais": "Portugal",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "Did you know that Cristiano Ronaldo is the only player in the entire history of football who has managed to score goals in 5 different World Cups?",
+      "The Portugal national team is called 'A Seleção das Quinas' because the 'quinas' are the five blue shields featured on its national flag.",
+      "The favorite dish of Cristiano Ronaldo and many players on the national team is 'Bacalhau à Brás', made with cod, eggs, and very finely cut fried potatoes.",
+      "Portugal's primary uniform always combines bright red and green, which are the colors that represent the hope and blood of their nation.",
+      "Cristiano Ronaldo doesn't just score goals; he is also the person with the most followers in the entire world on the social network Instagram.",
+      "Portugal's best position in a World Cup was third place in the year 1966, thanks to a legendary player named Eusébio, who was called 'The Black Panther'.",
+      "Cristiano Ronaldo's famous celebration cry, '¡Siuuu!', is imitated by children and footballers all over the planet every time they score a goal.",
+      "The Rooster of Barcelos is the symbol of good luck in Portugal, so many fans bring colorful plush toys of this rooster to matches!",
+      "Portugal produces more than half of the cork used worldwide, so some official national team souvenirs are made with this eco-friendly material.",
+      "The stadium where Portugal most frequently plays as host has a real golden eagle that flies over the pitch before matches.",
+      "Cristiano Ronaldo has scored a total of 8 goals across all the World Cups he has participated in."
+    ],
+    "code": "POR"
+  },
+  {
+    "pais": "Alemania",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "Germany is a football superpower: it has won the World Cup 4 times and has reached the final an incredible total of 8 times!",
+      "The German national team is called 'Die Mannschaft', which in their language simply means 'The Team', demonstrating that they play highly united.",
+      "Germany player Miroslav Klose holds a giant record: he is the top scorer in the history of all World Cups with 16 goals scored!",
+      "Their legendary goalkeeper Manuel Neuer invented a style called 'sweeper-keeper', where he runs far from his goal to play the ball with his feet like an extra defender.",
+      "The national team's crest features a black eagle with open wings, which has been the national symbol of strength and unity for Germany for centuries.",
+      "Although its flag has the colors black, red, and yellow, Germany's home jersey has always been white.",
+      "German players love to celebrate their victories by eating giant pretzels (bread with salt in the shape of a bow) and traditional sausages.",
+      "Germany starred in the most astonishing match of the modern century by beating Brazil 7-1 in its own country during the 2014 World Cup.",
+      "Player Thomas Müller is famous for being a total prankster inside the locker room, making all his teammates laugh to ease the nerves.",
+      "The most famous sportswear brands in football were born in Germany, so their boots and balls always feature the latest technology."
+    ],
+    "code": "GER"
+  },
+  {
+    "pais": "España",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Spain national team is called 'La Roja' due to the bright red color of its jersey, and they are also known as 'La Furia Española' (The Spanish Fury).",
+      "Spain won its first and only World Cup in South Africa 2010 thanks to an agonizing goal by Andrés Iniesta in the final minutes of the match.",
+      "Spain's style of play is super famous and is called 'Tiki-Taka', which consists of making many short, quick pases between players without the rival being able to touch the ball.",
+      "One of their new child prodigies is Lamine Yamal, who broke all records by playing and scoring goals with the senior national team at only 16 years old.",
+      "The crest they wear on their chest features a castle, a lion, red bars, and a chain, representing the ancient kingdoms that formed the country.",
+      "Spanish players love to eat 'paella' (a delicious rice dish with seafood or meat) on their rest days to celebrate.",
+      "Their most famous goalkeeper in history, Iker Casillas, had a very strange superstition: he wore his socks inside out and cut the sleeves off his jerseys.",
+      "The national animal of Spain is the toro bravo (fighting bull), which represents the strength and courage with which players enter to contest every ball.",
+      "When Spain wins a tournament, all the fans go to celebrate at famous fountains in Madrid, such as the Fountain of Cibeles or Neptune.",
+      "The national team players celebrate goals by making a heart gesture with their hands dedicated to the children and families watching them on television."
+    ],
+    "code": "ESP"
+  },
+  {
+    "pais": "Francia",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The France national team's crest features a drawing of a golden rooster, which is the animal symbol of bravery and pride for this country.",
+      "The current star of the team is Kylian Mbappé, who runs so fast on the pitch that he is sometimes compared to a race car or the superhero Flash.",
+      "The French national team is called 'Les Bleus' (The Blues) because they always wear an elegant dark blue jersey.",
+      "Kylian Mbappé made history by scoring three goals in the final of the Qatar 2022 World Cup, something only one other person had achieved in entire history.",
+      "France has won the World Cup on two occasions: the first time in 1998 when they were hosts, and the second in Russia 2018.",
+      "The favorite celebration of many French players is doing dances from famous video games (like Fortnite) when they score a goal.",
+      "The national team's training center is called Clairefontaine and is hidden inside a beautiful forest so that players can concentrate without distractions.",
+      "A very famous dessert in France that players enjoy on their days off are 'macarons', colorful cookies with delicious flavors.",
+      "Francia is the country where the original World Cup trophy was invented, devised by a French official named Jules Rimet.",
+      "When France wins a major tournament, hundreds of thousands of fans gather to celebrate at night on the famous Champs-Élysées avenue in Paris."
+    ],
+    "code": "FRA"
+  },
+  {
+    "pais": "Inglaterra",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The England national team is called 'The Three Lions' because its crest has featured three blue drawn lions for more than 150 years.",
+      "England is the country where the modern rules of football that we all play today in backyards and schools were invented.",
+      "Their current great goalscorer is Harry Kane, an incredible forward who loves to play golf on his days off to relax.",
+      "The young star of the team is Jude Bellingham, who celebrates his goals by opening his arms wide in front of the fans, like a king greeting his people!",
+      "The only time England won the World Cup was in the year 1966, when the tournament was played in their own stadiums and Queen Elizabeth II presented the cup.",
+      "English players love to drink hot tea with milk in the afternoons, a tradition of their country that they maintain even when traveling to World Cups.",
+      "The official mascot of the English team is a giant stuffed lion named 'Roary', who always travels with the team to bring them good luck.",
+      "The stadium where England plays as host is the famous Wembley in London, which features a giant arch on the roof that can be seen from across the city.",
+      "When English fans support their team, they sing a super famous song that says 'It's coming home', wishing for the cup to return to the country where football was born.",
+      "Many of the players on the English national team participate in the Premier League, which is considered the most exciting and fast-paced football league on the planet."
+    ],
+    "code": "ENG"
+  },
+  {
+    "pais": "Italia",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "A legend is back! After suffering greatly in past qualifiers, Italy achieved its qualification to this World Cup to show why it is a giant.",
+      "The Italy national team is called 'Gli Azzurri' (The Blues) due to the sky-blue color of its jersey, which was the color of the country's former royal family.",
+      "Italy is one of the most winning countries in football history: they have 4 golden stars on their crest for winning 4 World Cups!",
+      "Their most famous goalkeeper in history is Gianluigi Buffon, who played until he was 45 years old and contested an incredible amount of 5 different World Cups.",
+      "Italian players love to eat pasta with fresh tomato sauce prepared by their own chef before matches because it gives them a lot of energy.",
+      "Italy's footballers are famous worldwide for singing their national anthem with giant passion, closing their eyes and screaming at the top of their lungs!",
+      "The country is shaped like a boot on the map, and the players joke that this boot is designed especially for kicking footballs.",
+      "Italy is known for inventing a defensive style of play called 'Catenaccio' (which means padlock), where their defenders put an unbreakable lock on their goal.",
+      "The Italian wolf is the animal that represents the unity and strength of the players when they enter the pitch together.",
+      "Many children in Italy grow up playing football in cobbled squares that face ancient churches and monuments of the Roman Empire."
+    ],
+    "code": "ITA"
+  },
+  {
+    "pais": "Países Bajos",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Netherlands national team is called 'The Clockwork Orange' (La Naranja Mecánica) because its uniform is a very striking bright orange color.",
+      "The orange color of its jersey is not on its flag, but is the color of the Dutch royal family, called the House of Orange.",
+      "This team is also known as 'The King Without a Crown' because they have reached 3 World Cup finals, but unfortunately have not been able to win any yet.",
+      "In the 70s they invented a style called 'Total Football', where all players knew how to defend, attack, and change positions at any moment.",
+      "Their star defender is Virgil van Dijk, a giant so strong that rival forwards say passing him is like crashing into a brick wall.",
+      "Dutch fans love to dress completely in orange, wear giant wigs, and jump all together from left to right in the stands.",
+      "The Netherlands is famous for its windmills and its millions of bicycles; many players rode bicycles to training when they were children!",
+      "One of their most spectacular goals in the World Cups was scored by Robin van Persie in 2014, when he leaped through the air and scored with his head, floating as if he were Superman.",
+      "The animal featured on their jersey's crest is a golden rampant lion, representing the power of their nation.",
+      "The country is famous for its beautiful flower fields called tulips, and sometimes fans give orange tulips to rival teams as a symbol of peace."
+    ],
+    "code": "NED"
+  },
+  {
+    "pais": "Marruecos",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Atlas Lions! That's what they call the Morocco national team, named after a very strong species of lion that used to live in the mountains of their country.",
+      "Morocco made history in the Qatar 2022 World Cup by becoming the first national team from all of Africa to reach the semi-finals of a World Cup.",
+      "Their current star is Achraf Hakimi, a defender so fast that when he played at PSG - France with his great friend Kylian Mbappé, they invented super fun dances that all the children imitated.",
+      "After each historic victory, Morocco's players ran to the stands to hug and kiss their mothers, which moved the entire world!",
+      "The team's jerseys combine bright red and green, inspired by the five-pointed star featured on their national flag.",
+      "The country's traditional dish is 'Couscous' (made with wheat semolina and vegetables), and players eat it to recover all their strength after running.",
+      "Morocco's goalkeeper, Yassine Bounou (nicknamed 'Bono'), became a hero to children by blocking several penalties in the last World Cup with a huge smile.",
+      "Morocco is very close to Europe, so much so that from its beaches you can see Spain on clear days.",
+      "Moroccan fans love to wear a traditional red hat called a 'Fez' while cheering on the team with African drums.",
+      "The country has a giant desert called the Sahara, and the players say that training under the heat prepares them to be the most resilient on the pitch."
+    ],
+    "code": "MAR"
+  },
+  {
+    "pais": "Senegal",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Senegal national team is called 'The Lions of Teranga'. The word 'Teranga' is super beautiful because it means 'hospitality and friendship' in their local language.",
+      "Their most legendary and beloved player by children is Sadio Mané, who uses the money he earns in football to build schools and hospitals in his hometown.",
+      "In the 2002 World Cup, Senegal surprised the entire planet by beating the world champion, France, in the opening match.",
+      "Senegal fans love to paint their entire bodies with the colors of their flag (green, yellow, and red) and play drums throughout the entire match.",
+      "The national animal of the country is the lion, but they are also very famous for having gigantic and thick trees called Baobabs.",
+      "Senegal's players perform a very fun group dance on the pitch before matches start to fill themselves with joy and energy.",
+      "The favorite dish of Senegalese footballers is 'Thiéboudienne', a delicious dish made with rice, fresh fish, and tomato sauce.",
+      "Senegal is a flat and sunny country with beautiful beaches where children play football on shifting sand from sunrise.",
+      "Their goalkeeper Édouard Mendy won FIFA's Best Goalkeeper in the World award thanks to his impressive blocks, flying from post to post.",
+      "The crest on their jersey shows a roaring lion next to a green lucky star."
+    ],
+    "code": "SEN"
+  },
+  {
+    "pais": "Egipto",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Egypt national team is called 'The Pharaohs' in honor of the ancient kings who ruled the country and built the giant pyramids.",
+      "Their ultimate superstar is Mohamed Salah, whom fans call 'The Egyptian King' because he scores incredible goals with his left leg.",
+      "Mohamed Salah is so famous and beloved in his country that when there are elections, thousands of children and adults write his name on the ballots for him to be president!",
+      "Egypt is the country that has won the Africa Cup of Nations the most times in history, proving they are the kings of their continent.",
+      "The national team's crest carries the drawing of a golden golden eagle, known as the 'Eagle of Saladin', which represents the power of its flag.",
+      "Egypt holds an astonishing record: a goalkeeper named Essam El-Hadary played a World Cup match at 45 years old, being the oldest player in the history of the tournament.",
+      "Players love to celebrate goals by kneeling on the grass to give thanks, a very respectful gesture of their culture.",
+      "The Nile River, the longest river in the world, passes through the middle of the country, and footballers say its water gives them magic endurance to run.",
+      "Egypt fans fill the stadiums wearing fun mummy costumes or wearing pharaoh crowns made of golden cardboard.",
+      "Egypt's traditional uniform uses bright red on the jersey and white on the shorts."
+    ],
+    "code": "EGY"
+  },
+  {
+    "pais": "Panamá",
+    "confederacion": "CONCACAF",
+    "datos_curiosos": [
+      "The Panama national team is called 'Los Canaleros' (The Canal Men) because their country is home to the famous Panama Canal, a water highway that crosses the entire country and links two oceans.",
+      "Panama qualified for its first World Cup in Russia 2018, and when they scored their first goal, the entire country celebrated as if they had won the world cup!",
+      "The player who scored that historic first goal was Felipe Baloy, who jumped higher than everyone to put the ball in the net against England.",
+      "When Panama managed to qualify for the World Cup for the first time, the country's president declared a national holiday so that no child had to go to school.",
+      "Panama's uniform is a vibrant red color that represents the love and passion of its people for the sport.",
+      "The national animal of the country is the beautiful harpy eagle, one of the largest and most powerful birds in the world.",
+      "Panamanian players love to listen and dance to 'reggae' and 'salsa' music before matches to enter the pitch very relaxed.",
+      "The team's favorite food for breakfast before training is 'hojaldres', a delicious fried dough that they accompany with cheese.",
+      "Panama fans are famous for bringing small bells called 'chajchas' to stadiums, which make a lot of joyful noise.",
+      "The national team's crest carries the letters 'FEPAFUT' surrounded by eagle wings and the colors of its flag."
+    ],
+    "code": "PAN"
+  },
+  {
+    "pais": "Bélgica",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Belgium national team is called 'The Red Devils' due to the intense red color of its jersey and how fast they attack on the pitch.",
+      "Their most creative player is Kevin De Bruyne, who has such perfect vision that it seems he has eyes in his back to deliver pases.",
+      "Kevin De Bruyne is sometimes compared to the comic book character 'Tintin', a young adventurous reporter who was also born in Belgium.",
+      "Belgium is famous worldwide for manufacturing the richest chocolates on the planet, and the players eat a small piece after matches as a reward!",
+      "In the Russia 2018 World Cup, Belgium achieved its best result in history by winning the bronze medal for third place.",
+      "The team's official mascot is a friendly small red plush devil named 'Red', who always accompanies child fans.",
+      "The team's language is varied: since French, Dutch, and German are spoken in Belgium, players sometimes communicate in English to understand each other.",
+      "Belgium footballers love to eat traditional french fries (which in their country are served in paper cones with mayonnaise) on their days off.",
+      "The national team's crest carries a golden crown over a black shield with the country's red, yellow, and black colors.",
+      "Belgium was one of the founding countries of FIFA in the year 1904, making them one of the grandparents of world football."
+    ],
+    "code": "BEL"
+  },
+  {
+    "pais": "Croacia",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "Croatia's jersey is unique and super famous worldwide because it looks like a giant chessboard with red and white squares.",
+      "Their captain and great hero is Luka Modrić, a brilliant midfielder who won the World's Best Player award (Golden Ball) in 2018.",
+      "When he was a child, Luka Modrić had to train by kicking the ball in the hallways of an abandoned hotel due to a war in his country.",
+      "Despite being a small country, Croatia has surprised the entire world by reaching the final in 2018 and winning third place in 2022.",
+      "The national team is called 'Vatreni', which in their language means 'The Ones Full of Fire' due to the passion with which they play.",
+      "Did you know that the Dalmatian dog breed (the white dogs with black spots from the movies) was originally born in a region of Croatia called Dalmatia?",
+      "Croatian players love to celebrate their victories by singing traditional songs linked arm-in-arm in the center of the pitch alongside their children.",
+      "The necktie worn by adults with suits was originally invented in Croatia, so the players always travel very elegantly!",
+      "The fans' mascot is a winged horse that represents the speed and high jump of its players.",
+      "The national team's crest carries the red and white chessboard crowned by five small historical shields of its regions."
+    ],
+    "code": "CRO"
+  },
+  {
+    "pais": "Suiza",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "Switzerland's jersey carries a large white cross on a red background, identical to their country's flag, which is also the symbol of the global Red Cross.",
+      "Switzerland is famous for manufacturing the most exact watches on the planet, and that's why commentators say their players deliver pases with 'Swiss watch precision'.",
+      "Switzerland holds an incredible defensive record: in the 2006 World Cup, they were eliminated without conceding a single goal in the entire tournament.",
+      "Swiss players love to eat chocolate from the Alps and famous cheeses like Gruyère to have very strong bones.",
+      "Their star goalkeeper, Yann Sommer, is famous for having reflexes so fast that it seems he can stop time when he flies through the air.",
+      "Since Switzerland is a country with giant mountains full of snow (the Alps), the players don't mind playing under freezing storms.",
+      "The national team is called 'Nati', which is a short and affectionate way of saying 'National Team' in their country.",
+      "The country is known for being neutral, which means they like peace and getting along with everyone, but on the pitch they play with a lot of grit!",
+      "Many of Switzerland's players speak up to four different languages: German, French, Italian, and Romansh.",
+      "The headquarters of FIFA (the organizers of all World Cups) is located in the beautiful Swiss city of Zurich."
+    ],
+    "code": "SUI"
+  },
+  {
+    "pais": "Austria",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "A long-awaited return! Austria returns to play in a World Cup this 2026 after many years of trying to qualify in Europe.",
+      "The Austria national team is called 'Das Team' (The Team) and its main colors are bright red and white.",
+      "The country is the cradle of great musicians in history like Mozart, so fans say their plays on the pitch are like beautiful classical music symphonies.",
+      "Their most famous player and captain of recent years is David Alaba, a super strong defender who loves to celebrate championships by lifting a plastic chair in the air.",
+      "Austria achieved third place in the 1954 World Cup, which has been the best participation in its entire football history.",
+      "The national animal of Austria is the black eagle, which wears a crown on its head and appears drawn on the crest of the national team's jersey.",
+      "Austrian players love to eat a typical dessert called 'Apfelstrudel' (a delicious apple strudel with powdered sugar) to celebrate goals.",
+      "The country is surrounded by beautiful snowy mountains, so the favorite sport in winter is skiing, but in summer everyone runs after the football!",
+      "The largest stadium in the country bears the name of Ernst Happel, a legendary coach who revolutionized football with his smart tactics.",
+      "Austrian fans bring large traditional cowbells from the Alps to matches to make a super fun noise in the stands."
+    ],
+    "code": "AUT"
+  },
+  {
+    "pais": "Japón",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "The Japan national team is called 'The Blue Samurais' in honor of the ancient and brave warriors of their country.",
+      "Japan fans are famous worldwide for doing something incredible: when matches end, they take out trash bags and clean the entire stadium before leaving!",
+      "Japan's jersey is a beautiful blue color that represents the sky meeting the infinite ocean that surrounds its islands.",
+      "Did you know that the famous animated series 'Captain Tsubasa' (Supercampeones) was created in Japan to motivate children to play football? Even the real team uniform has been inspired by the cartoon!",
+      "The national team's crest features a drawing of a giant three-legged black crow called 'Yatagarasu', which in their ancient legends represents guidance and good luck.",
+      "Japan's players are known for being super fast and disciplined; they train rehearsed plays until they turn out perfect, as if they were robots.",
+      "Japanese footballers love to eat 'Sushi' (rice with fresh fish) and 'Ramen' noodle soup to fill themselves with healthy energy.",
+      "When the team qualifies for the round of 16, fans celebrate by dressing up as famous video game and anime characters like Mario Bros, Pikachu, or Goku.",
+      "In the locker room, Japan's players always leave everything spotless upon exiting, and they even make paper figures called 'Origami' with thank-you notes for the organizers.",
+      "Its best result in history has been reaching the round of 16, but in this World Cup they dream of going much further with their team play!"
+    ],
+    "code": "JPN"
+  },
+  {
+    "pais": "Corea del Sur",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "The South Korea national team is called 'The Taeguk Warriors' or also 'The Tigers of Asia' due to the strength with which they play.",
+      "Their ultimate hero and captain is Son Heung-min, a brilliant forward who always celebrates his goals by making a gesture with his hands as if he were taking a photo, to freeze that happy moment!",
+      "Son Heung-min is so beloved in his country that children are forbidden from saying bad things to him, and when he walks the streets of Seoul, people follow him as if he were a superhero!",
+      "South Korea made history in the 2002 World Cup, where they were organizers alongside Japan and managed to reach fourth place in the world.",
+      "The animal drawn on their jersey's crest is a roaring white tiger, a sacred animal that represents courage in their culture.",
+      "Players love to eat 'Kimchi' (a highly spicy fermented vegetable dish) that helps them have strong defenses and not get sick.",
+      "Many of the national team's fans are devotees of 'K-Pop' music, so modern songs with great rhythms are heard in the stands.",
+      "In South Korea, playing football is one of the favorite activities in schools, and children train from a very young age on pitches with synthetic grass.",
+      "The team's primary uniform is a bright red color that represents the energy of the rising sun.",
+      "When South Korea plays, thousands of fans called 'The Red Devils' gather in the giant squares of their capital to watch matches on screens the size of a building."
+    ],
+    "code": "KOR"
+  },
+  {
+    "pais": "Escocia",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Scotland national team is called 'The Tartan Army' due to the traditional plaid kilts worn by their fans.",
+      "The national animal of Scotland is a magical being: the unicorn! That's why this cute animal appears holding a flag on their ancient coat of arms.",
+      "Scotland played the first international football match in the entire history of the world against England in the year 1872.",
+      "The national team's uniform is a very dark navy blue combined with white details, reflecting the St. Andrew's cross of its flag.",
+      "Their most famous player of recent years is Andy Robertson, a tireless defender who loves to run down the left flank as if he had engines in his feet.",
+      "Scottish fans love to play a unique musical instrument called bagpipes, which makes a very loud sound that can be heard throughout the entire stadium.",
+      "The traditional dish that players eat to have strength is 'Haggis', but when they travel to World Cups, they prefer to eat oatmeal with fruit in the mornings.",
+      "Scotland's stadium is called Hampden Park and is famous because fans scream so loudly that they create the 'Hampden Roar', which scares rivals.",
+      "Although it rains almost every day of the year in their country, children play football in parks without minding the mud or freezing water.",
+      "The team's official mascot is a friendly plush lion named 'Roary the Lion', who wears a blue Scottish kilt."
+    ],
+    "code": "SCO"
+  },
+  {
+    "pais": "Noruega",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The grand debut of a goal beast! This 2026 World Cup is super special because it will be the first one featured playing Erling Haaland, one of the most feared forwards on the planet.",
+      "Erling Haaland is nicknamed 'The Cyborg' or 'Thor' because he is giant, blonde, and scores goals with such decomposing strength that he looks like a movie superhero.",
+      "The players of Norway are called 'The Vikings' in honor of the ancient and strong navigators who lived in their cold frozen lands.",
+      "Erling Haaland has a very famous celebration where he sits on the grass, crosses his legs, and closes his eyes as if he were meditating.",
+      "To recover energy and grow strong, Haaland has a very fun secret diet: he loves to eat animal hearts and livers and drink water filtered by himself!",
+      "The star managing the team's midfield is Martin Ødegaard, who debuted with the senior national team when he was just 15 years old—total madness!",
+      "Norway is a beautiful country full of 'fjords' (giant mountains with seawater in between) where children play football surrounded by snowy landscapes.",
+      "The national team's uniform carries the colors of its flag: a bright red jersey with blue and white details on the sleeves.",
+      "Did you know that Norway is one of the few countries in the world that has a positive record against Brazil? They have never lost a match against them!",
+      "Norwegian fans love to bring plastic viking helmets with horns to stadiums to cheer on Haaland and his teammates."
+    ],
+    "code": "NOR"
+  },
+  {
+    "pais": "Suecia",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Sweden national team is called 'Blågult' (Blue and Yellow) because its uniform carries exactly the same bright colors of its national flag.",
+      "The most legendary and entertaining player in their recent history is Zlatan Ibrahimović, who was famous for scoring incredible goals by delivering karate kicks in mid-air.",
+      "Zlatan Ibrahimović used to say very funny phrases to journalists, like: 'A World Cup without me is not worth watching', making all the children laugh!",
+      "Sweden managed to reach the World Cup final in the year 1958, where they played against Pelé's Brazil and won the silver medal for second place.",
+      "The country is home to worldwide famous brands, like the IKEA furniture stores or children's favorite block game: Minecraft!",
+      "Swedish players love to practice a tradition called 'Fika', which consists of making a pause to have a hot drink and eat cinnamon buns.",
+      "The national team's crest features a golden crown at the top, representing the history of the kings and queens of their nation.",
+      "Children in Sweden have excellent public football pitches that feature giant lights to be able to play even in winter when it gets dark very early.",
+      "Sweden's defenders are known for being among the tallest in the entire tournament, allowing them to win almost all balls through the air.",
+      "When the team scores a goal, music from the famous Swedish group ABBA plays in the stadium for all the fans to dance with joy."
+    ],
+    "code": "SWE"
+  },
+  {
+    "pais": "República Checa",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Czech Republic national team is called 'Národní tým' (The National Team) and its colors are red, white, and blue.",
+      "Their most legendary player was goalkeeper Petr Čech, who became super famous for wearing a protective rubber helmet on his head in all matches.",
+      "Petr Čech was like an octopus in the goal, and besides being a great footballer, he knows how to play the drums in a rock music band!",
+      "The country is famous for having some of the most ancient and beautiful medieval castles in all of Europe; they look like they were taken out of stories of princesses and knights!",
+      "When the country was called Czechoslovakia, they reached the World Cup final on two occasions (1934 and 1962), winning two historic silver medals.",
+      "The national animal of the country is a white lion with two tails wearing a golden crown, which appears with pride on the jersey's crest.",
+      "Players love to eat a traditional dish called 'Vepřo-knedlo-zelo' (pork with bread dumplings and cabbage) to have great strength.",
+      "The capital of the country, Prague, is known as 'The City of a Hundred Spires' because it features beautiful ancient buildings with pointed roofs.",
+      "Czech children adore playing ice hockey in winter, but as soon as spring arrives, everyone goes out to the streets to kick the football.",
+      "Their current star is Patrik Schick, a forward who scored an incredible golazo from the halfway line in the Euros, leaving everyone with their mouths wide open."
+    ],
+    "code": "CZE"
+  },
+  {
+    "pais": "Turquía",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Turkey national team is called 'Ay-Yıldızlılar' (The Crescent Moon Stars) due to the drawing of the moon and star on their flag.",
+      "Turkey gave the world a big surprise in the 2002 World Cup by taking home the bronze medal for third place after beating host South Korea.",
+      "In that same 2002 match, a Turkish player named Hakan Şükür scored the fastest goal in World Cup history: just 11 seconds after starting!",
+      "Turkey's jersey is an intense red color with a white band where they wear the crescent moon on their chest as an amulet.",
+      "Turkey fans are known for being among the loudest on the planet; they jump, sing, and light up colorful lights to make the stadium look like a giant party.",
+      "Players love to relax after training by drinking Turkish tea in small glass cups shaped like a tulip flower and eating sweets called 'Baklava'.",
+      "The country of Turkey is magical because it is located between two continents: one part is in Europe and the other part is in Asia!",
+      "The national animal of Turkey is the gray wolf, a symbol of cunning and agility that players try to imitate when running after the ball.",
+      "One of their new gems is Arda Güler, a super young boy with a magical left leg who makes pases and plays that marvel all children.",
+      "Stadiums in Istanbul, its largest city, are built very close to the sea, so sometimes giant ships can be seen passing by from the stands."
+    ],
+    "code": "TUR"
+  },
+  {
+    "pais": "Bosnia y Herzegovina",
+    "confederacion": "UEFA",
+    "datos_curiosos": [
+      "The Bosnia national team is called 'Zmajevi', which in their language means 'The Dragons'—a super powerful nickname to scare their rivals!",
+      "This is only the second time in its entire history that Bosnia and Herzegovina manages to qualify for a World Cup, the first being in Brazil 2014.",
+      "Their top scorer and eternal idol is Edin Džeko, a very tall forward whom they call 'The Bosnian Diamond' because his goals are worth gold.",
+      "When Edin Džeko was a child, he had to train football on pitches destroyed by problems in his country, proving that with effort dreams do come true.",
+      "The team's uniform combines bright blue and yellow, which are the colors of the stars and the triangle on their national flag.",
+      "The triangle on their flag represents the geographical shape of the country on the map, which looks like a piece of cheese or a perfect triangle!",
+      "Players love to eat 'Ćevapi' (seasoned minced meat rollers served inside a fluffy bread) to recover all their energy.",
+      "The country features beautiful waterfalls of crystal-clear water hidden among forests, and the players say that the nature of their land fills them with peace.",
+      "Bosnian fans travel all over the world singing songs with trumpets and drums, making stadiums fill with a very joyful atmosphere.",
+      "The first goal for Bosnia in World Cup history was scored by Vedad Ibišević against Lionel Messi's Argentina in the famous Maracanã stadium."
+    ],
+    "code": "BIH"
+  },
+  {
+    "pais": "Australia",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "The Australia national team is called 'The Socceroos', a super fun word they invented by mixing 'Soccer' and 'Kangaroo'.",
+      "Although Australia's flag is blue, red, and white, the national team's uniform is golden yellow and bright green.",
+      "They use those colors because they represent the 'Golden Wattle', the national flower of the country that shines with the sun's rays.",
+      "Their most legendary player was Tim Cahill, who celebrated his goals by running toward the corner of the pitch and throwing punches at the corner flag as if he were a boxer.",
+      "Australia has unique animals in the world that live nowhere else, like koalas, platypuses, and, of course, hopping kangaroos.",
+      "They hold a giant world record! Australia scored the highest amount of goals in a single official football match by beating American Samoa 31-0.",
+      "Australian footballers love to eat a dark-colored spread called 'Vegemite' on their breakfast toast to have super strength.",
+      "Many of the national team's players grew up surfing on the giant beaches of Sydney before deciding to be professional footballers.",
+      "Goalkeeper Andrew Redmayne became a hero to children by qualifying his team, blocking penalties while doing a very fun dance on the goal line.",
+      "The national team's crest features a kangaroo and an emu (a giant bird that doesn't fly) holding a football shield."
+    ],
+    "code": "AUS"
+  },
+  {
+    "pais": "Arabia Saudita",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "The Saudi Arabia national team is called 'The Green Falcons' due to the speed of this hunting bird and the color of its jersey.",
+      "Saudi Arabia delivered one of the biggest surprises in football history by beating Lionel Messi's Argentina 2-1 in the first match of the Qatar 2022 World Cup.",
+      "After that historic victory, the King of Saudi Arabia became so happy that he decreed a national holiday for all children to celebrate in the streets.",
+      "The team's uniform is completely green with white details, reflecting the color of its flag which represents peace and prosperity.",
+      "Players love to eat dates (super sweet fruits that grow on desert palm trees) before matches because they give them instant energy.",
+      "The country features gigantic deserts with shifting sand dunes, and the players say that running in the desert helps them have legs of steel.",
+      "Their most famous goal in World Cup history was scored by Saeed Al-Owairan in 1994, who ran from his own half, leaving behind four rivals as if he were Maradona.",
+      "Arabian fans cheer on their team wearing traditional white robes called 'Thobe' and singing songs full of rhythmic clapping.",
+      "In recent years, Saudi Arabia's football league has become super famous because global stars like Cristiano Ronaldo play in their stadiums.",
+      "The mascot for child fans is a friendly falcon dressed in football shorts that flies through virtual stands."
+    ],
+    "code": "KSA"
+  },
+  {
+    "pais": "Qatar",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "The Qatar national team is called 'Al-Anabi' (The Maroons) due to the characteristic wine-red color of its jersey and its national flag.",
+      "Qatar was the host country of the 2022 World Cup, building the most modern, luxurious stadiums featuring in-pitch air conditioning in the world.",
+      "The country is a small peninsula surrounded by the waters of the Persian Gulf, where the giant skyscrapers of the capital visually sink into the sea!",
+      "Their most skillful player is Akram Afif, a forward with a huge afro hairstyle who loves to celebrate by doing card magic tricks in front of the cameras.",
+      "Qatar is the current two-time champion of the Asia Cup, proving they have a team full of talent that plays by heart.",
+      "The national animal of the country is the Arabian Oryx, a type of white antelope with very long and elegant horns that appears on their planes and sports souvenirs.",
+      "Qatari footballers love to drink a traditional beverage called 'Gahwa' (a coffee with cardamom and saffron) accompanied by local sweets.",
+      "Many of the national team's players trained at a giant academy called 'Aspire', which features the best training fields on the planet.",
+      "The flag of Qatar is unique because it features nine white open points that join with the maroon color, representing the union of its ancient tribes.",
+      "Qatar fans bring real trained falcons to matches that perch on their arms covered with leather gloves while they watch the game."
+    ],
+    "code": "QAT"
+  },
+  {
+    "pais": "Jordania",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "Historic! The Jordan national team has managed to qualify for a World Cup for the first time in its entire history this 2026.",
+      "Jordan's players are called 'The Chivalrous' due to the fair play and great respect they show for their rivals on the pitch.",
+      "The country is famous across the entire planet for having 'Petra', a wonderful ancient city sculpted completely inside rose-colored rocks.",
+      "The traditional uniform of the national team is bright white with red details, inspired by the traditional headscarf called 'Shemagh' worn in their country.",
+      "Jordan surprised everyone by reaching the grand final of the Asian Cup, which gave them the momentum and confidence to qualify for this World Cup.",
+      "Near Jordan is the Dead Sea, a magical place where the water is so salty that people and footballers float on their backs without making any effort.",
+      "Players are fascinated by eating the national dish called 'Mansaf', which is rice with lamb meat cooked in a delicious dry yogurt sauce.",
+      "The national animal of Jordan is the desert Oryx, a strong and elegant animal that runs great distances under the burning sun.",
+      "The flag of Jordan features a seven-pointed white star in the center of a red triangle, which represents the first verses of their holy book.",
+      "All the children of Jordan went out to celebrate in the streets with flags and horns when the team secured its ticket to the 2026 World Cup."
+    ],
+    "code": "JOR"
+  },
+  {
+    "pais": "Irak",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "The Iraq national team is called 'The Lions of Mesopotamia' because their country is located in the land where the first civilizations in human history were born.",
+      "Iraq returns to the World Cup after a very long wait, having participated only in the Mexico 1986 World Cup.",
+      "The primary uniform of the national team is completely white with green and golden details, proudly carrying the country's name in its local language.",
+      "Iraqi players love to eat 'Masgouf', a traditional seasoned river fish dish grilled on firewood that gives them super strength before matches.",
+      "When the Iraq national team wins an important tournament, the joy is so giant that people from all cities hug in the streets and give sweets to children.",
+      "The team's crest features a golden golden eagle holding a round shield with the colors of its national flag (red, white, and black).",
+      "In Iraq are the Tigris River and the Euphrates River, two legendary rivers from which footballers say they draw the courage to never give up on the pitch.",
+      "Football is by far the favorite sport of all children in Iraq, who spend the day kicking the ball in squares and community sports fields.",
+      "Their most beloved historic player is Younis Mahmoud, who scored the goal with which Iraq became champion of Asia in the year 2007, making his entire people cry with happiness.",
+      "Iraq fans use giant drums called 'Dammam' in the stands, creating a constant rhythm that makes all attendees dance."
+    ],
+    "code": "IRQ"
+  },
+  {
+    "pais": "Costa de Marfil",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Ivory Coast national team is called 'The Elephants' because this large animal is the national symbol of strength and respect in their country.",
+      "The most legendary player in their history is Didier Drogba, a forward so powerful that he used his fame in football to halt a war in his country and call for peace.",
+      "The national team's jersey is a super striking bright orange color, combined with green shorts and white socks.",
+      "The team's crest carries the head of a gray elephant with large tusks holding a football with its trunk.",
+      "Ivory Coast footballers love to celebrate their scores by doing steps of 'Coupé-Décalé', a super joyful music and dance style from their land.",
+      "The team's favorite food is 'Attiéké', a dish made from grated cassava that looks like couscous and is accompanied by delicious fried fish.",
+      "Ivory Coast is the largest producer of cocoa in the world, so the chocolate in the candies you eat probably comes from the lands of these players!",
+      "Their current star is Sébastien Haller, a forward who overcame a serious illness and returned to the pitches to score the African championship goal.",
+      "Children in Ivory Coast love to play football barefoot on red dirt pitches, which helps them develop impressive ball control.",
+      "Fans bring multi-colored plastic trumpets and traditional wooden masks to stadiums to cheer on 'The Elephants'."
+    ],
+    "code": "CIV"
+  },
+  {
+    "pais": "Argelia",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Algeria national team is called 'The Desert Foxes' due to a small and cute fox called Fennec that lives in the dunes of their country.",
+      "In the Spain 1982 World Cup, Algeria surprised the entire world by beating the giant Germany national team 2-1 in one of the most remembered matches.",
+      "Algeria's traditional uniform is pure white with green and red details, which are the colors that represent freedom on their flag.",
+      "Algerian players love to eat 'Chorba' (a very tasty wheat and vegetable soup) accompanied by sweet dates to recover energy.",
+      "The national team's crest features a crescent moon and a red star in the center, surrounded by golden fox wings.",
+      "Algeria is the largest country in surface area across the entire continent of Africa, a giant territory full of deserts and beautiful coastlines!",
+      "Their most talented player of recent years is Riyad Mahrez, a winger with a magical left leg who makes dribbles so fast they confuse defenders.",
+      "When Algeria wins an important match, fans light up red and green lights flares, making the squares of their capital look magical.",
+      "Many of the national team's players were born in France but chose to play for Algeria to honor the land of their parents and grandparents.",
+      "The official mascot carried by child fans is a cute Fennec fox plush with giant ears wearing the number 10 jersey."
+    ],
+    "code": "ALG"
+  },
+  {
+    "pais": "Túnez",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Tunisia national team is called 'The Carthage Eagles' in honor of an ancient and powerful warrior city that existed in their territory thousands of years ago.",
+      "Tunisia made history in the 1978 World Cup by becoming the first national team from all of Africa to win a match in a World Cup (3-1 against Mexico).",
+      "The team's jersey is completely red with white details, and on the chest they proudly wear the drawing of a golden eagle with open wings.",
+      "In the Qatar 2022 World Cup, Tunisia achieved an unforgettable victory by beating the powerful France national team 1-0, who at that time were the world champions.",
+      "Tunisia's players are fascinated by eating a dish called 'Tunisian couscous', which is famous for being very spicy due to a special sauce called Harissa.",
+      "The country features beautiful houses painted completely in white and blue in a village called Sidi Bou Said, which faces the Mediterranean Sea.",
+      "Did you know that the Star Wars movies were filmed in the deserts of Tunisia? Luke Skywalker's planet truly exists in this football-loving country!",
+      "Children in Tunisia grow up playing football on fine and warm sand beaches during the summer months.",
+      "Tunisia fans cheer on their team wearing a traditional red wool hat called a 'Chechia'.",
+      "The national team's crest carries the initials 'FTF' (Tunisian Football Federation) beneath the imposing eagle of Carthage."
+    ],
+    "code": "TUN"
+  },
+  {
+    "pais": "Ghana",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Ghana national team is called 'The Black Stars' due to the large black star they carry in the center of their national flag.",
+      "Ghana was just one penalty away from becoming the first national team from Africa to reach a world semi-final in the South Africa 2010 World Cup.",
+      "The team's uniform combines white with very vivid yellow and red details, reflecting the joy and culture of its people.",
+      "Ghana players love to dance to 'Afrobeats' music in the locker room before heading onto the pitch, setting up a party that takes away all their nerves.",
+      "The favorite food of Ghana footballers is 'Jollof Rice', a rice dish with spices and tomato that generates fun competitions with their African neighbors over who cooks it richest.",
+      "The national team's crest features two golden golden eagles holding a black star in the middle of a football.",
+      "The country of Ghana is famous for its traditional fabrics called 'Kente', full of colorful geometric lines and shapes that players wear in their gala suits.",
+      "One of their fastest players is Inaki Williams, a speedy forward who decided to play for Ghana to fulfill a promise to his beloved grandfather.",
+      "In Ghana, football is lived with such passion that children manufacture their own balls using plastic bags tied with strings when they don't have a leather one.",
+      "The team's official mascot is a fun black star with eyes and legs that leaps across the pitch cheering on children in football schools."
+    ],
+    "code": "GHA"
+  },
+  {
+    "pais": "Sudáfrica",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The South Africa national team is called 'Bafana Bafana', which in their local language literally means 'The Boys, The Boys'.",
+      "South Africa was the first country from the entire African continent to organize a football World Cup, in the unforgettable year 2010.",
+      "In that 2010 World Cup, South African fans became famous for playing the 'Vuvuzela', a long plastic trumpet that made a noise identical to a giant swarm of bees.",
+      "The official song of their World Cup was Shakira's 'Waka Waka', a dance that all the children of the world know and keep dancing today!",
+      "The national team's jersey combines golden yellow and bright green, inspired by the beautiful landscapes of its nature.",
+      "South Africa is home to incredible wild animals like lions, elephants, rhinoceroses, and leopards, which can be seen in gigantic parks.",
+      "The player who scored the first goal of the 2010 World Cup was Siphiwe Tshabalala, who hit a bomb into the corner and celebrated it by doing a super coordinated dance with his teammates.",
+      "Players are fascinated by eating 'Braai', which is the traditional way they make meat barbecues on firewood in their country.",
+      "The team's crest carries a football surrounded by a bird called the blue crane, which is the national bird of South Africa.",
+      "The country's most famous leader was Nelson Mandela, who used the sport to unite all the people of the country as if they were a single team."
+    ],
+    "code": "RSA"
+  },
+  {
+    "pais": "Cabo Verde",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The Cape Verde national team is called 'The Blue Sharks' due to the large amount of these marine animals that swim in the beautiful waters of their islands.",
+      "Cape Verde is a country composed of 10 magical volcanic islands located in the middle of the Atlantic Ocean, close to the coasts of Africa.",
+      "Despite being a very small country, Cape Verde gave a giant surprise in the last Africa Cup of Nations, playing beautiful and fun football.",
+      "The team's uniform is a bright blue identical to the Caribbean sea, with red and white star details on the sides.",
+      "The language the players speak among themselves is Cape Verdean Creole, a beautiful mix of Portuguese with ancient African languages.",
+      "Footballers love to listen and relax with 'Morna' music, a traditional rhythm of their islands that is a heritage of humanity.",
+      "The food that gives players superpower strength is 'Cachupa', a delicious stew made of corn, beans, cassava, and meat.",
+      "The flag of Cape Verde features 10 yellow stars arranged in a circle, which represent the 10 islands that form the nation.",
+      "Many children in Cape Verde learn to play football using small coconuts or round fruits in the sand when they don't have a ball at hand.",
+      "The national team's crest features a blue shark leaping over a golden football, proving they are the kings of the ocean."
+    ],
+    "code": "CPV"
+  },
+  {
+    "pais": "República Democrática del Congo",
+    "confederacion": "CAF",
+    "datos_curiosos": [
+      "The DR Congo national team is called 'The Leopards' due to the agility, speed, and beautiful spots of this large feline from their jungles.",
+      "When the country was called Zaire, they became the first national team from sub-Saharan Africa to qualify for a World Cup, in Germany 1974.",
+      "The team's jersey is a very pretty light blue color, crossed by a bright red stripe and yellow details that mimic the sun on their flag.",
+      "The players of this national team are super famous for their goal celebrations called 'Fimbu', where they perform a fun dance simulating that they are playing an invisible drum.",
+      "In the jungles of the Congo lives the Okapi, a magical and strange animal that looks like a mix between a small giraffe and a zebra due to the stripes on its legs.",
+      "The footballers' favorite dish is 'Moambe', a delicious stew made with palm nuts, chicken, and crushed cassava leaves.",
+      "The national team's crest features the head of a roaring leopard with its mouth wide open in the middle of two traditional African spears.",
+      "The Congo holds the second largest tropical rainforest on entire planet Earth, full of gigantic rivers and trees that reach into the sky.",
+      "Fans love to go to stadiums playing wooden drums called 'Tam-Tam' that can be heard miles away.",
+      "One of their current figures is Yoane Wissa, a super elusive forward who celebrates his goals by sitting on the ground in a buddha position to show calmness."
+    ],
+    "code": "COD"
+  },
+  {
+    "pais": "Haití",
+    "confederacion": "CONCACAF",
+    "datos_curiosos": [
+      "The great return of the Caribbean! The Haiti national team returns to a World Cup after many years of effort in the CONCACAF qualifiers.",
+      "The players of Haiti are called 'Les Grenadiers' (The Grenadiers) in honor of the brave soldiers of their history who fought for freedom.",
+      "Haiti was the first country in all of Latin America and the Caribbean to gain independence and be completely free, something the players are super proud of.",
+      "The team's uniform combines dark blue and bright red, which are the two main colors of its national flag.",
+      "Their only previous participation in a World Cup was in Germany 1974, where a player named Emmanuel Sanon scored a historic goal against giant Italy.",
+      "Haitian footballers love to eat 'Soup Joumou' for breakfast, a delicious pumpkin soup that in their country is the symbol of children's freedom.",
+      "The national team's crest carries a palm tree in the center crowned by a liberty cap and surrounded by toy cannons.",
+      "Haiti fans fill stadiums with music using long metal trumpets called 'Rara' that make great Caribbean rhythms.",
+      "Haiti shares a beautiful tropical island with the Dominican Republic, surrounded by beaches with palm trees and turquoise blue water.",
+      "Children in Haiti play football in any free space, using stones as goals and demonstrating a giant joy every time they score a goal."
+    ],
+    "code": "HAI"
+  },
+  {
+    "pais": "Curazao",
+    "confederacion": "CONCACAF",
+    "datos_curiosos": [
+      "Historic! The Curaçao national team is going to participate for the first time in a World Cup this 2026.",
+      "Curaçao is a very small island located in the Caribbean Sea; it is so small that it fits more than 600 times inside the surface area of Mexico!",
+      "The players of this national team are called 'The Blues' because the uniform carries the bright blue color of the beautiful waters of the Caribbean sea that surrounds their island.",
+      "Although it is a Caribbean island, Curaçao belongs to the Kingdom of the Netherlands, so many of its footballers play in the leagues of Europe.",
+      "The language the players speak among themselves is Papiamento, a super fun mix of Spanish, Portuguese, Dutch, and African languages.",
+      "The houses in Curaçao's capital, Willemstad, are painted in bright colors like yellow, pink, and blue because a former governor said that the white color gave him a headache.",
+      "The most famous animal on the island is the green iguana, and they even have a typical dish of iguana soup to fill themselves with energy!",
+      "Being a tropical island, Curaçao fans celebrate goals to the rhythm of 'Tumba' music, a Caribbean dance full of drums and joy.",
+      "The flag of Curaçao features two yellow stars: one represents the large island and the other a small uninhabited islet called 'Klein Curaçao'.",
+      "The entire country will celebrate! Since Curaçao has barely about 150,000 inhabitants, almost the entire island will be glued to the television watching its World Cup debut."
+    ],
+    "code": "CUW"
+  },
+  {
+    "pais": "Uzbekistán",
+    "confederacion": "AFC",
+    "datos_curiosos": [
+      "A unique moment! The Uzbekistan national team has managed to qualify for the first time in its history for the World Cup this 2026.",
+      "The players of Uzbekistan are known as 'The White Wolves', an animal that represents strength, teamwork, and cunning in their forests.",
+      "Uzbekistan is a country in Central Asia through which the ancient 'Silk Road' passed, the path used by explorers to carry treasures from China to Europe.",
+      "The favorite food of Uzbek footballers to have energy before training is 'Plov', a giant rice dish with meat, carrots, and raisins cooked in a huge metal pot.",
+      "The national team's jerseys feature a beautiful light blue color that represents the clear sky and water, two highly sacred things in their culture.",
+      "Unlike most countries, Uzbekistan is landlocked, and it is surrounded by neighbors who are also landlocked!",
+      "The traditional sport of the country is 'Kurash', a very ancient style of wrestling, but now football has become the favorite game of all children.",
+      "In Uzbekistan, bread is sacred: it is never thrown to the ground or placed upside down, and even footballers bite a piece of local bread for good luck before traveling.",
+      "The country's flag features 12 stars that represent the 12 months of the year and also the 12 signs of the zodiac.",
+      "The main stadium where they celebrated their qualification is the Milliy Stadium in the capital, Tashkent, where fans make giant mosaics with lights."
+    ],
+    "code": "UZB"
+  },
+  {
+    "pais": "Nueva Zelanda",
+    "confederacion": "OFC",
+    "datos_curiosos": [
+      "The New Zealand national team is called 'All Whites' because their primary uniform is completely pure white.",
+      "They gave them that name to differentiate themselves from their famous rugby team, whom everyone knows worldwide as the 'All Blacks'.",
+      "Before starting some important matches, the players or fans perform the 'Haka', a Maori warrior dance where they shout, open their eyes wide, and stick out their tongues to scare the rival.",
+      "New Zealand holds an incredible undefeated record: in the South Africa 2010 World Cup, they were eliminated in the first round but without losing any match! They tied all three games.",
+      "The symbol animal of the country is the Kiwi, a tiny and plump bird that has no wings and only lives in the beautiful forests of their islands.",
+      "Their most famous player is Chris Wood, a very tall and super strong forward who plays in the England league and scores goals jumping above everyone.",
+      "The Lord of the Rings movies were filmed in New Zealand because its green landscapes, giant mountains, and hills look like they were taken out of a fantasy story.",
+      "The national team's crest carries a drawn silver fern leaf, a magical plant of their culture that represents strength and the path to follow.",
+      "Being in the southern hemisphere, when the players finish the football season, they love to go to the beaches to surf or walk up extinct volcanoes.",
+      "Since they won the Oceania tournament, New Zealand is the only national team representing all the beautiful Polynesian islands in this World Cup."
+    ],
+    "code": "NZL"
+  }
+]
