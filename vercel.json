@@ -1,5 +1,8 @@
 {
   "framework": "vite",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:web",
+  "outputDirectory": "apps/web/dist",
   "redirects": [
     {
       "source": "/(.*)",
