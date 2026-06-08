@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { FEATURES, STORAGE_KEY } from '../components/WhatsNewModal'
+import { FEATURES, WHATS_NEW_STORAGE_KEY as STORAGE_KEY } from '../data/whatsNewFeatures'
 
 export function useWhatsNew() {
   const [showWhatsNew, setShowWhatsNew] = useState(false)
