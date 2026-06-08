@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useState } from 'react'
 import '../global.css'
 import { initLocale } from '@/src/hooks/useI18n'
+import { ThemeProvider } from '@/src/context/ThemeContext'
 
 export { ErrorBoundary } from 'expo-router'
 
@@ -25,10 +26,12 @@ export default function RootLayout() {
   if (!ready) return null
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="country/[code]" options={{ headerShown: false }} />
-      <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
-    </Stack>
+    <ThemeProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="country/[code]" options={{ headerShown: false }} />
+        <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+      </Stack>
+    </ThemeProvider>
   )
 }

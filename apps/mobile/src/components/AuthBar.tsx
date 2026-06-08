@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import type { User } from '@supabase/supabase-js'
 import { useI18n } from '../hooks/useI18n'
 import { useTheme } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
+import UserMenu from './UserMenu'
 
 const GoogleIcon = () => (
   <Svg width={16} height={16} viewBox="0 0 24 24">
@@ -30,14 +31,34 @@ interface AuthBarProps {
   loading: boolean
   onSignIn: () => void
   onSignOut: () => void
+  onImport?: () => void
+  onWhatsNew?: () => void
+  whatsNewUnread?: boolean
+  totals?: {
+    teamCollected: number
+    fwcCollected: number
+    ccCollected: number
+    paniniCollected: number
+    totalRepeated: number
+  }
+  collectionLoading?: boolean
 }
 
-export default function AuthBar({ user, loading, onSignIn, onSignOut }: AuthBarProps) {
+export default function AuthBar({
+  user,
+  loading,
+  onSignIn,
+  onSignOut,
+  onImport,
+  onWhatsNew,
+  whatsNewUnread = false,
+  totals,
+  collectionLoading = false,
+}: AuthBarProps) {
   const { t } = useI18n()
   const { theme } = useTheme()
 
   if (user) {
-    const avatar = user.user_metadata?.avatar_url as string | undefined
     const name = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? ''
     const firstName = name.split(' ')[0]
 
@@ -54,39 +75,45 @@ export default function AuthBar({ user, loading, onSignIn, onSignOut }: AuthBarP
           backgroundColor: theme.bgSecondary,
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          {avatar ? (
-            <Image source={{ uri: avatar }} style={{ width: 28, height: 28, borderRadius: 14 }} />
-          ) : (
-            <View
+        <View style={{ flex: 1 }}>
+          {whatsNewUnread && (
+            <TouchableOpacity
+              onPress={onWhatsNew}
               style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: '#3b82f6',
+                flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
+                alignSelf: 'flex-start',
+                gap: 4,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                backgroundColor: theme.bgTertiary,
+                borderRadius: 9999,
+                borderWidth: 1,
+                borderColor: theme.borderColor,
               }}
             >
-              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>
-                {firstName.charAt(0).toUpperCase()}
+              <Text style={{ fontSize: 12, color: theme.textSecondary }}>
+                {t('whatsNewButton')}
               </Text>
-            </View>
+            </TouchableOpacity>
           )}
-          <Text style={{ color: theme.textSecondary, fontSize: 14 }}>{firstName}</Text>
         </View>
-        <TouchableOpacity
-          onPress={onSignOut}
-          style={{
-            paddingHorizontal: 12,
-            paddingVertical: 4,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: theme.borderStrong,
-          }}
-        >
-          <Text style={{ color: theme.textMuted, fontSize: 12 }}>{t('signOut')}</Text>
-        </TouchableOpacity>
+        <UserMenu
+          user={user}
+          onSignOut={onSignOut}
+          onImport={onImport || (() => {})}
+          t={t}
+          totals={
+            totals || {
+              teamCollected: 0,
+              fwcCollected: 0,
+              ccCollected: 0,
+              paniniCollected: 0,
+              totalRepeated: 0,
+            }
+          }
+          collectionLoading={collectionLoading}
+        />
       </View>
     )
   }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { View, Text, TextInput, FlatList, StatusBar } from 'react-native'
+import { View, Text, TextInput, FlatList, StatusBar, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
@@ -8,10 +8,16 @@ import CommunityStats from '@/src/components/CommunityStats'
 import CountryCard from '@/src/components/CountryCard'
 import type { CountryItem } from '@/src/components/CountryCard'
 import AuthBar from '@/src/components/AuthBar'
+import Footer from '@/src/components/Footer'
+import WhatsNewModal from '@/src/components/WhatsNewModal'
+import AboutModal from '@/src/components/AboutModal'
+import SuggestionModal from '@/src/components/SuggestionModal'
+import ImportCollectionModal from '@/src/components/ImportCollectionModal'
 import { useAuth } from '@/src/hooks/useAuth'
 import { useGlobalCollection } from '@/src/hooks/useGlobalCollection'
 import { useI18n } from '@/src/hooks/useI18n'
 import { useTheme } from '@/src/hooks/useTheme'
+import { useWhatsNew } from '@/src/hooks/useWhatsNew'
 
 function buildCountryList(): CountryItem[] {
   const seen = new Set<string>()
@@ -46,11 +52,15 @@ function buildCountryList(): CountryItem[] {
 
 export default function HomeScreen() {
   const [search, setSearch] = useState('')
+  const { showWhatsNew, setShowWhatsNew, hasUnread, openWhatsNew } = useWhatsNew()
+  const [showAbout, setShowAbout] = useState(false)
+  const [showSuggestion, setShowSuggestion] = useState(false)
+  const [showImport, setShowImport] = useState(false)
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
-  const { collection, totals } = useGlobalCollection(user)
-  const { t } = useI18n()
-  const { theme, isDark } = useTheme()
+  const { collection, totals, loading: collectionLoading } = useGlobalCollection(user)
+  const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
+  const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const allCountries = useMemo(() => buildCountryList(), [])
 
   const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
@@ -72,15 +82,30 @@ export default function HomeScreen() {
     router.push(`/country/${code}` as any)
   }
 
+  const toggleLocale = () => {
+    toggleI18nLocale()
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.bgPrimary }}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={theme.bgPrimary}
       />
-      <AuthBar user={user} loading={authLoading} onSignIn={signInWithGoogle} onSignOut={signOut} />
+      <AuthBar
+        user={user}
+        loading={authLoading}
+        onSignIn={signInWithGoogle}
+        onSignOut={signOut}
+        onImport={() => setShowImport(true)}
+        onWhatsNew={openWhatsNew}
+        whatsNewUnread={hasUnread}
+        totals={totals}
+        collectionLoading={collectionLoading}
+      />
       <FlatList
         data={filtered}
+        extraData={effectiveTheme}
         keyExtractor={(item) => item.code}
         renderItem={({ item }) => {
           const countryCollection = collection[item.code] ?? {}
@@ -99,29 +124,24 @@ export default function HomeScreen() {
                 textAlign: 'center',
                 lineHeight: 32,
                 letterSpacing: -0.5,
+                marginBottom: 16,
               }}
             >
               ⚽ {t('title')}
             </Text>
+
             <Text
               style={{
                 fontSize: 13,
                 color: theme.textMuted,
                 textAlign: 'center',
-                marginTop: 8,
+                marginBottom: 16,
                 lineHeight: 20,
               }}
             >
               {t('description')}
             </Text>
             <CommunityStats />
-            {user && totalCollected > 0 && (
-              <View style={{ marginTop: 8, marginBottom: 4, alignItems: 'center' }}>
-                <Text style={{ color: '#3b82f6', fontSize: 12, fontWeight: '600' }}>
-                  {totalCollected} {t('communityStatStickers')}
-                </Text>
-              </View>
-            )}
             <View
               style={{
                 marginTop: 12,
@@ -157,8 +177,41 @@ export default function HomeScreen() {
             </View>
           </View>
         }
+        ListFooterComponent={() => (
+          <Footer
+            t={t}
+            locale={locale}
+            toggleLocale={toggleLocale}
+            onShowAbout={() => setShowAbout(true)}
+            onShowSuggestion={() => setShowSuggestion(true)}
+            themeMode={effectiveTheme}
+            onToggleTheme={toggleTheme}
+            user={user}
+            totalCollected={totalCollected}
+          />
+        )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
+      />
+
+      <WhatsNewModal
+        visible={showWhatsNew}
+        onClose={() => setShowWhatsNew(false)}
+        t={t}
+        locale={locale}
+      />
+
+      <AboutModal visible={showAbout} onClose={() => setShowAbout(false)} t={t} />
+
+      <SuggestionModal visible={showSuggestion} onClose={() => setShowSuggestion(false)} t={t} />
+
+      <ImportCollectionModal
+        visible={showImport}
+        onClose={() => setShowImport(false)}
+        onSuccess={() => {
+          // Refresh collection data
+        }}
+        t={t}
       />
     </SafeAreaView>
   )
