@@ -3,15 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@mi-album-fifa/shared": [
-        "../../packages/shared/src/index.ts"
-      ],
-      "@mi-album-fifa/shared/*": [
-        "../../packages/shared/src/*"
-      ]
+      "@/*": ["./*"],
+      "@mi-album-fifa/shared": ["../../packages/shared/src/index.ts"],
+      "@mi-album-fifa/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": [
@@ -20,6 +14,7 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "../../packages/shared/src/**/*.ts",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    "src/types/**/*.d.ts"
   ]
 }

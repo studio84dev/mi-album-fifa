@@ -1,0 +1,26 @@
+import { useEffect } from 'react'
+import { View, ActivityIndicator } from 'react-native'
+import { useRouter, useLocalSearchParams } from 'expo-router'
+import { supabase } from '@/src/lib/supabaseClient'
+
+export default function AuthCallback() {
+  const router = useRouter()
+  const params = useLocalSearchParams<{ access_token?: string; refresh_token?: string }>()
+
+  useEffect(() => {
+    async function handleCallback() {
+      const { access_token, refresh_token } = params
+      if (access_token && refresh_token) {
+        await supabase.auth.setSession({ access_token, refresh_token })
+      }
+      router.replace('/')
+    }
+    handleCallback()
+  }, [])
+
+  return (
+    <View className="flex-1 bg-black items-center justify-center">
+      <ActivityIndicator color="#3B82F6" size="large" />
+    </View>
+  )
+}
