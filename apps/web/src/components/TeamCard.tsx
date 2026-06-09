@@ -98,12 +98,18 @@ interface TeamCardProps {
 }
 
 function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCardProps) {
-  const cardBase = `bg-card-bg rounded-lg p-4 w-full box-border min-w-0 flex items-center gap-[0.875rem] border border-border-color cursor-pointer transition-[background,border-color,box-shadow] duration-base hover:bg-bg-tertiary hover:border-border-strong hover:shadow-sm${single ? ' max-w-[400px]' : ''}`
-  const cardActive =
-    'border-accent-blue-border bg-accent-blue-subtle hover:bg-accent-blue-subtle hover:border-accent-blue-border'
-  const cardComplete =
-    'border-accent-orange-border bg-accent-orange-subtle hover:bg-accent-orange-subtle hover:border-accent-orange-border'
-  const cardStateClass = isActive ? cardActive : isComplete ? cardComplete : ''
+  const cardBase = [
+    'rounded-lg p-4 w-full box-border min-w-0 flex items-center gap-[0.875rem] border cursor-pointer',
+    'transition-[background,border-color,box-shadow] duration-base',
+    single ? 'max-w-[400px]' : '',
+    isActive
+      ? 'border-accent-blue-border bg-accent-blue-subtle hover:bg-accent-blue-subtle hover:border-accent-blue-border'
+      : isComplete
+        ? 'border-accent-orange-border bg-accent-orange-subtle hover:bg-accent-orange-subtle hover:border-accent-orange-border'
+        : 'bg-card-bg border-border-color hover:bg-bg-tertiary hover:border-border-strong hover:shadow-sm',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const pageNumClass =
     'text-[1.5rem] min-[601px]:text-[1.375rem] font-bold text-text-muted min-w-[50px] min-[601px]:min-w-[44px] text-center tracking-[-0.02em] tabular-nums'
@@ -140,7 +146,7 @@ function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCa
       team.card_type === 'fwc_special' ? '#3b82f6' : team.card_type === 'cc' ? '#e84040' : undefined
     const total = team.count
     return (
-      <div className={`${cardBase} justify-start ${cardStateClass}`.trim()} onClick={onClick}>
+      <div className={`${cardBase} justify-start`} onClick={onClick}>
         <div className={pageNumClass}>{team.page}</div>
         {icon}
         <div className="flex-1 min-w-0">
@@ -163,7 +169,7 @@ function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCa
   const groupColor = GROUP_COLORS[groupKey] ?? '#888'
 
   return (
-    <div className={`${cardBase} ${cardStateClass}`.trim()} onClick={onClick}>
+    <div className={cardBase} onClick={onClick}>
       <div className={pageNumClass}>{team.page}</div>
       <img
         src={flags[team.iso ?? '']}

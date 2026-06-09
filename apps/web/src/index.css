@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@config "../tailwind.config.js";
 
 /* ── Tailwind theme tokens ──────────────────────────────────── */
 @theme inline {
@@ -77,6 +76,15 @@
 /* ── Semantic color tokens (light/dark theme) ───────────────── */
 @layer base {
   :root {
+    --accent-blue: #3b82f6;
+    --accent-blue-hover: #2563eb;
+    --accent-blue-subtle: rgba(59, 130, 246, 0.12);
+    --accent-blue-border: rgba(59, 130, 246, 0.35);
+    --accent-orange: #e8742a;
+    --accent-orange-hover: #d4621c;
+    --accent-orange-subtle: rgba(232, 116, 42, 0.12);
+    --accent-orange-border: rgba(232, 116, 42, 0.35);
+
     --bg-primary: #f8fafc;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f1f5f9;
