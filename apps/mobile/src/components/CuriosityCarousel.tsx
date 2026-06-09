@@ -15,6 +15,7 @@ interface CuriosityCarouselProps {
 
 export default function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const cardWidth = useRef(280 + 32)
   const scrollRef = useRef<ScrollView>(null)
   const { theme } = useTheme()
 
@@ -25,8 +26,7 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const x = e.nativeEvent.contentOffset.x
-    const width = e.nativeEvent.layoutMeasurement.width
-    const index = Math.round(x / width)
+    const index = Math.min(Math.round(x / cardWidth.current), items.length - 1)
     setCurrentIndex(index)
   }
 
@@ -35,13 +35,25 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
       <ScrollView
         ref={scrollRef}
         horizontal
-        pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScroll}
+        snapToInterval={280 + 32}
+        snapToAlignment="center"
+        decelerationRate="fast"
+        disableIntervalMomentum
+        contentContainerStyle={{ paddingHorizontal: 0 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         {items.map((text, i) => (
           <View
             key={i}
+            onLayout={
+              i === 0
+                ? (e) => {
+                    cardWidth.current = e.nativeEvent.layout.width + 32
+                  }
+                : undefined
+            }
             style={{
               width: 280,
               backgroundColor: theme.bgTertiary,

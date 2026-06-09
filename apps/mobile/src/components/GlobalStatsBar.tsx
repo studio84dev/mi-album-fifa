@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { View, Text } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { View, Text, Animated } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 
 interface StatValueProps {
@@ -11,14 +11,7 @@ interface StatValueProps {
   ccColor?: boolean
 }
 
-function StatValue({
-  collected,
-  total,
-  isRepeated,
-  loading,
-  compact,
-  ccColor,
-}: StatValueProps) {
+function StatValue({ collected, total, isRepeated, loading, compact, ccColor }: StatValueProps) {
   const { theme } = useTheme()
   const fontSize = compact ? 14 : 18
 
@@ -54,9 +47,7 @@ function StatValue({
 
   return (
     <Text style={{ fontSize, fontWeight: '700' }}>
-      <Text style={{ color: complete ? accentColor : accentColor }}>
-        {collected}
-      </Text>
+      <Text style={{ color: complete ? accentColor : accentColor }}>{collected}</Text>
       <Text style={{ color: theme.textMuted, fontWeight: '500' }}>/{total}</Text>
     </Text>
   )
@@ -93,13 +84,20 @@ export default function GlobalStatsBar({
   const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL + PANINI_TOTAL
   const pct = Math.round((overallCollected / overallTotal) * 100)
 
+  const progressAnim = useRef(new Animated.Value(0)).current
   const [displayPct, setDisplayPct] = useState(0)
 
   useEffect(() => {
     if (loading) {
+      progressAnim.setValue(0)
       setDisplayPct(0)
       return
     }
+    Animated.timing(progressAnim, {
+      toValue: pct,
+      duration: 800,
+      useNativeDriver: false,
+    }).start()
     const timer = setTimeout(() => setDisplayPct(pct), 50)
     return () => clearTimeout(timer)
   }, [loading, pct])
@@ -154,9 +152,12 @@ export default function GlobalStatsBar({
           marginBottom: 14,
         }}
       >
-        <View
+        <Animated.View
           style={{
-            width: `${displayPct}%`,
+            width: progressAnim.interpolate({
+              inputRange: [0, 100],
+              outputRange: ['0%', '100%'],
+            }),
             height: '100%',
             backgroundColor: colors.accentBlue,
             borderRadius: 2,
@@ -317,12 +318,7 @@ export default function GlobalStatsBar({
             paddingHorizontal: compact ? 2 : 4,
           }}
         >
-          <StatValue
-            collected={totalRepeated}
-            isRepeated
-            loading={loading}
-            compact={compact}
-          />
+          <StatValue collected={totalRepeated} isRepeated loading={loading} compact={compact} />
           <Text
             style={{
               fontSize: labelSize,

@@ -1,23 +1,14 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Modal,
-  Pressable,
-  StatusBar,
-  FlatList,
-} from 'react-native'
+import { useMemo } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
-import { supabase } from '@/src/lib/supabaseClient'
 import { useAuth } from '@/src/hooks/useAuth'
 import { useGlobalCollection } from '@/src/hooks/useGlobalCollection'
 import { useTheme } from '@/src/hooks/useTheme'
 import flags from '@/src/data/flags'
 import CuriosityCarousel from '@/src/components/CuriosityCarousel'
+import StickerPanel from '@/src/components/StickerPanel'
 import Svg, { Path } from 'react-native-svg'
 
 const GoogleIcon = () => (
@@ -41,25 +32,9 @@ const GoogleIcon = () => (
   </Svg>
 )
 
-const LONG_PRESS_MS = 500
-
-interface CollectionEntry {
-  collected: boolean
-  repeated: number
-}
-
-function buildMaps(data: Record<string, CollectionEntry>) {
-  const cMap: Record<number, boolean> = {}
-  const rMap: Record<number, number> = {}
-  Object.entries(data).forEach(([num, entry]) => {
-    cMap[Number(num)] = entry.collected
-    rMap[Number(num)] = entry.repeated ?? 0
-  })
-  return { cMap, rMap }
-}
-
 export default function CountryScreen() {
-  const { code } = useLocalSearchParams<{ code: string }>()
+  const { code, highlight } = useLocalSearchParams<{ code: string; highlight?: string }>()
+  const highlightNumber = highlight ? parseInt(highlight, 10) : null
   const router = useRouter()
   const { user, signInWithGoogle } = useAuth()
   const { collection, updateEntry } = useGlobalCollection(user)
@@ -71,23 +46,9 @@ export default function CountryScreen() {
   const page = countryStickers[0]?.page ?? null
   const isoCode = countryStickers[0]?.iso ?? null
 
-  const initialData = collection[code ?? ''] ?? {}
-  const { cMap: initCollected, rMap: initRepeated } = buildMaps(initialData)
-
-  const [collected, setCollected] = useState(initCollected)
-  const [repeated, setRepeated] = useState(initRepeated)
-  const [modal, setModal] = useState<number | null>(null)
-  const [modalRepeated, setModalRepeated] = useState(0)
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    const { cMap, rMap } = buildMaps(collection[code ?? ''] ?? {})
-    setCollected(cMap)
-    setRepeated(rMap)
-  }, [code, collection])
-
-  const collectedCount = Object.values(collected).filter(Boolean).length
-  const repeatedCount = Object.values(repeated).reduce((acc, v) => acc + (v || 0), 0)
+  const collectedData = collection[code ?? ''] ?? {}
+  const collectedCount = Object.values(collectedData).filter((e) => e.collected).length
+  const repeatedCount = Object.values(collectedData).reduce((acc, e) => acc + (e.repeated ?? 0), 0)
   const isComplete = stickerCount > 0 && collectedCount >= stickerCount
 
   const rawFlag = isoCode ? flags[isoCode] : null
@@ -97,99 +58,6 @@ export default function CountryScreen() {
         height: number
       }>)
     : null
-
-  const toggleSticker = (number: number) => {
-    if (repeated[number] > 0) {
-      openModal(number)
-      return
-    }
-    doToggle(number)
-  }
-
-  const doToggle = async (number: number) => {
-    const current = !!collected[number]
-    const next = !current
-    setCollected((prev) => ({ ...prev, [number]: next }))
-    if (!next) setRepeated((prev) => ({ ...prev, [number]: 0 }))
-    updateEntry(code!, number, { collected: next, repeated: 0 })
-
-    if (next) {
-      await supabase.from('sticker_collection').insert({
-        user_id: user!.id,
-        country_code: code,
-        sticker_number: number,
-        repeated: 0,
-        updated_at: new Date().toISOString(),
-      })
-    } else {
-      await supabase
-        .from('sticker_collection')
-        .delete()
-        .eq('user_id', user!.id)
-        .eq('country_code', code)
-        .eq('sticker_number', number)
-    }
-  }
-
-  const openModal = (number: number) => {
-    const current = repeated[number] ?? 0
-    setModalRepeated(current > 0 ? current : 1)
-    setModal(number)
-  }
-
-  const closeModal = () => setModal(null)
-
-  const applyModalAction = async (action: string) => {
-    const number = modal!
-    const rep = modalRepeated
-    closeModal()
-
-    if (action === 'none') {
-      setCollected((prev) => ({ ...prev, [number]: false }))
-      setRepeated((prev) => ({ ...prev, [number]: 0 }))
-      updateEntry(code!, number, { collected: false, repeated: 0 })
-      await supabase
-        .from('sticker_collection')
-        .delete()
-        .eq('user_id', user!.id)
-        .eq('country_code', code)
-        .eq('sticker_number', number)
-      return
-    }
-
-    setCollected((prev) => ({ ...prev, [number]: true }))
-    setRepeated((prev) => ({ ...prev, [number]: rep }))
-    updateEntry(code!, number, { collected: true, repeated: rep })
-
-    const existing = collected[number]
-    if (existing) {
-      await supabase
-        .from('sticker_collection')
-        .update({ repeated: rep, updated_at: new Date().toISOString() })
-        .eq('user_id', user!.id)
-        .eq('country_code', code)
-        .eq('sticker_number', number)
-    } else {
-      await supabase.from('sticker_collection').insert({
-        user_id: user!.id,
-        country_code: code,
-        sticker_number: number,
-        repeated: rep,
-        updated_at: new Date().toISOString(),
-      })
-    }
-  }
-
-  const handleLongPressIn = (number: number) => {
-    longPressTimer.current = setTimeout(() => openModal(number), LONG_PRESS_MS)
-  }
-
-  const handleLongPressOut = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current)
-      longPressTimer.current = null
-    }
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.bgPrimary }}>
@@ -227,12 +95,17 @@ export default function CountryScreen() {
             )}
           </View>
         </View>
-        <Text
-          style={{ color: isComplete ? '#E8742A' : '#3b82f6', fontWeight: '700', fontSize: 14 }}
-        >
-          {collectedCount}/{stickerCount}
-          {repeatedCount > 0 && <Text style={{ color: '#E8742A' }}> · +{repeatedCount}</Text>}
-        </Text>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={{ color: '#3b82f6', fontWeight: '700', fontSize: 14 }}>
+            {collectedCount}
+            <Text style={{ color: theme.textMuted, fontWeight: '500' }}>/{stickerCount}</Text>
+          </Text>
+          {repeatedCount > 0 && (
+            <Text style={{ color: '#E8742A', fontSize: 11, fontWeight: '600' }}>
+              {repeatedCount}
+            </Text>
+          )}
+        </View>
       </View>
 
       {!user ? (
@@ -279,253 +152,20 @@ export default function CountryScreen() {
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}>
-          <FlatList
-            data={Array.from({ length: stickerCount }, (_, i) => i + 1)}
-            numColumns={5}
-            keyExtractor={(num) => String(num)}
-            scrollEnabled={false}
-            contentContainerStyle={{ paddingTop: 16 }}
-            columnWrapperStyle={{ gap: 5 }}
-            ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
-            renderItem={({ item: num }) => {
-              const isCollected = !!collected[num]
-              const isRepeated = (repeated[num] ?? 0) > 0
-
-              let bgColor = theme.bgTertiary
-              let borderColor = theme.borderColor
-              let textColor = theme.textMuted
-
-              if (isCollected && isRepeated) {
-                bgColor = '#1d4ed8'
-                borderColor = '#3b82f6'
-                textColor = '#ffffff'
-              } else if (isCollected) {
-                bgColor = '#3b82f6'
-                borderColor = '#3b82f6'
-                textColor = '#ffffff'
-              } else if (isRepeated) {
-                bgColor = 'rgba(232,116,42,0.12)'
-                borderColor = 'rgba(232,116,42,0.4)'
-                textColor = '#E8742A'
-              }
-
-              return (
-                <Pressable
-                  onPress={() => toggleSticker(num)}
-                  onLongPress={() => openModal(num)}
-                  onPressIn={() => handleLongPressIn(num)}
-                  onPressOut={handleLongPressOut}
-                  delayLongPress={LONG_PRESS_MS}
-                  style={{
-                    flex: 1,
-                    aspectRatio: 1.1,
-                    backgroundColor: bgColor,
-                    borderWidth: 1,
-                    borderColor,
-                    borderRadius: 6,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    paddingVertical: 4,
-                  }}
-                >
-                  <Text
-                    style={{ color: textColor, fontSize: 15, fontWeight: '700', lineHeight: 16 }}
-                  >
-                    {num}
-                  </Text>
-                  <Text
-                    style={{
-                      color: textColor,
-                      fontSize: 9,
-                      fontWeight: '500',
-                      opacity: 0.75,
-                      marginTop: 1,
-                    }}
-                  >
-                    {code}
-                  </Text>
-                  {isRepeated && (
-                    <View
-                      style={{
-                        position: 'absolute',
-                        top: 2,
-                        right: 2,
-                        backgroundColor: '#E8742A',
-                        borderRadius: 3,
-                        paddingHorizontal: 2,
-                      }}
-                    >
-                      <Text style={{ color: '#fff', fontSize: 8, fontWeight: '700' }}>
-                        +{repeated[num]}
-                      </Text>
-                    </View>
-                  )}
-                </Pressable>
-              )
-            }}
+          <StickerPanel
+            countryCode={code ?? ''}
+            user={user}
+            stickerCount={stickerCount}
+            initialData={collectedData}
+            highlightNumber={highlightNumber}
+            onCollectionChange={(cc, number, data) => updateEntry(cc, number, data)}
           />
-
-          <Text
-            style={{ color: theme.textDisabled, fontSize: 12, textAlign: 'center', marginTop: 8 }}
-          >
-            Toca para marcar · Mantén presionado para repetidas
-          </Text>
 
           <View style={{ marginTop: 16 }}>
             <CuriosityCarousel countryCode={code ?? ''} />
           </View>
         </ScrollView>
       )}
-
-      <Modal visible={modal !== null} transparent animationType="fade" onRequestClose={closeModal}>
-        <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.65)',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 16,
-          }}
-          onPress={closeModal}
-        >
-          <Pressable
-            style={{
-              backgroundColor: theme.cardBg,
-              borderWidth: 1,
-              borderColor: theme.borderColor,
-              borderRadius: 16,
-              padding: 24,
-              width: '100%',
-              maxWidth: 320,
-            }}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text
-              style={{
-                color: theme.textPrimary,
-                fontWeight: '700',
-                fontSize: 15,
-                textAlign: 'center',
-                marginBottom: 16,
-              }}
-            >
-              {code} #{modal}
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: 'rgba(232,116,42,0.1)',
-                borderWidth: 1,
-                borderColor: 'rgba(232,116,42,0.3)',
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                marginBottom: 8,
-              }}
-            >
-              <Text style={{ color: '#E8742A', fontWeight: '600', fontSize: 14 }}>Repetidas</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-                <TouchableOpacity
-                  onPress={() => setModalRepeated((v) => Math.max(0, v - 1))}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: 'rgba(232,116,42,0.4)',
-                    backgroundColor: 'rgba(232,116,42,0.1)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ color: '#E8742A', fontSize: 16, fontWeight: '700' }}>−</Text>
-                </TouchableOpacity>
-                <Text
-                  style={{
-                    color: theme.textPrimary,
-                    fontSize: 20,
-                    fontWeight: '700',
-                    minWidth: 24,
-                    textAlign: 'center',
-                  }}
-                >
-                  {modalRepeated}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setModalRepeated((v) => v + 1)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: 'rgba(232,116,42,0.4)',
-                    backgroundColor: 'rgba(232,116,42,0.1)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ color: '#E8742A', fontSize: 16, fontWeight: '700' }}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {modalRepeated === 0 && (
-              <Text
-                style={{
-                  color: theme.textMuted,
-                  fontSize: 12,
-                  textAlign: 'center',
-                  marginBottom: 8,
-                }}
-              >
-                0 repetidas = quitar de la colección
-              </Text>
-            )}
-
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  backgroundColor: '#3b82f6',
-                  borderRadius: 8,
-                  paddingVertical: 12,
-                  alignItems: 'center',
-                }}
-                onPress={() => applyModalAction('collected')}
-              >
-                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
-                  {modalRepeated === 0 ? 'Solo coleccionada' : `Tengo +${modalRepeated}`}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  borderRadius: 8,
-                  paddingVertical: 12,
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: 'rgba(239,68,68,0.3)',
-                  backgroundColor: 'rgba(239,68,68,0.1)',
-                }}
-                onPress={() => applyModalAction('none')}
-              >
-                <Text style={{ color: '#ef4444', fontWeight: '600', fontSize: 14 }}>Quitar</Text>
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-              onPress={closeModal}
-              style={{ marginTop: 16, paddingVertical: 8, alignItems: 'center' }}
-            >
-              <Text style={{ color: theme.textMuted, fontSize: 14 }}>Cancelar</Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   )
 }

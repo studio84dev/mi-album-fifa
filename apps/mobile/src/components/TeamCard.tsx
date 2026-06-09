@@ -19,7 +19,7 @@ const GROUP_COLORS: Record<string, string> = {
   l: '#744210',
 }
 
-export interface CountryItem {
+export interface TeamItem {
   code: string
   team_name: string | null
   group: string | null
@@ -29,13 +29,19 @@ export interface CountryItem {
   count: number
 }
 
-interface CountryCardProps {
-  item: CountryItem
+interface TeamCardProps {
+  item: TeamItem
   collectedCount?: number
+  repeatedCount?: number
   onPress?: (code: string) => void
 }
 
-export default function CountryCard({ item, collectedCount = 0, onPress }: CountryCardProps) {
+export default function TeamCard({
+  item,
+  collectedCount = 0,
+  repeatedCount = 0,
+  onPress,
+}: TeamCardProps) {
   const { theme } = useTheme()
   const rawFlag = item.iso ? flags[item.iso] : null
   const FlagSvg = rawFlag
@@ -47,31 +53,32 @@ export default function CountryCard({ item, collectedCount = 0, onPress }: Count
   const groupKey = item.group?.toLowerCase() ?? ''
   const groupColor = GROUP_COLORS[groupKey] ?? theme.textMuted
 
+  const isComplete = item.count > 0 && collectedCount >= item.count
+
+  const cardStyle = {
+    backgroundColor: isComplete ? 'rgba(232,116,42,0.08)' : theme.cardBg,
+    borderWidth: 1,
+    borderColor: isComplete ? 'rgba(232,116,42,0.45)' : theme.borderColor,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  }
+
   return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: theme.cardBg,
-        borderWidth: 1,
-        borderColor: theme.borderColor,
-        borderRadius: 12,
-        marginHorizontal: 16,
-        marginBottom: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-      }}
-      activeOpacity={0.7}
-      onPress={() => onPress?.(item.code)}
-    >
+    <TouchableOpacity style={cardStyle} activeOpacity={0.7} onPress={() => onPress?.(item.code)}>
       <Text
         style={{
-          fontSize: 20,
-          width: 36,
+          fontSize: 15,
+          width: 44,
           fontWeight: '700',
           color: theme.textMuted,
           textAlign: 'center',
         }}
+        numberOfLines={1}
       >
         {item.page}
       </Text>
@@ -132,17 +139,22 @@ export default function CountryCard({ item, collectedCount = 0, onPress }: Count
         </Text>
       </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'baseline', marginLeft: 8 }}>
-        <Text
-          style={{
-            color: collectedCount > 0 ? '#3b82f6' : theme.textDisabled,
-            fontSize: 14,
-            fontWeight: '600',
-          }}
-        >
-          {collectedCount}
-        </Text>
-        <Text style={{ color: theme.textMuted, fontSize: 12 }}>/{item.count}</Text>
+      <View style={{ alignItems: 'flex-end', marginLeft: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+          <Text
+            style={{
+              color: collectedCount > 0 ? '#3b82f6' : theme.textDisabled,
+              fontSize: 14,
+              fontWeight: '600',
+            }}
+          >
+            {collectedCount}
+          </Text>
+          <Text style={{ color: theme.textMuted, fontSize: 12 }}>/{item.count}</Text>
+        </View>
+        {repeatedCount > 0 && (
+          <Text style={{ color: '#E8742A', fontSize: 11, fontWeight: '600' }}>{repeatedCount}</Text>
+        )}
       </View>
     </TouchableOpacity>
   )
