@@ -128,6 +128,9 @@
   "whatsNewCloseAriaLabel": "Close",
   "closeAriaLabel": "Close",
   "scrollToTopAriaLabel": "Scroll to top",
+  "back": "Back",
+  "loginToTrack": "Sign in to track your collection",
+  "countryLoginPrompt": "Mark the {count} stickers for {country} and manage your duplicates.",
   "feature.sticker-panel-page.title": "Album page in sticker panel",
   "feature.sticker-panel-page.description": "The sticker panel now shows the corresponding physical album page (e.g. 'Stickers SWE · Page 8') so you know exactly where to find each team.",
   "feature.player-search.title": "Player search",
@@ -171,5 +174,6 @@
   "themeToggleLabel": "Toggle theme",
   "themeLight": "Light",
   "themeDark": "Dark",
+  "curiosityLabel": "Curiosity {current}/{total}",
   "footerDisclaimer": "This project has no affiliation with Panini, FIFA, or Coca-Cola. It is an independent project for entertainment and collecting purposes."
 }

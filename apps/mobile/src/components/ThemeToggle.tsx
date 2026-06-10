@@ -20,7 +20,6 @@ const MoonIcon = ({ color }: IconProps) => (
 )
 
 interface ThemeToggleProps {
-  t: (_key: string) => string
   themeMode: 'light' | 'dark'
   onToggle: () => void
 }

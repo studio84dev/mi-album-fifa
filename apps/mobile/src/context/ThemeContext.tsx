@@ -37,6 +37,16 @@ export const colors = {
   accentBlueHover: '#2563eb',
   accentOrange: '#e8742a',
   accentOrangeHover: '#d4621c',
+  highlightYellow: '#facc15',
+  successGreen: '#22c55e',
+  errorRed: '#ef4444',
+  kofiRed: '#ff5e5b',
+  googleBlue: '#4285F4',
+  googleGreen: '#34A853',
+  googleYellow: '#FBBC05',
+  googleRed: '#EA4335',
+  starYellow: '#f59e0b',
+  ccRed: '#e84040',
 }
 
 type ThemeMode = 'light' | 'dark' | 'system'
@@ -60,11 +70,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeMode, setThemeMode] = useState<ThemeMode>('system')
 
   useEffect(() => {
-    AsyncStorage.getItem(THEME_STORAGE_KEY).then((saved) => {
-      if (saved === 'light' || saved === 'dark' || saved === 'system') {
-        setThemeMode(saved)
-      }
-    }).catch(() => null)
+    AsyncStorage.getItem(THEME_STORAGE_KEY)
+      .then((saved) => {
+        if (saved === 'light' || saved === 'dark' || saved === 'system') {
+          setThemeMode(saved)
+        }
+      })
+      .catch(() => null)
   }, [])
 
   const effectiveTheme: 'light' | 'dark' =
@@ -85,7 +97,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <ThemeContext.Provider value={{ theme, isDark, themeMode, effectiveTheme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider
+      value={{ theme, isDark, themeMode, effectiveTheme, toggleTheme, setTheme }}
+    >
       {children}
     </ThemeContext.Provider>
   )

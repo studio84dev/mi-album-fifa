@@ -43,7 +43,7 @@ function StatValue({ collected, total, isRepeated, loading, compact, ccColor }: 
   }
 
   const complete = total !== undefined && collected >= total
-  const accentColor = ccColor ? '#e84040' : colors.accentBlue
+  const accentColor = ccColor ? colors.ccRed : colors.accentBlue
 
   return (
     <Text style={{ fontSize, fontWeight: '700' }}>

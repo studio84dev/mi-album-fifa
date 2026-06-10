@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 import type { CardType } from '@mi-album-fifa/shared'
 import flags from '../data/flags'
-import { useTheme } from '../hooks/useTheme'
+import { useTheme, colors } from '../hooks/useTheme'
 
 const GROUP_COLORS: Record<string, string> = {
   a: '#2d7a35',
@@ -56,9 +56,9 @@ export default function TeamCard({
   const isComplete = item.count > 0 && collectedCount >= item.count
 
   const cardStyle = {
-    backgroundColor: isComplete ? 'rgba(232,116,42,0.08)' : theme.cardBg,
+    backgroundColor: isComplete ? `${colors.accentOrange}14` : theme.cardBg,
     borderWidth: 1,
-    borderColor: isComplete ? 'rgba(232,116,42,0.45)' : theme.borderColor,
+    borderColor: isComplete ? `${colors.accentOrange}73` : theme.borderColor,
     borderRadius: 12,
     marginHorizontal: 16,
     marginBottom: 16,
@@ -128,7 +128,7 @@ export default function TeamCard({
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: '#fff', fontSize: 9, fontWeight: '700' }}>{item.group}</Text>
+            <Text style={{ color: '#ffffff', fontSize: 9, fontWeight: '700' }}>{item.group}</Text>
           </View>
         </View>
         <Text
@@ -143,7 +143,7 @@ export default function TeamCard({
         <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
           <Text
             style={{
-              color: collectedCount > 0 ? '#3b82f6' : theme.textDisabled,
+              color: collectedCount > 0 ? colors.accentBlue : theme.textDisabled,
               fontSize: 14,
               fontWeight: '600',
             }}
@@ -153,7 +153,9 @@ export default function TeamCard({
           <Text style={{ color: theme.textMuted, fontSize: 12 }}>/{item.count}</Text>
         </View>
         {repeatedCount > 0 && (
-          <Text style={{ color: '#E8742A', fontSize: 11, fontWeight: '600' }}>{repeatedCount}</Text>
+          <Text style={{ color: colors.accentOrange, fontSize: 11, fontWeight: '600' }}>
+            {repeatedCount}
+          </Text>
         )}
       </View>
     </TouchableOpacity>

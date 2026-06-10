@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, FlatList, Modal, Pressable, TouchableOpacity } from 'react-native'
 import { supabase } from '../lib/supabaseClient'
-import { useTheme } from '../hooks/useTheme'
+import { useTheme, colors } from '../hooks/useTheme'
+import { useI18n } from '../hooks/useI18n'
 import StickerCard from './StickerCard'
 
 const LONG_PRESS_MS = 500
@@ -39,6 +40,7 @@ export default function StickerPanel({
   onCollectionChange,
 }: StickerPanelProps) {
   const { theme } = useTheme()
+  const { t } = useI18n()
 
   const { cMap: initCollected, rMap: initRepeated } = buildMaps(initialData)
   const [collected, setCollected] = useState(initCollected)
@@ -174,7 +176,7 @@ export default function StickerPanel({
       />
 
       <Text style={{ color: theme.textDisabled, fontSize: 12, textAlign: 'center', marginTop: 8 }}>
-        Toca para marcar · Mantén presionado para repetidas
+        {t('hintTouch')}
       </Text>
 
       <Modal visible={modal !== null} transparent animationType="fade" onRequestClose={closeModal}>
@@ -209,7 +211,7 @@ export default function StickerPanel({
                 marginBottom: 16,
               }}
             >
-              {countryCode} #{modal}
+              {countryCode} #{modal} · {t('modalTitle')}
             </Text>
 
             <View
@@ -217,16 +219,18 @@ export default function StickerPanel({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                backgroundColor: 'rgba(232,116,42,0.1)',
+                backgroundColor: `${colors.accentOrange}1A`,
                 borderWidth: 1,
-                borderColor: 'rgba(232,116,42,0.3)',
+                borderColor: `${colors.accentOrange}4D`,
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 marginBottom: 8,
               }}
             >
-              <Text style={{ color: '#E8742A', fontWeight: '600', fontSize: 14 }}>Repetidas</Text>
+              <Text style={{ color: colors.accentOrange, fontWeight: '600', fontSize: 14 }}>
+                {t('modalRepeatedLabel')}
+              </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
                 <TouchableOpacity
                   onPress={() => setModalRepeated((v) => Math.max(0, v - 1))}
@@ -235,13 +239,15 @@ export default function StickerPanel({
                     height: 32,
                     borderRadius: 16,
                     borderWidth: 1,
-                    borderColor: 'rgba(232,116,42,0.4)',
-                    backgroundColor: 'rgba(232,116,42,0.1)',
+                    borderColor: `${colors.accentOrange}66`,
+                    backgroundColor: `${colors.accentOrange}1A`,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <Text style={{ color: '#E8742A', fontSize: 16, fontWeight: '700' }}>−</Text>
+                  <Text style={{ color: colors.accentOrange, fontSize: 16, fontWeight: '700' }}>
+                    −
+                  </Text>
                 </TouchableOpacity>
                 <Text
                   style={{
@@ -261,13 +267,15 @@ export default function StickerPanel({
                     height: 32,
                     borderRadius: 16,
                     borderWidth: 1,
-                    borderColor: 'rgba(232,116,42,0.4)',
-                    backgroundColor: 'rgba(232,116,42,0.1)',
+                    borderColor: `${colors.accentOrange}66`,
+                    backgroundColor: `${colors.accentOrange}1A`,
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <Text style={{ color: '#E8742A', fontSize: 16, fontWeight: '700' }}>+</Text>
+                  <Text style={{ color: colors.accentOrange, fontSize: 16, fontWeight: '700' }}>
+                    +
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -281,7 +289,7 @@ export default function StickerPanel({
                   marginBottom: 8,
                 }}
               >
-                0 repetidas = quitar de la colección
+                {t('modalHintRemove')}
               </Text>
             )}
 
@@ -289,15 +297,17 @@ export default function StickerPanel({
               <TouchableOpacity
                 style={{
                   flex: 1,
-                  backgroundColor: '#3b82f6',
+                  backgroundColor: colors.accentBlue,
                   borderRadius: 8,
                   paddingVertical: 12,
                   alignItems: 'center',
                 }}
                 onPress={() => applyModalAction('collected')}
               >
-                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
-                  {modalRepeated === 0 ? 'Solo coleccionada' : `Tengo +${modalRepeated}`}
+                <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
+                  {modalRepeated === 0
+                    ? t('modalBtnCollectedZero')
+                    : t('modalBtnCollectedRep').replace('{count}', String(modalRepeated))}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -307,12 +317,14 @@ export default function StickerPanel({
                   paddingVertical: 12,
                   alignItems: 'center',
                   borderWidth: 1,
-                  borderColor: 'rgba(239,68,68,0.3)',
-                  backgroundColor: 'rgba(239,68,68,0.1)',
+                  borderColor: `${colors.errorRed}4D`,
+                  backgroundColor: `${colors.errorRed}1A`,
                 }}
                 onPress={() => applyModalAction('none')}
               >
-                <Text style={{ color: '#ef4444', fontWeight: '600', fontSize: 14 }}>Quitar</Text>
+                <Text style={{ color: colors.errorRed, fontWeight: '600', fontSize: 14 }}>
+                  {t('modalBtnNone')}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -320,7 +332,7 @@ export default function StickerPanel({
               onPress={closeModal}
               style={{ marginTop: 16, paddingVertical: 8, alignItems: 'center' }}
             >
-              <Text style={{ color: theme.textMuted, fontSize: 14 }}>Cancelar</Text>
+              <Text style={{ color: theme.textMuted, fontSize: 14 }}>{t('modalCancel')}</Text>
             </TouchableOpacity>
           </Pressable>
         </Pressable>

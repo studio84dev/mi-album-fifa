@@ -8,13 +8,27 @@ import ScrollableModal from './ScrollableModal'
 const CONFIRM_WORD = 'IMPORTAR'
 
 const CheckIcon = () => (
-  <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth={2}>
+  <Svg
+    width={48}
+    height={48}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={colors.successGreen}
+    strokeWidth={2}
+  >
     <Path d="M20 6L9 17l-5-5" />
   </Svg>
 )
 
 const WarningIcon = () => (
-  <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth={2}>
+  <Svg
+    width={48}
+    height={48}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={colors.errorRed}
+    strokeWidth={2}
+  >
     <Path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
     <Path d="M12 9v4" />
     <Path d="M12 17h.01" />
@@ -301,14 +315,14 @@ export default function ImportCollectionModal({
               disabled={confirmText !== CONFIRM_WORD}
               style={{
                 flex: 1,
-                backgroundColor: '#ef4444',
+                backgroundColor: colors.errorRed,
                 paddingVertical: 12,
                 borderRadius: 8,
                 alignItems: 'center',
                 opacity: confirmText !== CONFIRM_WORD ? 0.5 : 1,
               }}
             >
-              <Text style={{ color: '#fff', fontWeight: '600' }}>{t('importConfirmBtn')}</Text>
+              <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importConfirmBtn')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -385,7 +399,7 @@ export default function ImportCollectionModal({
               borderRadius: 9999,
             }}
           >
-            <Text style={{ color: '#fff', fontWeight: '600' }}>{t('importTryAgain')}</Text>
+            <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importTryAgain')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -422,7 +436,7 @@ export default function ImportCollectionModal({
               borderRadius: 9999,
             }}
           >
-            <Text style={{ color: '#fff', fontWeight: '600' }}>{t('importSuccessBtn')}</Text>
+            <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importSuccessBtn')}</Text>
           </TouchableOpacity>
         </View>
       )}

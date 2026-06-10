@@ -22,7 +22,6 @@ const ShareIcon = ({ color }: { color: string }) => (
 )
 
 interface ShareMenuProps {
-  t: (_key: string) => string
   shareText: string
   shareTitle: string
 }

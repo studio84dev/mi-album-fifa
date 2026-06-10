@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
 import { View, Text, ScrollView, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { curiositiesEs, curiositiesEn } from '@mi-album-fifa/shared'
-import { useTheme } from '../hooks/useTheme'
+import { useTheme, colors } from '../hooks/useTheme'
+import { useI18n } from '../hooks/useI18n'
 
 const mapsCache: Record<string, Map<string, string[]>> = {
   es: new Map(curiositiesEs.map((c) => [c.code, c.datos_curiosos])),
@@ -18,6 +19,7 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
   const cardWidth = useRef(280 + 32)
   const scrollRef = useRef<ScrollView>(null)
   const { theme } = useTheme()
+  const { t } = useI18n()
 
   const curiositiesMap = mapsCache[locale] ?? mapsCache.es
   const items = curiositiesMap.get(countryCode) ?? []
@@ -31,7 +33,7 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
   }
 
   return (
-    <View className="mt-4">
+    <View style={{ marginTop: 16 }}>
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -74,14 +76,16 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
                 marginBottom: 8,
               }}
             >
-              Curiosidad {i + 1}/{items.length}
+              {t('curiosityLabel')
+                .replace('{current}', String(i + 1))
+                .replace('{total}', String(items.length))}
             </Text>
             <Text style={{ color: theme.textSecondary, fontSize: 13, lineHeight: 20 }}>{text}</Text>
           </View>
         ))}
       </ScrollView>
       {items.length > 1 && (
-        <View className="flex-row justify-center mt-2" style={{ gap: 4, marginTop: 16 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 16, gap: 4 }}>
           {items.map((_, i) => (
             <View
               key={i}
@@ -89,7 +93,7 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
                 width: 6,
                 height: 6,
                 borderRadius: 3,
-                backgroundColor: i === currentIndex ? '#3b82f6' : theme.bgQuaternary,
+                backgroundColor: i === currentIndex ? colors.accentBlue : theme.bgQuaternary,
               }}
             />
           ))}

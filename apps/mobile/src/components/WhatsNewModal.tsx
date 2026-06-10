@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import { useTheme, colors } from '../hooks/useTheme'
+import { useTheme } from '../hooks/useTheme'
 import ScrollableModal from './ScrollableModal'
 import { FEATURES, WHATS_NEW_STORAGE_KEY as STORAGE_KEY } from '../data/whatsNewFeatures'
 

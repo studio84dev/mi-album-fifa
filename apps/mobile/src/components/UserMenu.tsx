@@ -5,8 +5,8 @@ import { useTheme, colors } from '../hooks/useTheme'
 import GlobalStatsBar from './GlobalStatsBar'
 import Svg, { Path } from 'react-native-svg'
 
-const ImportIcon = () => (
-  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth={2}>
+const ImportIcon = ({ color }: { color: string }) => (
+  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
     <Path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
     <Path d="M7 10l5 5 5-5" />
     <Path d="M12 15V3" />
@@ -72,7 +72,7 @@ export default function UserMenu({
         >
           <Text
             style={{
-              color: '#fff',
+              color: '#ffffff',
               fontSize: 14,
               fontWeight: '700',
             }}
@@ -125,12 +125,7 @@ export default function UserMenu({
             }}
           >
             {/* Stats */}
-            <GlobalStatsBar
-              totals={totals}
-              loading={collectionLoading}
-              t={t}
-              compact
-            />
+            <GlobalStatsBar totals={totals} loading={collectionLoading} t={t} compact />
 
             {/* Divider */}
             <View
@@ -170,7 +165,7 @@ export default function UserMenu({
               }}
               activeOpacity={0.7}
             >
-              <ImportIcon />
+              <ImportIcon color={theme.textMuted} />
               <Text
                 style={{
                   fontSize: 14,

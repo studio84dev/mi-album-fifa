@@ -174,7 +174,15 @@ const theme = {
 
 const colors = {
   accentBlue: '#3b82f6',
-  accentOrange: '#E8742A',
+  accentBlueHover: '#2563eb',
+  accentOrange: '#e8742a',
+  accentOrangeHover: '#d4621c',
+  highlightYellow: '#facc15',
+  successGreen: '#22c55e',
+  errorRed: '#ef4444',
+  kofiRed: '#ff5e5b',
+  starYellow: '#f59e0b',
+  ccRed: '#e84040',
 }
 ```
 
@@ -330,19 +338,24 @@ AppState.addEventListener('change', (state) => {
 | SuggestionModal       | ✅ Feedback form                |
 | ImportCollectionModal | ✅ 3-step import flow           |
 
-### Mobile (To Implement)
+### Mobile (Production Ready)
 
-| Component             | Status                                |
-| --------------------- | ------------------------------------- |
-| UserMenu              | ❌ Missing - need dropdown with stats |
-| GlobalStatsBar        | ❌ Missing                            |
-| Footer                | ❌ Missing                            |
-| ShareMenu             | ❌ Missing                            |
-| ThemeToggle           | ❌ Missing - manual toggle needed     |
-| WhatsNewModal         | ❌ Missing                            |
-| AboutModal            | ❌ Missing                            |
-| SuggestionModal       | ❌ Missing                            |
-| ImportCollectionModal | ❌ Missing                            |
+| Component             | Status                              |
+| --------------------- | ----------------------------------- |
+| UserMenu              | ✅ Dropdown with GlobalStatsBar     |
+| GlobalStatsBar        | ✅ Compact and full versions        |
+| Footer                | ✅ Complete with all sections       |
+| ShareMenu             | ✅ Native share sheet               |
+| ThemeToggle           | ✅ Light/Dark/System toggle         |
+| WhatsNewModal         | ✅ Changelog modal                  |
+| AboutModal            | ✅ Project info with tech badges    |
+| SuggestionModal       | ✅ Feedback form with rate limiting |
+| ImportCollectionModal | ✅ 3-step import flow               |
+| StickerPanel          | ✅ With repeated counter modal      |
+| StickerCard           | ✅ Highlight and animation support  |
+| TeamCard              | ✅ Progress indicators              |
+| CuriosityCarousel     | ✅ With pagination dots             |
+| ScrollableModal       | ✅ Reusable modal component         |
 
 ---
 

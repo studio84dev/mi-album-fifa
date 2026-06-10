@@ -128,6 +128,9 @@
   "whatsNewCloseAriaLabel": "Cerrar",
   "closeAriaLabel": "Cerrar",
   "scrollToTopAriaLabel": "Volver arriba",
+  "back": "Volver",
+  "loginToTrack": "Inicia sesión para registrar tu colección",
+  "countryLoginPrompt": "Marca las {count} figuritas de {country} y controla tus repetidas.",
   "feature.sticker-panel-page.title": "Página del álbum en el panel",
   "feature.sticker-panel-page.description": "El panel de figuritas ahora muestra la página correspondiente del álbum físico (ej: 'Figuritas SWE · Pág. 8'), para que sepas exactamente dónde encontrar cada selección.",
   "feature.player-search.title": "Búsqueda por jugador",
@@ -171,5 +174,6 @@
   "themeToggleLabel": "Cambiar tema",
   "themeLight": "Claro",
   "themeDark": "Oscuro",
+  "curiosityLabel": "Curiosidad {current}/{total}",
   "footerDisclaimer": "Este proyecto no tiene relación alguna con Panini, FIFA ni Coca-Cola. Es un proyecto independiente con fines de entretenimiento y colección."
 }

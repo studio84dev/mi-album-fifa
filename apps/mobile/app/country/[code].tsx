@@ -5,7 +5,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
 import { useAuth } from '@/src/hooks/useAuth'
 import { useGlobalCollection } from '@/src/hooks/useGlobalCollection'
-import { useTheme } from '@/src/hooks/useTheme'
+import { useTheme, colors } from '@/src/hooks/useTheme'
+import { useI18n } from '@/src/hooks/useI18n'
 import flags from '@/src/data/flags'
 import CuriosityCarousel from '@/src/components/CuriosityCarousel'
 import StickerPanel from '@/src/components/StickerPanel'
@@ -39,6 +40,7 @@ export default function CountryScreen() {
   const { user, signInWithGoogle } = useAuth()
   const { collection, updateEntry } = useGlobalCollection(user)
   const { theme, isDark } = useTheme()
+  const { t } = useI18n()
 
   const countryStickers = useMemo(() => allStickers.filter((s) => s.country_code === code), [code])
   const stickerCount = countryStickers.length
@@ -78,7 +80,7 @@ export default function CountryScreen() {
         }}
       >
         <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12, padding: 4 }}>
-          <Text style={{ color: '#3b82f6', fontSize: 15 }}>← Volver</Text>
+          <Text style={{ color: colors.accentBlue, fontSize: 15 }}>← {t('back')}</Text>
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 10 }}>
           {FlagSvg && (
@@ -91,17 +93,19 @@ export default function CountryScreen() {
               {teamName}
             </Text>
             {page != null && (
-              <Text style={{ color: theme.textMuted, fontSize: 11 }}>Pág. {page}</Text>
+              <Text style={{ color: theme.textMuted, fontSize: 11 }}>
+                {t('stickerPanelPageLabel')} {page}
+              </Text>
             )}
           </View>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ color: '#3b82f6', fontWeight: '700', fontSize: 14 }}>
+          <Text style={{ color: colors.accentBlue, fontWeight: '700', fontSize: 14 }}>
             {collectedCount}
             <Text style={{ color: theme.textMuted, fontWeight: '500' }}>/{stickerCount}</Text>
           </Text>
           {repeatedCount > 0 && (
-            <Text style={{ color: '#E8742A', fontSize: 11, fontWeight: '600' }}>
+            <Text style={{ color: colors.accentOrange, fontSize: 11, fontWeight: '600' }}>
               {repeatedCount}
             </Text>
           )}
@@ -122,12 +126,14 @@ export default function CountryScreen() {
               marginBottom: 8,
             }}
           >
-            Iniciá sesión para registrar tu colección
+            {t('loginToTrack')}
           </Text>
           <Text
             style={{ color: theme.textMuted, fontSize: 14, textAlign: 'center', marginBottom: 24 }}
           >
-            Marcá las {stickerCount} figuritas de {teamName} y controla tus repetidas.
+            {t('countryLoginPrompt')
+              .replace('{count}', String(stickerCount))
+              .replace('{country}', teamName ?? code)}
           </Text>
           <TouchableOpacity
             onPress={signInWithGoogle}
@@ -146,7 +152,7 @@ export default function CountryScreen() {
           >
             <GoogleIcon />
             <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '600' }}>
-              Iniciar sesión con Google
+              {t('loginBarCta')}
             </Text>
           </TouchableOpacity>
         </View>

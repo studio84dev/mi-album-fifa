@@ -6,7 +6,14 @@ import Svg, { Path } from 'react-native-svg'
 import ScrollableModal from './ScrollableModal'
 
 const CheckIcon = () => (
-  <Svg width={48} height={48} viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth={2}>
+  <Svg
+    width={48}
+    height={48}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={colors.successGreen}
+    strokeWidth={2}
+  >
     <Path d="M20 6L9 17l-5-5" />
   </Svg>
 )
@@ -96,7 +103,7 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
               borderRadius: 9999,
             }}
           >
-            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
+            <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
               {t('closeButton')}
             </Text>
           </TouchableOpacity>
@@ -175,7 +182,7 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
             <Text
               style={{
                 fontSize: 13,
-                color: '#ef4444',
+                color: colors.errorRed,
                 textAlign: 'center',
               }}
             >
@@ -206,9 +213,9 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
             }}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#ffffff" />
             ) : (
-              <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
+              <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
                 {t('sendButton')}
               </Text>
             )}

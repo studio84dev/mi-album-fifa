@@ -4,7 +4,7 @@ import Svg, { Path } from 'react-native-svg'
 import ScrollableModal from './ScrollableModal'
 
 const StarIcon = () => (
-  <Svg width={14} height={14} viewBox="0 0 24 24" fill="#f59e0b">
+  <Svg width={14} height={14} viewBox="0 0 24 24" fill={colors.starYellow}>
     <Path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
   </Svg>
 )
@@ -92,7 +92,7 @@ export default function AboutModal({ visible, onClose, t }: AboutModalProps) {
       >
         {t('aboutParagraph4a')}{' '}
         <Text
-          style={{ color: '#ff5e5b', fontWeight: '600' }}
+          style={{ color: colors.kofiRed, fontWeight: '600' }}
           onPress={() => Linking.openURL('https://link.mercadopago.cl/mialbumfifa')}
         >
           {t('aboutParagraph4b')}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { View, Text, Pressable, Animated } from 'react-native'
-import { useTheme } from '../hooks/useTheme'
+import { useTheme, colors } from '../hooks/useTheme'
 
 interface StickerCardProps {
   num: number
@@ -53,17 +53,17 @@ export default function StickerCard({
   let textColor = theme.textMuted
 
   if (isCollected && isRepeated) {
-    bgColor = '#1d4ed8'
-    borderColor = '#3b82f6'
+    bgColor = colors.accentBlueHover
+    borderColor = colors.accentBlue
     textColor = '#ffffff'
   } else if (isCollected) {
-    bgColor = '#3b82f6'
-    borderColor = '#3b82f6'
+    bgColor = colors.accentBlue
+    borderColor = colors.accentBlue
     textColor = '#ffffff'
   } else if (isRepeated) {
-    bgColor = 'rgba(232,116,42,0.12)'
-    borderColor = 'rgba(232,116,42,0.4)'
-    textColor = '#E8742A'
+    bgColor = `${colors.accentOrange}1F`
+    borderColor = `${colors.accentOrange}66`
+    textColor = colors.accentOrange
   }
 
   return (
@@ -79,7 +79,7 @@ export default function StickerCard({
           aspectRatio: 1.1,
           backgroundColor: bgColor,
           borderWidth: isHighlighted ? 2 : 1,
-          borderColor: isHighlighted ? '#facc15' : borderColor,
+          borderColor: isHighlighted ? colors.highlightYellow : borderColor,
           borderRadius: 6,
           alignItems: 'center',
           justifyContent: 'center',
@@ -107,12 +107,14 @@ export default function StickerCard({
               position: 'absolute',
               top: 2,
               right: 2,
-              backgroundColor: '#E8742A',
+              backgroundColor: colors.accentOrange,
               borderRadius: 3,
               paddingHorizontal: 2,
             }}
           >
-            <Text style={{ color: '#fff', fontSize: 8, fontWeight: '700' }}>+{repeatedCount}</Text>
+            <Text style={{ color: '#ffffff', fontSize: 8, fontWeight: '700' }}>
+              +{repeatedCount}
+            </Text>
           </View>
         )}
       </Pressable>

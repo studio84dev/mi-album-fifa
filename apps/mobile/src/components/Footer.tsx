@@ -76,14 +76,14 @@ export default function Footer({
           <TouchableOpacity
             onPress={() => Linking.openURL('https://link.mercadopago.cl/mialbumfifa')}
             style={{
-              backgroundColor: '#ff5e5b',
+              backgroundColor: colors.kofiRed,
               paddingHorizontal: 24,
               paddingVertical: 12,
               borderRadius: 9999,
             }}
             activeOpacity={0.8}
           >
-            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>
+            <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
               {t('kofiButton')}
             </Text>
           </TouchableOpacity>
@@ -128,7 +128,7 @@ export default function Footer({
 
       {/* Theme Toggle */}
       <View style={{ alignItems: 'center', marginBottom: 16 }}>
-        <ThemeToggle t={t} themeMode={themeMode} onToggle={onToggleTheme} />
+        <ThemeToggle themeMode={themeMode} onToggle={onToggleTheme} />
       </View>
 
       {/* Language Selector */}
@@ -188,7 +188,7 @@ export default function Footer({
 
       {/* Share */}
       <View style={{ alignItems: 'center', marginBottom: 16 }}>
-        <ShareMenu t={t} shareTitle={t('shareTitle')} shareText={t('shareText')} />
+        <ShareMenu shareTitle={t('shareTitle')} shareText={t('shareText')} />
       </View>
 
       {/* Disclaimer */}

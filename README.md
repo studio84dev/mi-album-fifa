@@ -6,15 +6,17 @@
 
 Live at → **https://mialbumfifa.com**
 
+Also available as a **React Native mobile app** (Expo).
+
 ---
 
 ## ✨ What is this?
 
-Mi Álbum FIFA is a fast, mobile-first web app for collectors of the **FIFA World Cup 2026 Panini sticker album**.
+Mi Álbum FIFA is a fast, mobile-first application for collectors of the **FIFA World Cup 2026 Panini sticker album**.
 
 Search any country instantly, track your collection digitally, manage repeated stickers and quickly check what you already own while swapping with friends or family.
 
-Originally built as a side project during the World Cup sticker season, the app has evolved into a full open-source collector companion focused on speed, simplicity and real-world usability.
+Originally built as a side project during the World Cup sticker season, the app has evolved into a full open-source collector companion available as both a **web app** and **mobile app**, focused on speed, simplicity and real-world usability.
 
 ---
 
@@ -52,12 +54,15 @@ Originally built as a side project during the World Cup sticker season, the app 
 
 ### 📱 Mobile-first Experience
 
-- Responsive UI
-- Theme support
+- Responsive UI optimized for trading sessions
+- **Native mobile app** with Expo (iOS & Android)
+- Theme support (light/dark mode)
 - Welcome onboarding modal
 - Persistent promo banners
-- Share menu
+- Share menu with native share sheet
 - Scroll-to-top shortcuts
+- Long-press gestures for quick actions
+- Haptic feedback support
 
 ### 🌐 Internationalization
 
@@ -85,6 +90,8 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contribution guidelines.
 
 ## 🛠️ Tech Stack
 
+### Web App
+
 | Layer         | Tech                                                          |
 | ------------- | ------------------------------------------------------------- |
 | Frontend      | React 18 + TypeScript (strict) + Vite 5                       |
@@ -95,26 +102,55 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contribution guidelines.
 | Hosting       | Vercel                                                        |
 | Icons / Flags | [`flag-icons`](https://github.com/lipis/flag-icons) by @lipis |
 
+### Mobile App
+
+| Layer         | Tech                                      |
+| ------------- | ----------------------------------------- |
+| Framework     | Expo SDK 56 + React Native 0.85           |
+| Router        | expo-router (file-based routing)          |
+| Styling       | Inline StyleSheet objects (no CSS)        |
+| Storage       | @react-native-async-storage/async-storage |
+| Icons / Flags | react-native-svg                          |
+| Safe Area     | react-native-safe-area-context            |
+
 ---
 
-## 🧱 Project Structure
+## 🧱 Project Structure (Monorepo)
+
+This is an npm workspaces monorepo with web, mobile, and shared packages:
 
 ```text
-src/
-├── components/   # Reusable UI components (.tsx)
-├── hooks/        # Custom React hooks (.ts)
-├── data/         # Static album + curiosity data
-├── styles/       # Design system + modular CSS
-├── i18n/         # Translation files
-├── lib/          # External clients/config
-├── App.tsx
-└── main.tsx
-```
-
-Supabase Edge Functions live under:
-
-```text
-supabase/functions/
+mi-album-fifa/
+├── apps/
+│   ├── web/                 # React 18 + Vite SPA
+│   │   ├── src/
+│   │   │   ├── components/  # UI components (.tsx)
+│   │   │   ├── hooks/       # Custom hooks (.ts)
+│   │   │   ├── data/        # Static album data
+│   │   │   ├── styles/      # Modular CSS
+│   │   │   ├── i18n/        # Translations
+│   │   │   └── lib/         # Supabase client
+│   │   └── ...
+│   │
+│   └── mobile/              # Expo SDK 56 + React Native
+│       ├── app/             # File-based routing (expo-router)
+│       ├── src/
+│       │   ├── components/  # RN components (.tsx)
+│       │   ├── hooks/       # Custom hooks (.ts)
+│       │   ├── data/        # Static files
+│       │   └── lib/         # Supabase client
+│       └── ...
+│
+├── packages/
+│   └── shared/              # @mi-album-fifa/shared
+│       └── src/
+│           ├── data/        # stickers, flags, curiosities
+│           ├── hooks/       # Factory hooks
+│           ├── i18n/        # Translation JSONs
+│           └── lib/         # Supabase helpers
+│
+└── supabase/
+    └── functions/           # Edge Functions
 ```
 
 ---
@@ -138,8 +174,9 @@ The UI intentionally avoids excessive visual noise and prioritizes usability and
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 18+ (see `.nvmrc` for exact version)
 - A Supabase project with Google OAuth enabled
+- For mobile: Expo Go app on your device or simulator
 
 ### Setup
 
@@ -148,31 +185,57 @@ git clone https://github.com/studio84dev/mi-album-fifa.git
 
 cd mi-album-fifa
 
-npm install
+nvm use && npm install
 ```
 
-Create a `.env` file:
+Create environment files:
+
+**Root `.env` (for web):**
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Run locally:
+**`apps/mobile/.env` (for mobile):**
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### Running the Apps
+
+**Web app:**
 
 ```bash
-npm run dev
+nvm use && npm run dev:web
 ```
+
+**Mobile app:**
+
+```bash
+nvm use && npm run dev:mobile
+```
+
+The mobile app will start an Expo development server. Scan the QR code with the Expo Go app on your device, or press `i` for iOS simulator / `a` for Android emulator.
 
 ---
 
 ## 📦 Available Scripts
 
 ```bash
-npm run dev        # Start development server
-npm run build      # Production build (includes type-check)
-npm run lint       # ESLint + TypeScript checks
-npm run format     # Prettier formatting
+# Development
+npm run dev:web      # Start web development server
+npm run dev:mobile   # Start Expo development server
+
+# Building
+npm run build:web    # Production build for web
+npm run build:mobile # Build mobile app for production
+
+# Code quality
+npm run lint         # ESLint + TypeScript checks
+npm run format       # Prettier formatting
 ```
 
 ---
