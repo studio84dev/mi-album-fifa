@@ -63,6 +63,88 @@ mi-album-fifa/
     └── functions/           # Edge Functions
 ```
 
+### Diagrama de Arquitectura
+
+```mermaid
+graph TD
+    subgraph Monorepo["📦 mi-album-fifa/"]
+        direction TB
+
+        subgraph Apps["apps/"]
+            direction LR
+
+            subgraph Web["🌐 web/"]
+                W_Vite["Vite + React 18"]
+                W_Components["components/"]
+                W_Hooks["hooks/"]
+                W_Styles["styles/*.css"]
+                W_Router["React Router"]
+                W_Supabase["Supabase Client"]
+            end
+
+            subgraph Mobile["📱 mobile/"]
+                M_Expo["Expo SDK 56"]
+                M_RN["React Native 0.85"]
+                M_Router["expo-router"]
+                M_Components["components/"]
+                M_Hooks["hooks/"]
+                M_Storage["AsyncStorage"]
+                M_Supabase["Supabase Client"]
+            end
+        end
+
+        subgraph Shared["📦 packages/shared/"]
+            S_Data["data/"]
+            S_Hooks["Factory Hooks"]
+            S_I18n["i18n/"]
+            S_Lib["Supabase Helpers"]
+        end
+
+        subgraph Supabase["🔥 supabase/"]
+            SF_Edge["Edge Functions"]
+        end
+    end
+
+    subgraph External["☁️ Servicios Externos"]
+        SupabaseCloud["Supabase Cloud"]
+        GoogleAuth["Google OAuth"]
+        Vercel["Vercel (Web)"]
+        EAS["EAS Build (Mobile)"]
+    end
+
+    %% Conexiones Web
+    W_Vite --> W_Components
+    W_Components --> W_Hooks
+    W_Components --> W_Styles
+    W_Hooks --> W_Supabase
+    W_Supabase --> SupabaseCloud
+
+    %% Conexiones Mobile
+    M_Expo --> M_RN
+    M_RN --> M_Router
+    M_Router --> M_Components
+    M_Components --> M_Hooks
+    M_Hooks --> M_Supabase
+    M_Supabase --> M_Storage
+    M_Supabase --> SupabaseCloud
+
+    %% Conexiones Shared
+    W_Hooks --> Shared
+    M_Hooks --> Shared
+    Shared --> SupabaseCloud
+
+    %% Edge Functions
+    SF_Edge --> SupabaseCloud
+
+    %% Auth
+    W_Supabase --> GoogleAuth
+    M_Supabase --> GoogleAuth
+
+    %% Deploy
+    Web --> Vercel
+    Mobile --> EAS
+```
+
 ---
 
 ## App Web (React + Vite)
