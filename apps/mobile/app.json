@@ -15,6 +15,7 @@
     },
     "android": {
       "package": "com.studio84.mialbumfifa",
+      "versionCode": 1,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
@@ -40,6 +41,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4b5c43d5-2231-48f0-a8d3-3a7639eba5cf"
+      }
     }
   }
 }
