@@ -422,6 +422,65 @@ Root `vercel.json`:
 
 ---
 
+## EAS Build (Android)
+
+### Comandos
+
+```bash
+# Build en la nube (produce .aab para Play Store)
+nvm use && eas build --platform android --profile production
+
+# Verificar el bundle localmente ANTES de enviar a la nube
+nvm use && npx expo export --platform android
+
+# Ver estado de un build
+nvm use && eas build:view <build-id> --json
+```
+
+### Verificar bundle antes de compilar en la nube
+
+**Siempre correr esto antes de lanzar un EAS Build:**
+
+```bash
+nvm use && npx expo export --platform android
+```
+
+Si termina con `Exported: dist` sin errores → el build en la nube va a pasar.
+Si hay errores de Hermes → arreglar localmente primero.
+
+### Problemas conocidos y soluciones
+
+#### `hermesc` falla con "Invalid expression encountered" — import() dinámico
+
+**Causa:** `@supabase/supabase-js` en su versión `.mjs` usa `import(OTEL_PKG)` — un dynamic import con variable que Hermes no puede compilar. Metro resuelve el `.mjs` cuando `unstable_enablePackageExports` está habilitado.
+
+**Fix aplicado en `metro.config.js`:**
+
+```js
+config.resolver = {
+  ...resolver,
+  unstable_enablePackageExports: false, // fuerza uso de .cjs en vez de .mjs
+}
+```
+
+**NO eliminar esta línea.** Sin ella el build falla con:
+
+```
+Execution failed for task ':app:createBundleReleaseJsAndAssets'
+hermesc finished with non-zero exit value 2
+```
+
+### Secrets de EAS (variables de entorno)
+
+Las vars del `.env` NO se leen en builds en la nube. Están subidas como EAS secrets:
+
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+Para actualizar un secret: `nvm use && eas secret:create --name VAR --value "valor" --force`
+
+---
+
 ## Expo Reference
 
 Read exact versioned docs at: https://docs.expo.dev/versions/v56.0.0/
