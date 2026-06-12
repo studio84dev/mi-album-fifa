@@ -8,6 +8,7 @@
     "@supabase/supabase-js": "^2.106.1",
     "expo": "~56.0.8",
     "expo-auth-session": "^56.0.13",
+    "expo-build-properties": "^56.0.18",
     "expo-constants": "~56.0.16",
     "expo-crypto": "^56.0.4",
     "expo-font": "~56.0.5",
