@@ -36,12 +36,7 @@ interface TeamCardProps {
   onPress?: (code: string) => void
 }
 
-export default function TeamCard({
-  item,
-  collectedCount = 0,
-  repeatedCount = 0,
-  onPress,
-}: TeamCardProps) {
+function TeamCard({ item, collectedCount = 0, repeatedCount = 0, onPress }: TeamCardProps) {
   const { theme } = useTheme()
   const rawFlag = item.iso ? flags[item.iso] : null
   const FlagSvg = rawFlag
@@ -161,3 +156,5 @@ export default function TeamCard({
     </TouchableOpacity>
   )
 }
+
+export default React.memo(TeamCard)
