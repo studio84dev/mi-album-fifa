@@ -37,7 +37,7 @@ export default function CountryScreen() {
   const { code, highlight } = useLocalSearchParams<{ code: string; highlight?: string }>()
   const highlightNumber = highlight ? parseInt(highlight, 10) : null
   const router = useRouter()
-  const { user, signInWithGoogle } = useAuth()
+  const { user, loading: authLoading, signInWithGoogle } = useAuth()
   const { collection, updateEntry } = useCollection()
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
@@ -112,7 +112,7 @@ export default function CountryScreen() {
         </View>
       </View>
 
-      {!user ? (
+      {authLoading ? null : !user ? (
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
         >

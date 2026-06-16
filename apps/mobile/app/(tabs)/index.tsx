@@ -7,6 +7,7 @@ import {
   StatusBar,
   TouchableOpacity,
   Pressable,
+  Keyboard,
   type TextInput as TextInputType,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -185,6 +186,7 @@ export default function HomeScreen() {
 
   const handleCountryPress = useCallback(
     (code: string) => {
+      Keyboard.dismiss()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       router.push(`/country/${code}` as any)
     },
@@ -212,10 +214,11 @@ export default function HomeScreen() {
   const renderStickerItem = useCallback(
     ({ item }: { item: StickerResult }) => (
       <TouchableOpacity
-        onPress={() =>
+        onPress={() => {
+          Keyboard.dismiss()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           router.push(`/country/${item.country_code}?highlight=${item.number}` as any)
-        }
+        }}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -380,6 +383,7 @@ export default function HomeScreen() {
           />
         )}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 32 }}
         initialNumToRender={15}
         maxToRenderPerBatch={10}
@@ -395,6 +399,7 @@ export default function HomeScreen() {
           keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
           renderItem={renderSearchItem}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
           initialNumToRender={15}
           maxToRenderPerBatch={10}
