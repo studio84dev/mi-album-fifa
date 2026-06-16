@@ -75,13 +75,12 @@ export default function Footer({
           </Text>
           <Pressable
             onPress={() => Linking.openURL('https://link.mercadopago.cl/mialbumfifa')}
-            style={({ pressed }) => ({
+            style={{
               backgroundColor: colors.kofiRed,
               paddingHorizontal: 24,
               paddingVertical: 12,
               borderRadius: 9999,
-              opacity: pressed ? 0.8 : 1,
-            })}
+            }}
           >
             <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
               {t('kofiButton')}
