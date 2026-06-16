@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
+import { View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import { invokeFunction } from '../lib/supabaseClient'
 import Svg, { Path } from 'react-native-svg'
@@ -94,7 +94,7 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
           >
             {t('suggestionSent')}
           </Text>
-          <TouchableOpacity
+          <Pressable
             onPress={handleClose}
             style={{
               backgroundColor: colors.accentOrange,
@@ -106,7 +106,7 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
             <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
               {t('closeButton')}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ) : (
         <View style={{ gap: 16 }}>
@@ -193,7 +193,7 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
           )}
 
           {/* Submit Button */}
-          <TouchableOpacity
+          <Pressable
             onPress={handleSubmit}
             disabled={
               loading || !formData.name.trim() || !formData.email.trim() || !formData.message.trim()
@@ -219,7 +219,7 @@ export default function SuggestionModal({ visible, onClose, t }: SuggestionModal
                 {t('sendButton')}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </ScrollableModal>

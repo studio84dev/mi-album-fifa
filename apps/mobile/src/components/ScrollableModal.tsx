@@ -1,13 +1,5 @@
 import { ReactNode } from 'react'
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-  ScrollView,
-  useWindowDimensions,
-} from 'react-native'
+import { View, Text, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native'
 import { useTheme } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
 
@@ -99,9 +91,9 @@ export default function ScrollableModal({
               )}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 {headerRight}
-                <TouchableOpacity onPress={onClose}>
+                <Pressable onPress={onClose} hitSlop={8}>
                   <CloseIcon color={theme.textMuted} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           )}

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import type { User } from '@supabase/supabase-js'
 import { useI18n } from '../hooks/useI18n'
 import { useTheme } from '../hooks/useTheme'
@@ -77,7 +77,7 @@ export default function AuthBar({
       >
         <View style={{ flex: 1 }}>
           {whatsNewUnread && (
-            <TouchableOpacity
+            <Pressable
               onPress={onWhatsNew}
               style={{
                 flexDirection: 'row',
@@ -95,7 +95,7 @@ export default function AuthBar({
               <Text style={{ fontSize: 12, color: theme.textSecondary }}>
                 {t('whatsNewButton')}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
         <UserMenu
@@ -131,7 +131,7 @@ export default function AuthBar({
         backgroundColor: theme.bgSecondary,
       }}
     >
-      <TouchableOpacity
+      <Pressable
         onPress={onSignIn}
         style={{
           flexDirection: 'row',
@@ -144,13 +144,12 @@ export default function AuthBar({
           paddingHorizontal: 16,
           paddingVertical: 8,
         }}
-        activeOpacity={0.75}
       >
         <GoogleIcon />
         <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '600' }}>
           {t('loginBarCta')}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   )
 }

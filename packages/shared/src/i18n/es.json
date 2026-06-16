@@ -116,7 +116,7 @@
   "importErrorNotRestoredDesc": "La importación falló y no fue posible restaurar tu colección. Contacta al soporte.",
   "importErrorGenericTitle": "No se pudo importar",
   "importTryAgain": "Intentar de nuevo",
-  "importConfirmBtn": "Sí, importar y reemplazar",
+  "importConfirmBtn": "Sí, importar",
   "importSuccessTitle": "¡Importación completada!",
   "importSuccessDesc": "Se importaron {count} figuritas correctamente.",
   "importSuccessBtn": "Listo",

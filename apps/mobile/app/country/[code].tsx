@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
 import { useAuth } from '@/src/hooks/useAuth'
-import { useGlobalCollection } from '@/src/hooks/useGlobalCollection'
+import { useCollection } from '@/src/context/CollectionContext'
 import { useTheme, colors } from '@/src/hooks/useTheme'
 import { useI18n } from '@/src/hooks/useI18n'
 import flags from '@/src/data/flags'
@@ -38,7 +38,7 @@ export default function CountryScreen() {
   const highlightNumber = highlight ? parseInt(highlight, 10) : null
   const router = useRouter()
   const { user, signInWithGoogle } = useAuth()
-  const { collection, updateEntry } = useGlobalCollection(user)
+  const { collection, updateEntry } = useCollection()
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
 

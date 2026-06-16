@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, TouchableOpacity, Image, Modal, Pressable } from 'react-native'
+import { View, Text, Image, Modal, Pressable } from 'react-native'
 import type { User } from '@supabase/supabase-js'
 import { useTheme, colors } from '../hooks/useTheme'
 import GlobalStatsBar from './GlobalStatsBar'
@@ -50,14 +50,13 @@ export default function UserMenu({
   return (
     <>
       {/* Avatar Button */}
-      <TouchableOpacity
+      <Pressable
         onPress={() => setShowMenu(true)}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           gap: 4,
         }}
-        activeOpacity={0.7}
       >
         <View
           style={{
@@ -93,7 +92,7 @@ export default function UserMenu({
           )}
         </View>
         <Text style={{ color: theme.textMuted, fontSize: 12 }}>▼</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Modal Menu */}
       <Modal
@@ -150,7 +149,7 @@ export default function UserMenu({
             </Text>
 
             {/* Import Button */}
-            <TouchableOpacity
+            <Pressable
               onPress={() => {
                 onImport()
                 setShowMenu(false)
@@ -163,7 +162,6 @@ export default function UserMenu({
                 paddingVertical: 12,
                 borderRadius: 8,
               }}
-              activeOpacity={0.7}
             >
               <ImportIcon color={theme.textMuted} />
               <Text
@@ -174,10 +172,10 @@ export default function UserMenu({
               >
                 {t('importMenuItem')}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
 
             {/* Sign Out Button */}
-            <TouchableOpacity
+            <Pressable
               onPress={() => {
                 onSignOut()
                 setShowMenu(false)
@@ -187,7 +185,6 @@ export default function UserMenu({
                 paddingVertical: 12,
                 borderRadius: 8,
               }}
-              activeOpacity={0.7}
             >
               <Text
                 style={{
@@ -197,7 +194,7 @@ export default function UserMenu({
               >
                 {t('signOut')}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </Pressable>
         </Pressable>
       </Modal>

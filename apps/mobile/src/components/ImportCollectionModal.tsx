@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { View, Text, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native'
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import { supabase } from '../lib/supabaseClient'
 import Svg, { Path } from 'react-native-svg'
@@ -166,280 +175,310 @@ export default function ImportCollectionModal({
       onClose={handleClose}
       title={t('importTitle')}
       closeOnBackdrop={!loading}
+      scrollable={false}
     >
-      {/* Step 1: Email input */}
-      {step === 1 && !loading && !errorState && (
-        <View style={{ gap: 16 }}>
-          <Text
-            style={{
-              fontSize: 14,
-              color: theme.textSecondary,
-              lineHeight: 22,
-            }}
-          >
-            {t('importDesc')}
-          </Text>
-          <View>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: '500',
-                color: theme.textPrimary,
-                marginBottom: 6,
-              }}
-            >
-              {t('importEmailLabel')}
-            </Text>
-            <TextInput
-              style={inputStyle}
-              value={email}
-              onChangeText={setEmail}
-              placeholder={t('importEmailPlaceholder')}
-              placeholderTextColor={theme.textMuted}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity
-              onPress={handleClose}
-              style={{
-                flex: 1,
-                paddingVertical: 12,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: theme.borderColor,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: theme.textSecondary, fontWeight: '600' }}>
-                {t('importCancel')}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+          style={{ flex: 1 }}
+        >
+          {/* Step 1: Email input */}
+          {step === 1 && !loading && !errorState && (
+            <View style={{ gap: 16 }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textSecondary,
+                  lineHeight: 22,
+                }}
+              >
+                {t('importDesc')}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleCheckEmail}
-              disabled={!email.trim()}
-              style={{
-                flex: 1,
-                backgroundColor: colors.accentBlue,
-                paddingVertical: 12,
-                borderRadius: 8,
-                alignItems: 'center',
-                opacity: !email.trim() ? 0.5 : 1,
-              }}
-            >
-              <Text style={{ color: '#fff', fontWeight: '600' }}>{t('importContinue')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '500',
+                    color: theme.textPrimary,
+                    marginBottom: 6,
+                  }}
+                >
+                  {t('importEmailLabel')}
+                </Text>
+                <TextInput
+                  style={inputStyle}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder={t('importEmailPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Pressable
+                  onPress={handleClose}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: theme.borderColor,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    style={{ color: theme.textSecondary, fontWeight: '600', textAlign: 'center' }}
+                  >
+                    {t('importCancel')}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleCheckEmail}
+                  disabled={!email.trim()}
+                  style={{
+                    flex: 1,
+                    backgroundColor: colors.accentBlue,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: !email.trim() ? 0.5 : 1,
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '600', textAlign: 'center' }}>
+                    {t('importContinue')}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
 
-      {/* Step 2: Confirmation */}
-      {step === 2 && !loading && !errorState && (
-        <View style={{ gap: 16 }}>
-          <WarningIcon />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '700',
-              color: theme.textPrimary,
-              textAlign: 'center',
-            }}
-          >
-            {t('importWarningTitle')}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: theme.textSecondary,
-              lineHeight: 22,
-            }}
-          >
-            {t('importWarningLine1')}
-          </Text>
-          <View style={{ gap: 8 }}>
-            <Text style={{ fontSize: 13, color: theme.textMuted }}>
-              • {t('importWarningBullet1')}
-            </Text>
-            <Text style={{ fontSize: 13, color: theme.textMuted }}>
-              • {t('importWarningBullet2')}
-            </Text>
-          </View>
-          <View
-            style={{
-              backgroundColor: theme.bgTertiary,
-              padding: 12,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ fontSize: 13, color: theme.textMuted }}>{t('importWarningSource')}</Text>
-            <Text style={{ fontSize: 14, fontWeight: '600', color: theme.textPrimary }}>
-              {email}
-            </Text>
-          </View>
-          <Text
-            style={{
-              fontSize: 14,
-              color: theme.textSecondary,
-            }}
-          >
-            {t('importConfirmInstruction')}{' '}
-            <Text style={{ fontWeight: '700', color: theme.textPrimary }}>{CONFIRM_WORD}</Text>
-          </Text>
-          <TextInput
-            style={inputStyle}
-            value={confirmText}
-            onChangeText={setConfirmText}
-            placeholder={CONFIRM_WORD}
-            placeholderTextColor={theme.textMuted}
-            autoCapitalize="characters"
-          />
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity
-              onPress={() => setStep(1)}
-              style={{
-                flex: 1,
-                paddingVertical: 12,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: theme.borderColor,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: theme.textSecondary, fontWeight: '600' }}>
-                {t('importBack')}
+          {/* Step 2: Confirmation */}
+          {step === 2 && !loading && !errorState && (
+            <View style={{ gap: 16 }}>
+              <WarningIcon />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: theme.textPrimary,
+                  textAlign: 'center',
+                }}
+              >
+                {t('importWarningTitle')}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleImport}
-              disabled={confirmText !== CONFIRM_WORD}
-              style={{
-                flex: 1,
-                backgroundColor: colors.errorRed,
-                paddingVertical: 12,
-                borderRadius: 8,
-                alignItems: 'center',
-                opacity: confirmText !== CONFIRM_WORD ? 0.5 : 1,
-              }}
-            >
-              <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importConfirmBtn')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textSecondary,
+                  lineHeight: 22,
+                }}
+              >
+                {t('importWarningLine1')}
+              </Text>
+              <View style={{ gap: 8 }}>
+                <Text style={{ fontSize: 13, color: theme.textMuted }}>
+                  • {t('importWarningBullet1')}
+                </Text>
+                <Text style={{ fontSize: 13, color: theme.textMuted }}>
+                  • {t('importWarningBullet2')}
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: theme.bgTertiary,
+                  padding: 12,
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ fontSize: 13, color: theme.textMuted }}>
+                  {t('importWarningSource')}
+                </Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: theme.textPrimary }}>
+                  {email}
+                </Text>
+              </View>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textSecondary,
+                }}
+              >
+                {t('importConfirmInstruction')}{' '}
+                <Text style={{ fontWeight: '700', color: theme.textPrimary }}>{CONFIRM_WORD}</Text>
+              </Text>
+              <TextInput
+                style={inputStyle}
+                value={confirmText}
+                onChangeText={setConfirmText}
+                placeholder={CONFIRM_WORD}
+                placeholderTextColor={theme.textMuted}
+                autoCapitalize="characters"
+              />
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Pressable
+                  onPress={() => setStep(1)}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: theme.borderColor,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    style={{ color: theme.textSecondary, fontWeight: '600', textAlign: 'center' }}
+                  >
+                    {t('importBack')}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleImport}
+                  disabled={confirmText !== CONFIRM_WORD}
+                  style={{
+                    flex: 1,
+                    backgroundColor: colors.errorRed,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: confirmText !== CONFIRM_WORD ? 0.5 : 1,
+                  }}
+                >
+                  <Text style={{ color: '#ffffff', fontWeight: '600', textAlign: 'center' }}>
+                    {t('importConfirmBtn')}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
 
-      {/* Loading states */}
-      {loading && (
-        <View style={{ alignItems: 'center', paddingVertical: 32, gap: 16 }}>
-          <ActivityIndicator size="large" color={colors.accentBlue} />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: theme.textPrimary,
-              textAlign: 'center',
-            }}
-          >
-            {loadingPhase === 'backup' ? t('importPhaseBackup') : t('importPhaseImporting')}
-          </Text>
-          <Text
-            style={{
-              fontSize: 13,
-              color: theme.textMuted,
-              textAlign: 'center',
-            }}
-          >
-            {loadingPhase === 'backup' ? t('importPhaseBackupSub') : t('importLoading')}
-          </Text>
-        </View>
-      )}
+          {/* Loading states */}
+          {loading && (
+            <View style={{ alignItems: 'center', paddingVertical: 32, gap: 16 }}>
+              <ActivityIndicator size="large" color={colors.accentBlue} />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: theme.textPrimary,
+                  textAlign: 'center',
+                }}
+              >
+                {loadingPhase === 'backup' ? t('importPhaseBackup') : t('importPhaseImporting')}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: theme.textMuted,
+                  textAlign: 'center',
+                }}
+              >
+                {loadingPhase === 'backup' ? t('importPhaseBackupSub') : t('importLoading')}
+              </Text>
+            </View>
+          )}
 
-      {/* Error state */}
-      {errorState && !loading && (
-        <View style={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
-          <WarningIcon />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '700',
-              color: theme.textPrimary,
-              textAlign: 'center',
-            }}
-          >
-            {errorState.isImportFail
-              ? t('importErrorRestoredTitle')
-              : errorState.restored === false
-                ? t('importErrorNotRestoredTitle')
-                : t('importErrorGenericTitle')}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: theme.textSecondary,
-              textAlign: 'center',
-              lineHeight: 20,
-            }}
-          >
-            {errorState.isImportFail
-              ? t('importErrorRestoredDesc').replace('{count}', String(errorState.backupCount || 0))
-              : errorState.restored === false
-                ? t('importErrorNotRestoredDesc')
-                : errorState.message || t('importError')}
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setErrorState(null)
-              setStep(1)
-              setConfirmText('')
-            }}
-            style={{
-              backgroundColor: colors.accentOrange,
-              paddingHorizontal: 24,
-              paddingVertical: 12,
-              borderRadius: 9999,
-            }}
-          >
-            <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importTryAgain')}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+          {/* Error state */}
+          {errorState && !loading && (
+            <View style={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
+              <WarningIcon />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: theme.textPrimary,
+                  textAlign: 'center',
+                }}
+              >
+                {errorState.isImportFail
+                  ? t('importErrorRestoredTitle')
+                  : errorState.restored === false
+                    ? t('importErrorNotRestoredTitle')
+                    : t('importErrorGenericTitle')}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textSecondary,
+                  textAlign: 'center',
+                  lineHeight: 20,
+                }}
+              >
+                {errorState.isImportFail
+                  ? t('importErrorRestoredDesc').replace(
+                      '{count}',
+                      String(errorState.backupCount || 0)
+                    )
+                  : errorState.restored === false
+                    ? t('importErrorNotRestoredDesc')
+                    : errorState.message || t('importError')}
+              </Text>
+              <Pressable
+                onPress={() => {
+                  setErrorState(null)
+                  setStep(1)
+                  setConfirmText('')
+                }}
+                style={{
+                  backgroundColor: colors.accentOrange,
+                  paddingHorizontal: 24,
+                  paddingVertical: 12,
+                  borderRadius: 9999,
+                }}
+              >
+                <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importTryAgain')}</Text>
+              </Pressable>
+            </View>
+          )}
 
-      {/* Success state */}
-      {step === 3 && !loading && (
-        <View style={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
-          <CheckIcon />
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: theme.textPrimary,
-              textAlign: 'center',
-            }}
-          >
-            {t('importSuccessTitle')}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: theme.textSecondary,
-              textAlign: 'center',
-            }}
-          >
-            {t('importSuccessDesc').replace('{count}', String(importedCount))}
-          </Text>
-          <TouchableOpacity
-            onPress={handleDone}
-            style={{
-              backgroundColor: colors.accentOrange,
-              paddingHorizontal: 24,
-              paddingVertical: 12,
-              borderRadius: 9999,
-            }}
-          >
-            <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importSuccessBtn')}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+          {/* Success state */}
+          {step === 3 && !loading && (
+            <View style={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
+              <CheckIcon />
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  color: theme.textPrimary,
+                  textAlign: 'center',
+                }}
+              >
+                {t('importSuccessTitle')}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textSecondary,
+                  textAlign: 'center',
+                }}
+              >
+                {t('importSuccessDesc').replace('{count}', String(importedCount))}
+              </Text>
+              <Pressable
+                onPress={handleDone}
+                style={{
+                  backgroundColor: colors.accentOrange,
+                  paddingHorizontal: 24,
+                  paddingVertical: 12,
+                  borderRadius: 9999,
+                }}
+              >
+                <Text style={{ color: '#ffffff', fontWeight: '600' }}>{t('importSuccessBtn')}</Text>
+              </Pressable>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ScrollableModal>
   )
 }

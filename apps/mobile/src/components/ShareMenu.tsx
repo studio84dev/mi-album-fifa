@@ -1,4 +1,4 @@
-import { TouchableOpacity, Share } from 'react-native'
+import { Pressable, Share } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import Svg, { Path, Circle, Line } from 'react-native-svg'
 
@@ -42,7 +42,7 @@ export default function ShareMenu({ shareText, shareTitle }: ShareMenuProps) {
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handleShare}
       style={{
         width: 40,
@@ -54,9 +54,8 @@ export default function ShareMenu({ shareText, shareTitle }: ShareMenuProps) {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-      activeOpacity={0.7}
     >
       <ShareIcon color={colors.accentBlue} />
-    </TouchableOpacity>
+    </Pressable>
   )
 }

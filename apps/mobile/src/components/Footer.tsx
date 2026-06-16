@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Linking } from 'react-native'
+import { View, Text, Pressable, Linking } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import ShareMenu from './ShareMenu'
 import ThemeToggle from './ThemeToggle'
@@ -73,20 +73,20 @@ export default function Footer({
           >
             {t('kofiSubMessage')}
           </Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() => Linking.openURL('https://link.mercadopago.cl/mialbumfifa')}
-            style={{
+            style={({ pressed }) => ({
               backgroundColor: colors.kofiRed,
               paddingHorizontal: 24,
               paddingVertical: 12,
               borderRadius: 9999,
-            }}
-            activeOpacity={0.8}
+              opacity: pressed ? 0.8 : 1,
+            })}
           >
             <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
               {t('kofiButton')}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
 
@@ -101,15 +101,15 @@ export default function Footer({
           marginBottom: 16,
         }}
       >
-        <TouchableOpacity onPress={onShowAbout}>
+        <Pressable onPress={onShowAbout} hitSlop={8}>
           <Text style={{ fontSize: 12, color: theme.textMuted }}>{t('aboutButton')}</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={{ color: theme.borderStrong, fontSize: 12 }}>·</Text>
-        <TouchableOpacity onPress={onShowSuggestion}>
+        <Pressable onPress={onShowSuggestion} hitSlop={8}>
           <Text style={{ fontSize: 12, color: theme.textMuted }}>{t('suggestionButton')}</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={{ color: theme.borderStrong, fontSize: 12 }}>·</Text>
-        <TouchableOpacity
+        <Pressable
           onPress={() => Linking.openURL('https://github.com/studio84dev/mi-album-fifa')}
           style={{
             width: 28,
@@ -123,7 +123,7 @@ export default function Footer({
           }}
         >
           <GitHubIcon color={theme.textSecondary} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Theme Toggle */}
@@ -142,7 +142,7 @@ export default function Footer({
         }}
       >
         <Text style={{ fontSize: 12, color: theme.textMuted }}>{t('langToggleLabel')}:</Text>
-        <TouchableOpacity
+        <Pressable
           onPress={() => locale !== 'es' && toggleLocale()}
           style={{
             borderWidth: 1,
@@ -162,8 +162,8 @@ export default function Footer({
           >
             ES
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Pressable>
+        <Pressable
           onPress={() => locale !== 'en' && toggleLocale()}
           style={{
             borderWidth: 1,
@@ -183,7 +183,7 @@ export default function Footer({
           >
             EN
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Share */}

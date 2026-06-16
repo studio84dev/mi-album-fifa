@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
 
@@ -29,7 +29,7 @@ export default function ThemeToggle({ themeMode, onToggle }: ThemeToggleProps) {
   const isLight = !isDark
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onToggle}
       style={{
         flexDirection: 'row',
@@ -42,7 +42,6 @@ export default function ThemeToggle({ themeMode, onToggle }: ThemeToggleProps) {
         paddingHorizontal: 10,
         paddingVertical: 6,
       }}
-      activeOpacity={0.7}
     >
       <SunIcon color={isLight ? colors.accentBlue : theme.textMuted} />
       <View
@@ -69,6 +68,6 @@ export default function ThemeToggle({ themeMode, onToggle }: ThemeToggleProps) {
         />
       </View>
       <MoonIcon color={isLight ? theme.textMuted : colors.accentBlue} />
-    </TouchableOpacity>
+    </Pressable>
   )
 }

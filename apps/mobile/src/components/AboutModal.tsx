@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Linking } from 'react-native'
+import { View, Text, Pressable, Linking } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
 import ScrollableModal from './ScrollableModal'
@@ -171,7 +171,7 @@ export default function AboutModal({ visible, onClose, t }: AboutModalProps) {
 
         {/* Action buttons */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <TouchableOpacity
+          <Pressable
             onPress={() => Linking.openURL('https://github.com/studio84dev/mi-album-fifa')}
             style={{
               flexDirection: 'row',
@@ -189,8 +189,8 @@ export default function AboutModal({ visible, onClose, t }: AboutModalProps) {
             <Text style={{ fontSize: 12, fontWeight: '600', color: theme.textSecondary }}>
               {t('aboutActionStar')}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             onPress={() => Linking.openURL('https://github.com/studio84dev/mi-album-fifa/issues')}
             style={{
               flexDirection: 'row',
@@ -208,8 +208,8 @@ export default function AboutModal({ visible, onClose, t }: AboutModalProps) {
             <Text style={{ fontSize: 12, fontWeight: '600', color: theme.textSecondary }}>
               {t('aboutActionIssue')}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             onPress={() =>
               Linking.openURL(
                 'https://github.com/studio84dev/mi-album-fifa/blob/master/CONTRIBUTING.md'
@@ -231,7 +231,7 @@ export default function AboutModal({ visible, onClose, t }: AboutModalProps) {
             <Text style={{ fontSize: 12, fontWeight: '600', color: theme.textSecondary }}>
               {t('aboutActionContribute')}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </ScrollableModal>
