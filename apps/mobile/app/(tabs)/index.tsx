@@ -91,6 +91,21 @@ function buildSearchData() {
         }
       }
       teamsObj[key].count++
+    } else {
+      if (!teamsObj[key]) {
+        teamsObj[key] = {
+          code: key,
+          team_name: null,
+          teamNameUpper: '',
+          group: null,
+          iso: null,
+          page: sticker.page,
+          pageStr: sticker.page.toString(),
+          card_type: sticker.card_type as CardType,
+          count: 0,
+        }
+      }
+      teamsObj[key].count++
     }
 
     if (sticker.number != null && sticker.country_code != null) {
