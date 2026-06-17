@@ -31,10 +31,11 @@ export default function ShareMenu({ shareText, shareTitle }: ShareMenuProps) {
 
   const handleShare = async () => {
     try {
+      const url = 'https://mialbumfifa.com'
       await Share.share({
-        message: `${shareTitle}\n${shareText}`,
+        message: `${shareTitle}\n${shareText}\n${url}`,
         title: shareTitle,
-        url: 'https://mialbumfifa.vercel.app',
+        url,
       })
     } catch {
       // User cancelled
