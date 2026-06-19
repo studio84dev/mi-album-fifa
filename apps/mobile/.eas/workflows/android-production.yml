@@ -1,5 +1,6 @@
 name: Android Production Build
 
+# Trigger automático en push a master con cambios en mobile o shared
 on:
   push:
     branches:
