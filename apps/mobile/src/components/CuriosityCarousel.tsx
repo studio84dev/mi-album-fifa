@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { View, Text, ScrollView, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { curiositiesEs, curiositiesEn } from '@mi-album-fifa/shared'
 import { useTheme, colors } from '../hooks/useTheme'
@@ -14,7 +14,10 @@ interface CuriosityCarouselProps {
   locale?: string
 }
 
-export default function CuriosityCarousel({ countryCode, locale = 'es' }: CuriosityCarouselProps) {
+const CuriosityCarousel = React.memo(function CuriosityCarousel({
+  countryCode,
+  locale = 'es',
+}: CuriosityCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const cardWidth = useRef(280 + 32)
   const scrollRef = useRef<ScrollView>(null)
@@ -101,4 +104,6 @@ export default function CuriosityCarousel({ countryCode, locale = 'es' }: Curios
       )}
     </View>
   )
-}
+})
+
+export default CuriosityCarousel

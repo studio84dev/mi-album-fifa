@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
   useWindowDimensions,
+  type ListRenderItem,
 } from 'react-native'
 import { supabase } from '../lib/supabaseClient'
 import { useTheme, colors } from '../hooks/useTheme'
@@ -14,20 +15,29 @@ import { useI18n } from '../hooks/useI18n'
 import StickerCard from './StickerCard'
 
 const LONG_PRESS_MS = 500
+const keyExtractor = (num: number) => String(num)
+const contentContainerStyle = { paddingTop: 16, paddingBottom: 24 }
+const columnWrapperStyle = { gap: 5 }
+const ItemSeparatorComponent = () => <View style={{ height: 5 }} />
 
 interface CollectionEntry {
   collected: boolean
   repeated: number
 }
 
-function buildMaps(data: Record<string, CollectionEntry>) {
-  const cMap: Record<number, boolean> = {}
-  const rMap: Record<number, number> = {}
+interface StickerState {
+  collected: Record<number, boolean>
+  repeated: Record<number, number>
+}
+
+function buildState(data: Record<string, CollectionEntry>): StickerState {
+  const collected: Record<number, boolean> = {}
+  const repeated: Record<number, number> = {}
   Object.entries(data).forEach(([num, entry]) => {
-    cMap[Number(num)] = entry.collected
-    rMap[Number(num)] = entry.repeated ?? 0
+    collected[Number(num)] = entry.collected
+    repeated[Number(num)] = entry.repeated ?? 0
   })
-  return { cMap, rMap }
+  return { collected, repeated }
 }
 
 interface StickerPanelProps {
@@ -40,7 +50,7 @@ interface StickerPanelProps {
   onCollectionChange: (countryCode: string, number: number, data: CollectionEntry) => void
 }
 
-export default function StickerPanel({
+function StickerPanel({
   countryCode,
   user,
   stickerCount,
@@ -55,139 +65,193 @@ export default function StickerPanel({
   // 16px paddingH each side + 4 gaps of 5px between 5 columns
   const cardWidth = Math.floor((screenWidth - 32 - 20) / 5)
 
-  const { cMap: initCollected, rMap: initRepeated } = buildMaps(initialData)
-  const [collected, setCollected] = useState(initCollected)
-  const [repeated, setRepeated] = useState(initRepeated)
+  const [state, setState] = useState<StickerState>(() => buildState(initialData))
   const [modal, setModal] = useState<number | null>(null)
   const [modalRepeated, setModalRepeated] = useState(0)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    const { cMap, rMap } = buildMaps(initialData)
-    setCollected(cMap)
-    setRepeated(rMap)
-  }, [countryCode, initialData])
+    setState(buildState(initialData))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countryCode])
 
-  const toggleSticker = (number: number) => {
-    if (repeated[number] > 0) {
-      openModal(number)
-      return
-    }
-    doToggle(number)
-  }
+  const { collected, repeated } = state
 
-  const doToggle = async (number: number) => {
-    const current = !!collected[number]
-    const next = !current
-    setCollected((prev) => ({ ...prev, [number]: next }))
-    if (!next) setRepeated((prev) => ({ ...prev, [number]: 0 }))
-    onCollectionChange(countryCode, number, { collected: next, repeated: 0 })
+  // Refs para mantener handlers estables y evitar re-render de StickerCards
+  const stateRef = useRef(state)
+  stateRef.current = state
+  const countryCodeRef = useRef(countryCode)
+  countryCodeRef.current = countryCode
+  const onCollectionChangeRef = useRef(onCollectionChange)
+  onCollectionChangeRef.current = onCollectionChange
+  const userRef = useRef(user)
+  userRef.current = user
+  const cardWidthRef = useRef(cardWidth)
+  cardWidthRef.current = cardWidth
+  const highlightNumberRef = useRef(highlightNumber)
+  highlightNumberRef.current = highlightNumber
 
-    if (next) {
-      await supabase.from('sticker_collection').insert({
-        user_id: user!.id,
-        country_code: countryCode,
-        sticker_number: number,
-        repeated: 0,
-        updated_at: new Date().toISOString(),
-      })
-    } else {
-      await supabase
-        .from('sticker_collection')
-        .delete()
-        .eq('user_id', user!.id)
-        .eq('country_code', countryCode)
-        .eq('sticker_number', number)
-    }
-  }
+  const setSticker = useCallback((number: number, collected: boolean, repeated: number) => {
+    setState((prev) => ({
+      collected: { ...prev.collected, [number]: collected },
+      repeated: { ...prev.repeated, [number]: repeated },
+    }))
+  }, [])
 
-  const openModal = (number: number) => {
-    const current = repeated[number] ?? 0
+  const openModal = useCallback((number: number) => {
+    const current = stateRef.current.repeated[number] ?? 0
     setModalRepeated(current > 0 ? current : 1)
     setModal(number)
-  }
+  }, [])
 
-  const closeModal = () => setModal(null)
+  const closeModal = useCallback(() => setModal(null), [])
 
-  const applyModalAction = async (action: string) => {
-    const number = modal!
-    const rep = modalRepeated
-    closeModal()
-
-    if (action === 'none') {
-      setCollected((prev) => ({ ...prev, [number]: false }))
-      setRepeated((prev) => ({ ...prev, [number]: 0 }))
-      onCollectionChange(countryCode, number, { collected: false, repeated: 0 })
+  const syncSupabase = useCallback(async (number: number, collected: boolean, repeated: number) => {
+    const currentUser = userRef.current
+    const currentCountryCode = countryCodeRef.current
+    if (!currentUser) return
+    if (collected) {
+      const existing = stateRef.current.collected[number]
+      if (existing) {
+        await supabase
+          .from('sticker_collection')
+          .update({ repeated, updated_at: new Date().toISOString() })
+          .eq('user_id', currentUser.id)
+          .eq('country_code', currentCountryCode)
+          .eq('sticker_number', number)
+      } else {
+        await supabase.from('sticker_collection').insert({
+          user_id: currentUser.id,
+          country_code: currentCountryCode,
+          sticker_number: number,
+          repeated,
+          updated_at: new Date().toISOString(),
+        })
+      }
+    } else {
       await supabase
         .from('sticker_collection')
         .delete()
-        .eq('user_id', user!.id)
-        .eq('country_code', countryCode)
+        .eq('user_id', currentUser.id)
+        .eq('country_code', currentCountryCode)
         .eq('sticker_number', number)
-      return
     }
+  }, [])
 
-    setCollected((prev) => ({ ...prev, [number]: true }))
-    setRepeated((prev) => ({ ...prev, [number]: rep }))
-    onCollectionChange(countryCode, number, { collected: true, repeated: rep })
-
-    const existing = collected[number]
-    if (existing) {
-      await supabase
-        .from('sticker_collection')
-        .update({ repeated: rep, updated_at: new Date().toISOString() })
-        .eq('user_id', user!.id)
-        .eq('country_code', countryCode)
-        .eq('sticker_number', number)
-    } else {
-      await supabase.from('sticker_collection').insert({
-        user_id: user!.id,
-        country_code: countryCode,
-        sticker_number: number,
-        repeated: rep,
-        updated_at: new Date().toISOString(),
+  const handleStickerPress = useCallback(
+    async (number: number) => {
+      const currentState = stateRef.current
+      if (currentState.repeated[number] > 0) {
+        openModal(number)
+        return
+      }
+      const current = !!currentState.collected[number]
+      const next = !current
+      setSticker(number, next, 0)
+      onCollectionChangeRef.current(countryCodeRef.current, number, {
+        collected: next,
+        repeated: 0,
       })
-    }
-  }
+      await syncSupabase(number, next, 0)
+    },
+    [setSticker, syncSupabase]
+  )
 
-  const handleLongPressIn = (number: number) => {
+  const handleStickerLongPress = useCallback((number: number) => openModal(number), [])
+
+  const applyModalAction = useCallback(
+    async (action: string) => {
+      const number = modal!
+      const rep = modalRepeated
+      closeModal()
+
+      if (action === 'none') {
+        setSticker(number, false, 0)
+        onCollectionChangeRef.current(countryCodeRef.current, number, {
+          collected: false,
+          repeated: 0,
+        })
+        await syncSupabase(number, false, 0)
+        return
+      }
+
+      setSticker(number, true, rep)
+      onCollectionChangeRef.current(countryCodeRef.current, number, {
+        collected: true,
+        repeated: rep,
+      })
+      await syncSupabase(number, true, rep)
+    },
+    [modal, modalRepeated, closeModal, setSticker, syncSupabase]
+  )
+
+  const handleLongPressIn = useCallback((number: number) => {
     longPressTimer.current = setTimeout(() => openModal(number), LONG_PRESS_MS)
-  }
+  }, [])
 
-  const handleLongPressOut = () => {
+  const handleLongPressOut = useCallback(() => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current)
       longPressTimer.current = null
     }
-  }
+  }, [])
+
+  const data = useMemo(
+    () => stickerNumbers ?? Array.from({ length: stickerCount }, (_, i) => i + 1),
+    [stickerNumbers, stickerCount]
+  )
+
+  const renderItem: ListRenderItem<number> = useCallback(
+    ({ item: num }) => {
+      const currentState = stateRef.current
+      const currentHighlight = highlightNumberRef.current
+      return (
+        <View style={{ width: cardWidthRef.current }}>
+          <StickerCard
+            num={num}
+            countryCode={countryCodeRef.current}
+            isCollected={!!currentState.collected[num]}
+            isRepeated={(currentState.repeated[num] ?? 0) > 0}
+            repeatedCount={currentState.repeated[num] ?? 0}
+            isHighlighted={currentHighlight === num}
+            onPress={handleStickerPress}
+            onLongPress={handleStickerLongPress}
+            onPressIn={handleLongPressIn}
+            onPressOut={handleLongPressOut}
+            delayLongPress={LONG_PRESS_MS}
+          />
+        </View>
+      )
+    },
+    [handleStickerPress, handleStickerLongPress, handleLongPressIn, handleLongPressOut]
+  )
+
+  const getItemLayout = useCallback(
+    (_: unknown, index: number) => ({
+      length: cardWidthRef.current,
+      offset: cardWidthRef.current * (index % 5),
+      index,
+    }),
+    []
+  )
 
   return (
     <>
       <FlatList
-        data={stickerNumbers ?? Array.from({ length: stickerCount }, (_, i) => i + 1)}
+        data={data}
         numColumns={5}
-        keyExtractor={(num) => String(num)}
+        keyExtractor={keyExtractor}
         scrollEnabled={false}
-        contentContainerStyle={{ paddingTop: 16, paddingBottom: 24 }}
-        columnWrapperStyle={{ gap: 5 }}
-        ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
-        renderItem={({ item: num }) => (
-          <View style={{ width: cardWidth }}>
-            <StickerCard
-              num={num}
-              countryCode={countryCode}
-              isCollected={!!collected[num]}
-              isRepeated={(repeated[num] ?? 0) > 0}
-              repeatedCount={repeated[num] ?? 0}
-              isHighlighted={highlightNumber === num}
-              onPress={() => toggleSticker(num)}
-              onLongPress={() => openModal(num)}
-              onPressIn={() => handleLongPressIn(num)}
-              onPressOut={handleLongPressOut}
-              delayLongPress={LONG_PRESS_MS}
-            />
-          </View>
-        )}
+        contentContainerStyle={contentContainerStyle}
+        columnWrapperStyle={columnWrapperStyle}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        renderItem={renderItem}
+        getItemLayout={getItemLayout}
+        extraData={state}
+        initialNumToRender={20}
+        maxToRenderPerBatch={20}
+        windowSize={5}
+        removeClippedSubviews={true}
       />
 
       <Text style={{ color: theme.textDisabled, fontSize: 12, textAlign: 'center', marginTop: 8 }}>
@@ -355,3 +419,5 @@ export default function StickerPanel({
     </>
   )
 }
+
+export default React.memo(StickerPanel)

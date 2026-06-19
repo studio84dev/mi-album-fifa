@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react'
-import { View, Text, Pressable, Animated } from 'react-native'
+import React, { useEffect, useRef, useMemo } from 'react'
+import { View, Text, Pressable, Animated, type ViewStyle, type TextStyle } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 
 interface StickerCardProps {
@@ -9,14 +9,35 @@ interface StickerCardProps {
   isRepeated: boolean
   repeatedCount: number
   isHighlighted?: boolean
-  onPress: () => void
-  onLongPress: () => void
-  onPressIn: () => void
+  onPress: (num: number) => void
+  onLongPress: (num: number) => void
+  onPressIn: (num: number) => void
   onPressOut: () => void
   delayLongPress: number
 }
 
-export default function StickerCard({
+const BASE_STYLE: ViewStyle = {
+  aspectRatio: 1.1,
+  borderRadius: 6,
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative',
+  paddingVertical: 4,
+}
+
+const NUM_STYLE: TextStyle = { fontSize: 15, fontWeight: '700', lineHeight: 16 }
+const CODE_STYLE: TextStyle = { fontSize: 9, fontWeight: '500', opacity: 0.75, marginTop: 1 }
+const BADGE_STYLE: ViewStyle = {
+  position: 'absolute',
+  top: 2,
+  right: 2,
+  backgroundColor: colors.accentOrange,
+  borderRadius: 3,
+  paddingHorizontal: 2,
+}
+const BADGE_TEXT_STYLE: TextStyle = { color: '#ffffff', fontSize: 8, fontWeight: '700' }
+
+const StickerCard = React.memo(function StickerCard({
   num,
   countryCode,
   isCollected,
@@ -48,75 +69,73 @@ export default function StickerCard({
     return () => pulse.stop()
   }, [isHighlighted])
 
-  let bgColor = theme.bgTertiary
-  let borderColor = theme.borderColor
-  let textColor = theme.textMuted
+  const { bgColor, borderColor, textColor, borderWidth } = useMemo(() => {
+    if (isCollected && isRepeated) {
+      return {
+        bgColor: colors.accentBlueHover,
+        borderColor: colors.accentBlue,
+        textColor: '#ffffff',
+        borderWidth: isHighlighted ? 2 : 1,
+      }
+    }
+    if (isCollected) {
+      return {
+        bgColor: colors.accentBlue,
+        borderColor: colors.accentBlue,
+        textColor: '#ffffff',
+        borderWidth: isHighlighted ? 2 : 1,
+      }
+    }
+    if (isRepeated) {
+      return {
+        bgColor: `${colors.accentOrange}1F`,
+        borderColor: `${colors.accentOrange}66`,
+        textColor: colors.accentOrange,
+        borderWidth: isHighlighted ? 2 : 1,
+      }
+    }
+    return {
+      bgColor: theme.bgTertiary,
+      borderColor: theme.borderColor,
+      textColor: theme.textMuted,
+      borderWidth: isHighlighted ? 2 : 1,
+    }
+  }, [isCollected, isRepeated, isHighlighted, theme.bgTertiary, theme.borderColor, theme.textMuted])
 
-  if (isCollected && isRepeated) {
-    bgColor = colors.accentBlueHover
-    borderColor = colors.accentBlue
-    textColor = '#ffffff'
-  } else if (isCollected) {
-    bgColor = colors.accentBlue
-    borderColor = colors.accentBlue
-    textColor = '#ffffff'
-  } else if (isRepeated) {
-    bgColor = `${colors.accentOrange}1F`
-    borderColor = `${colors.accentOrange}66`
-    textColor = colors.accentOrange
-  }
+  const containerStyle = useMemo(
+    () => ({
+      ...BASE_STYLE,
+      backgroundColor: bgColor,
+      borderWidth,
+      borderColor,
+    }),
+    [bgColor, borderWidth, borderColor]
+  )
+
+  const handlePress = () => onPress(num)
+  const handleLongPress = () => onLongPress(num)
+  const handlePressIn = () => onPressIn(num)
 
   return (
     <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
       <Pressable
-        onPress={onPress}
-        onLongPress={onLongPress}
-        onPressIn={onPressIn}
+        onPress={handlePress}
+        onLongPress={handleLongPress}
+        onPressIn={handlePressIn}
         onPressOut={onPressOut}
         delayLongPress={delayLongPress}
-        style={{
-          aspectRatio: 1.1,
-          backgroundColor: bgColor,
-          borderWidth: isHighlighted ? 2 : 1,
-          borderColor: isHighlighted ? colors.highlightYellow : borderColor,
-          borderRadius: 6,
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          paddingVertical: 4,
-        }}
+        style={containerStyle}
       >
-        <Text style={{ color: textColor, fontSize: 15, fontWeight: '700', lineHeight: 16 }}>
-          {num}
-        </Text>
-        <Text
-          style={{
-            color: textColor,
-            fontSize: 9,
-            fontWeight: '500',
-            opacity: 0.75,
-            marginTop: 1,
-          }}
-        >
-          {countryCode}
-        </Text>
+        <Text style={{ color: textColor, ...NUM_STYLE }}>{num}</Text>
+        <Text style={{ color: textColor, ...CODE_STYLE }}>{countryCode}</Text>
         {isRepeated && (
-          <View
-            style={{
-              position: 'absolute',
-              top: 2,
-              right: 2,
-              backgroundColor: colors.accentOrange,
-              borderRadius: 3,
-              paddingHorizontal: 2,
-            }}
-          >
-            <Text style={{ color: '#ffffff', fontSize: 8, fontWeight: '700' }}>
-              +{repeatedCount}
-            </Text>
+          <View style={BADGE_STYLE}>
+            <Text style={BADGE_TEXT_STYLE}>+{repeatedCount}</Text>
           </View>
         )}
       </Pressable>
     </Animated.View>
   )
-}
+})
+
+export default StickerCard

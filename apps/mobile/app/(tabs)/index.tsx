@@ -24,7 +24,7 @@ import AboutModal from '@/src/components/AboutModal'
 import SuggestionModal from '@/src/components/SuggestionModal'
 import ImportCollectionModal from '@/src/components/ImportCollectionModal'
 import { useAuth } from '@/src/hooks/useAuth'
-import { useCollection } from '@/src/context/CollectionContext'
+import { useCollectionState } from '@/src/context/CollectionContext'
 import { useI18n } from '@/src/hooks/useI18n'
 import { useTheme } from '@/src/hooks/useTheme'
 import { useWhatsNew } from '@/src/hooks/useWhatsNew'
@@ -152,7 +152,7 @@ export default function HomeScreen() {
   const [showImport, setShowImport] = useState(false)
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
-  const { collection, totals, loading: collectionLoading } = useCollection()
+  const { collection, totals, loading: collectionLoading } = useCollectionState()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { allCountries, stickerByCode, searchableStickers } = useMemo(() => buildSearchData(), [])

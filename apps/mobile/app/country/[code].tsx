@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
 import { useAuth } from '@/src/hooks/useAuth'
-import { useCollection } from '@/src/context/CollectionContext'
+import { useCollectionState, useCollectionDispatch } from '@/src/context/CollectionContext'
 import { useTheme, colors } from '@/src/hooks/useTheme'
 import { useI18n } from '@/src/hooks/useI18n'
 import flags from '@/src/data/flags'
@@ -33,12 +33,13 @@ const GoogleIcon = () => (
   </Svg>
 )
 
-export default function CountryScreen() {
+function CountryScreen() {
   const { code, highlight } = useLocalSearchParams<{ code: string; highlight?: string }>()
   const highlightNumber = highlight ? parseInt(highlight, 10) : null
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle } = useAuth()
-  const { collection, updateEntry } = useCollection()
+  const { collection } = useCollectionState()
+  const { updateEntry } = useCollectionDispatch()
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
 
@@ -54,13 +55,30 @@ export default function CountryScreen() {
   const page = countryStickers[0]?.page ?? null
   const isoCode = countryStickers[0]?.iso ?? null
 
-  const collectedData = {
-    ...(code === '00' ? (collection['null'] ?? {}) : {}),
-    ...(collection[code ?? ''] ?? {}),
-  }
-  const collectedCount = Object.values(collectedData).filter((e) => e.collected).length
-  const repeatedCount = Object.values(collectedData).reduce((acc, e) => acc + (e.repeated ?? 0), 0)
-  const isComplete = stickerCount > 0 && collectedCount >= stickerCount
+  const stickerNumbers = useMemo(
+    () => countryStickers.map((s) => (s.number === 0 ? 1 : s.number!)),
+    [countryStickers]
+  )
+
+  const { collectedData, collectedCount, repeatedCount, isComplete } = useMemo(() => {
+    const rawData = {
+      ...(code === '00' ? (collection['null'] ?? {}) : {}),
+      ...(collection[code ?? ''] ?? {}),
+    }
+    const data: Record<string, { collected: boolean; repeated: number }> = {}
+    for (const [key, entry] of Object.entries(rawData)) {
+      data[key] = { collected: entry.collected, repeated: entry.repeated ?? 0 }
+    }
+    const collected = Object.values(data).filter((e) => e.collected).length
+    const repeated = Object.values(data).reduce((acc, e) => acc + e.repeated, 0)
+    const complete = stickerCount > 0 && collected >= stickerCount
+    return {
+      collectedData: data,
+      collectedCount: collected,
+      repeatedCount: repeated,
+      isComplete: complete,
+    }
+  }, [code, collection, stickerCount])
 
   const rawFlag = isoCode ? flags[isoCode] : null
   const FlagSvg = rawFlag
@@ -171,10 +189,10 @@ export default function CountryScreen() {
             countryCode={code ?? ''}
             user={user}
             stickerCount={stickerCount}
-            stickerNumbers={countryStickers.map((s) => (s.number === 0 ? 1 : s.number!))}
+            stickerNumbers={stickerNumbers}
             initialData={collectedData}
             highlightNumber={highlightNumber}
-            onCollectionChange={(cc, number, data) => updateEntry(cc, number, data)}
+            onCollectionChange={updateEntry}
           />
 
           <View style={{ marginTop: 16 }}>
@@ -185,3 +203,5 @@ export default function CountryScreen() {
     </SafeAreaView>
   )
 }
+
+export default React.memo(CountryScreen)

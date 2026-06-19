@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export interface CollectionEntry {
@@ -82,7 +82,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       []
     )
 
-    const totals = (() => {
+    const totals = useMemo(() => {
       const SPECIAL_CODES = new Set(['FWC', 'CC', '00'])
       const TEAM_CODES = new Set(Object.keys(collection).filter((c) => !SPECIAL_CODES.has(c)))
       let teamCollected = 0
@@ -104,7 +104,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       })
 
       return { teamCollected, fwcCollected, ccCollected, paniniCollected, totalRepeated }
-    })()
+    }, [collection])
 
     return { collection, loading, updateEntry, totals }
   }
