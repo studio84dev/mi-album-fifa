@@ -10,6 +10,9 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
     "dev:mobile": "npm run start --workspace=apps/mobile",
+    "build:mobile": "cd apps/mobile && npx eas build",
+    "build:mobile:android": "cd apps/mobile && npx eas build --platform android --profile production",
+    "build:mobile:ios": "cd apps/mobile && npx eas build --platform ios --profile production",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier --write ."
   },
