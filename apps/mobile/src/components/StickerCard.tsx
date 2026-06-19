@@ -67,7 +67,7 @@ export default function StickerCard({
   }
 
   return (
-    <Animated.View style={{ flex: 1, transform: [{ scale: pulseAnim }] }}>
+    <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
       <Pressable
         onPress={onPress}
         onLongPress={onLongPress}
@@ -75,7 +75,6 @@ export default function StickerCard({
         onPressOut={onPressOut}
         delayLongPress={delayLongPress}
         style={{
-          flex: 1,
           aspectRatio: 1.1,
           backgroundColor: bgColor,
           borderWidth: isHighlighted ? 2 : 1,

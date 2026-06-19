@@ -42,13 +42,22 @@ export default function CountryScreen() {
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
 
-  const countryStickers = useMemo(() => allStickers.filter((s) => s.country_code === code), [code])
+  const countryStickers = useMemo(
+    () =>
+      allStickers.filter(
+        (s) => s.country_code === code || (s.country_code == null && s.code === code)
+      ),
+    [code]
+  )
   const stickerCount = countryStickers.length
   const teamName = countryStickers[0]?.team_name ?? code
   const page = countryStickers[0]?.page ?? null
   const isoCode = countryStickers[0]?.iso ?? null
 
-  const collectedData = collection[code ?? ''] ?? {}
+  const collectedData = {
+    ...(code === '00' ? (collection['null'] ?? {}) : {}),
+    ...(collection[code ?? ''] ?? {}),
+  }
   const collectedCount = Object.values(collectedData).filter((e) => e.collected).length
   const repeatedCount = Object.values(collectedData).reduce((acc, e) => acc + (e.repeated ?? 0), 0)
   const isComplete = stickerCount > 0 && collectedCount >= stickerCount
@@ -162,6 +171,7 @@ export default function CountryScreen() {
             countryCode={code ?? ''}
             user={user}
             stickerCount={stickerCount}
+            stickerNumbers={countryStickers.map((s) => (s.number === 0 ? 1 : s.number!))}
             initialData={collectedData}
             highlightNumber={highlightNumber}
             onCollectionChange={(cc, number, data) => updateEntry(cc, number, data)}

@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
-import { View, Text, FlatList, Modal, Pressable, TouchableOpacity } from 'react-native'
+import {
+  View,
+  Text,
+  FlatList,
+  Modal,
+  Pressable,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native'
 import { supabase } from '../lib/supabaseClient'
 import { useTheme, colors } from '../hooks/useTheme'
 import { useI18n } from '../hooks/useI18n'
@@ -26,6 +34,7 @@ interface StickerPanelProps {
   countryCode: string
   user: { id: string } | null
   stickerCount: number
+  stickerNumbers?: number[]
   initialData: Record<string, CollectionEntry>
   highlightNumber?: number | null
   onCollectionChange: (countryCode: string, number: number, data: CollectionEntry) => void
@@ -35,12 +44,16 @@ export default function StickerPanel({
   countryCode,
   user,
   stickerCount,
+  stickerNumbers,
   initialData,
   highlightNumber = null,
   onCollectionChange,
 }: StickerPanelProps) {
   const { theme } = useTheme()
   const { t } = useI18n()
+  const { width: screenWidth } = useWindowDimensions()
+  // 16px paddingH each side + 4 gaps of 5px between 5 columns
+  const cardWidth = Math.floor((screenWidth - 32 - 20) / 5)
 
   const { cMap: initCollected, rMap: initRepeated } = buildMaps(initialData)
   const [collected, setCollected] = useState(initCollected)
@@ -151,7 +164,7 @@ export default function StickerPanel({
   return (
     <>
       <FlatList
-        data={Array.from({ length: stickerCount }, (_, i) => i + 1)}
+        data={stickerNumbers ?? Array.from({ length: stickerCount }, (_, i) => i + 1)}
         numColumns={5}
         keyExtractor={(num) => String(num)}
         scrollEnabled={false}
@@ -159,19 +172,21 @@ export default function StickerPanel({
         columnWrapperStyle={{ gap: 5 }}
         ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
         renderItem={({ item: num }) => (
-          <StickerCard
-            num={num}
-            countryCode={countryCode}
-            isCollected={!!collected[num]}
-            isRepeated={(repeated[num] ?? 0) > 0}
-            repeatedCount={repeated[num] ?? 0}
-            isHighlighted={highlightNumber === num}
-            onPress={() => toggleSticker(num)}
-            onLongPress={() => openModal(num)}
-            onPressIn={() => handleLongPressIn(num)}
-            onPressOut={handleLongPressOut}
-            delayLongPress={LONG_PRESS_MS}
-          />
+          <View style={{ width: cardWidth }}>
+            <StickerCard
+              num={num}
+              countryCode={countryCode}
+              isCollected={!!collected[num]}
+              isRepeated={(repeated[num] ?? 0) > 0}
+              repeatedCount={repeated[num] ?? 0}
+              isHighlighted={highlightNumber === num}
+              onPress={() => toggleSticker(num)}
+              onLongPress={() => openModal(num)}
+              onPressIn={() => handleLongPressIn(num)}
+              onPressOut={handleLongPressOut}
+              delayLongPress={LONG_PRESS_MS}
+            />
+          </View>
         )}
       />
 
