@@ -3,6 +3,7 @@
   "installCommand": "cd ../.. && npm install",
   "buildCommand": "cd ../.. && npm run build:web",
   "outputDirectory": "dist",
+  "ignoreCommand": "bash -c 'changed=$(git diff --name-only HEAD^ HEAD); web_related=$(echo \"$changed\" | grep -vE \"^apps/mobile/\" | wc -l); [ \"$web_related\" -eq 0 ]'",
   "redirects": [
     {
       "source": "/(.*)",
