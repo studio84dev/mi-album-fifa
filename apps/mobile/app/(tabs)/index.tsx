@@ -28,6 +28,7 @@ import { useCollectionState } from '@/src/context/CollectionContext'
 import { useI18n } from '@/src/hooks/useI18n'
 import { useTheme } from '@/src/hooks/useTheme'
 import { useWhatsNew } from '@/src/hooks/useWhatsNew'
+import { useUpdateAvailability } from '@/src/hooks/useUpdateAvailability'
 
 const EXACT_CODE_RE = /^([A-Z0-9]+?)(\.?\d+)$/i
 
@@ -155,6 +156,7 @@ export default function HomeScreen() {
   const { collection, totals, loading: collectionLoading } = useCollectionState()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
+  const { updateAvailable } = useUpdateAvailability()
   const { allCountries, stickerByCode, searchableStickers } = useMemo(() => buildSearchData(), [])
 
   const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
@@ -303,6 +305,7 @@ export default function HomeScreen() {
         onImport={() => setShowImport(true)}
         onWhatsNew={openWhatsNew}
         whatsNewUnread={hasUnread}
+        updateAvailable={updateAvailable}
         totals={totals}
         collectionLoading={collectionLoading}
       />

@@ -4,6 +4,7 @@ import { useI18n } from '../hooks/useI18n'
 import { useTheme } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
 import UserMenu from './UserMenu'
+import UpdateBanner from './UpdateBanner'
 
 const GoogleIcon = () => (
   <Svg width={16} height={16} viewBox="0 0 24 24">
@@ -34,6 +35,7 @@ interface AuthBarProps {
   onImport?: () => void
   onWhatsNew?: () => void
   whatsNewUnread?: boolean
+  updateAvailable?: boolean
   totals?: {
     teamCollected: number
     fwcCollected: number
@@ -52,6 +54,7 @@ export default function AuthBar({
   onImport,
   onWhatsNew,
   whatsNewUnread = false,
+  updateAvailable = false,
   totals,
   collectionLoading = false,
 }: AuthBarProps) {
@@ -65,55 +68,62 @@ export default function AuthBar({
     return (
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 16,
-          paddingVertical: 8,
           borderBottomWidth: 1,
           borderBottomColor: theme.borderColor,
           backgroundColor: theme.bgSecondary,
         }}
       >
-        <View style={{ flex: 1 }}>
-          {whatsNewUnread && (
-            <Pressable
-              onPress={onWhatsNew}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                alignSelf: 'flex-start',
-                gap: 4,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                backgroundColor: theme.bgTertiary,
-                borderRadius: 9999,
-                borderWidth: 1,
-                borderColor: theme.borderColor,
-              }}
-            >
-              <Text style={{ fontSize: 12, color: theme.textSecondary }}>
-                {t('whatsNewButton')}
-              </Text>
-            </Pressable>
-          )}
-        </View>
-        <UserMenu
-          user={user}
-          onSignOut={onSignOut}
-          onImport={onImport || (() => {})}
-          t={t}
-          totals={
-            totals || {
-              teamCollected: 0,
-              fwcCollected: 0,
-              ccCollected: 0,
-              paniniCollected: 0,
-              totalRepeated: 0,
+        <UpdateBanner visible={updateAvailable} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            {whatsNewUnread && (
+              <Pressable
+                onPress={onWhatsNew}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  alignSelf: 'flex-start',
+                  gap: 4,
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  backgroundColor: theme.bgTertiary,
+                  borderRadius: 9999,
+                  borderWidth: 1,
+                  borderColor: theme.borderColor,
+                }}
+              >
+                <Text style={{ fontSize: 12, color: theme.textSecondary }}>
+                  {t('whatsNewButton')}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+
+          <UserMenu
+            user={user}
+            onSignOut={onSignOut}
+            onImport={onImport || (() => {})}
+            t={t}
+            totals={
+              totals || {
+                teamCollected: 0,
+                fwcCollected: 0,
+                ccCollected: 0,
+                paniniCollected: 0,
+                totalRepeated: 0,
+              }
             }
-          }
-          collectionLoading={collectionLoading}
-        />
+            collectionLoading={collectionLoading}
+          />
+        </View>
       </View>
     )
   }
@@ -121,35 +131,41 @@ export default function AuthBar({
   return (
     <View
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
         borderBottomWidth: 1,
         borderBottomColor: theme.borderColor,
         backgroundColor: theme.bgSecondary,
       }}
     >
-      <Pressable
-        onPress={onSignIn}
+      <UpdateBanner visible={updateAvailable} />
+      <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 8,
-          backgroundColor: theme.bgTertiary,
-          borderWidth: 1,
-          borderColor: theme.borderStrong,
-          borderRadius: 9999,
+          justifyContent: 'center',
           paddingHorizontal: 16,
           paddingVertical: 8,
         }}
       >
-        <GoogleIcon />
-        <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '600' }}>
-          {t('loginBarCta')}
-        </Text>
-      </Pressable>
+        <Pressable
+          onPress={onSignIn}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            backgroundColor: theme.bgTertiary,
+            borderWidth: 1,
+            borderColor: theme.borderStrong,
+            borderRadius: 9999,
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+          }}
+        >
+          <GoogleIcon />
+          <Text style={{ color: theme.textPrimary, fontSize: 14, fontWeight: '600' }}>
+            {t('loginBarCta')}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   )
 }

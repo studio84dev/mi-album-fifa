@@ -67,6 +67,8 @@
   "redirectBannerNew": "mialbumfifa.com",
   "redirectBannerDismiss": "Entendido",
   "whatsNewButton": "✨ Novedades",
+  "updateAvailableMessage": "Nueva versión disponible",
+  "updateAvailableButton": "Actualizar",
   "userMenuAriaLabel": "Menú de usuario",
   "signIn": "Iniciar sesión",
   "signOut": "Cerrar sesión",
