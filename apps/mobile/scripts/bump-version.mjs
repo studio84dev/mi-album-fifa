@@ -2,23 +2,26 @@
 /**
  * bump-version.mjs
  *
- * Increments app.json version (patch) and android.versionCode,
- * then uploads the new version.json to the Supabase Storage bucket.
+ * 1. Queries EAS for the current remote androidVersionCode
+ * 2. Computes nextVersionCode = current + 1
+ * 3. Bumps app.json version (patch: 1.0.1 → 1.0.2)
+ * 4. Uploads { androidVersionCode: nextVersionCode } to Supabase Storage
  *
  * Usage:
  *   node scripts/bump-version.mjs
  *
- * Requires SUPABASE_SERVICE_ROLE_KEY in apps/mobile/.env.local
+ * Requires SUPABASE_SERVICE_ROLE_KEY in apps/mobile/.env or .env.local
  */
 
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { execSync } from 'child_process'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 
-// --- Load .env.local ---
+// --- Load env files ---
 let serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 for (const envFile of ['.env.local', '.env']) {
   if (serviceRoleKey) break
@@ -39,45 +42,49 @@ for (const envFile of ['.env.local', '.env']) {
 if (!serviceRoleKey) {
   console.error(
     '❌  SUPABASE_SERVICE_ROLE_KEY not found.\n' +
-      '    Add it to apps/mobile/.env.local:\n' +
+      '    Add it to apps/mobile/.env or .env.local:\n' +
       '    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key'
   )
   process.exit(1)
 }
 
-// --- Read app.json ---
+// --- Get current versionCode from EAS ---
+console.log('🔍  Fetching current versionCode from EAS...')
+let currentVersionCode
+try {
+  const output = execSync(
+    'eas build:version:get --platform android --profile production --non-interactive 2>&1',
+    { cwd: ROOT, encoding: 'utf-8' }
+  )
+  const match = output.match(/Android versionCode\s*-\s*(\d+)/)
+  if (!match) throw new Error(`Could not parse versionCode from output:\n${output}`)
+  currentVersionCode = parseInt(match[1], 10)
+} catch (err) {
+  console.error('❌  Failed to get versionCode from EAS:', err.message)
+  process.exit(1)
+}
+
+const nextVersionCode = currentVersionCode + 1
+console.log(`    EAS versionCode: ${currentVersionCode} → next build will be: ${nextVersionCode}`)
+
+// --- Update app.json version to match nextVersionCode (format: 1.0.<versionCode>) ---
 const appJsonPath = resolve(ROOT, 'app.json')
 const appJson = JSON.parse(readFileSync(appJsonPath, 'utf-8'))
 
 const oldVersion = appJson.expo.version
-const oldVersionCode = appJson.expo.android.versionCode
-
-// Bump patch version: "1.0.1" → "1.0.2"
-const versionParts = oldVersion.split('.').map(Number)
-versionParts[2] += 1
-const newVersion = versionParts.join('.')
-
-// Bump versionCode
-const newVersionCode = oldVersionCode + 1
+const newVersion = `1.0.${nextVersionCode}`
 
 appJson.expo.version = newVersion
-appJson.expo.android.versionCode = newVersionCode
-
-// --- Write app.json ---
 writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2) + '\n', 'utf-8')
-console.log(`✅  app.json updated:`)
-console.log(`    version:     ${oldVersion} → ${newVersion}`)
-console.log(`    versionCode: ${oldVersionCode} → ${newVersionCode}`)
+console.log(`✅  app.json version: ${oldVersion} → ${newVersion}`)
 
 // --- Upload version.json to Supabase Storage ---
 const supabaseUrl = 'https://jmgiooeiimjyyltpgrna.supabase.co'
 const bucket = 'app-updates'
 const filePath = 'version.json'
-const body = JSON.stringify({ androidVersionCode: newVersionCode }, null, 2) + '\n'
+const body = JSON.stringify({ androidVersionCode: nextVersionCode }, null, 2) + '\n'
 
-const url = `${supabaseUrl}/storage/v1/object/${bucket}/${filePath}`
-
-const response = await fetch(url, {
+const uploadResponse = await fetch(`${supabaseUrl}/storage/v1/object/${bucket}/${filePath}`, {
   method: 'PUT',
   headers: {
     Authorization: `Bearer ${serviceRoleKey}`,
@@ -87,12 +94,12 @@ const response = await fetch(url, {
   body,
 })
 
-if (!response.ok) {
-  const text = await response.text()
-  console.error(`❌  Supabase upload failed (${response.status}): ${text}`)
+if (!uploadResponse.ok) {
+  const text = await uploadResponse.text()
+  console.error(`❌  Supabase upload failed (${uploadResponse.status}): ${text}`)
   process.exit(1)
 }
 
 console.log(`✅  Supabase bucket updated:`)
-console.log(`    ${bucket}/${filePath} → androidVersionCode: ${newVersionCode}`)
-console.log(`\n🚀  Ready to build: eas build --platform android`)
+console.log(`    ${bucket}/${filePath} → androidVersionCode: ${nextVersionCode}`)
+console.log(`\n🚀  Ready to build: npm run build:android`)

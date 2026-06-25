@@ -45,7 +45,7 @@
     "web": "expo start --web",
     "lint": "eslint .",
     "bump-version": "node scripts/bump-version.mjs",
-    "build:android": "npm run bump-version && eas build --platform android --profile production"
+    "build:android": "eas build --platform android --profile production"
   },
   "private": true
 }
