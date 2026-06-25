@@ -15,7 +15,7 @@
     },
     "android": {
       "package": "com.studio84.mialbumfifa",
-      "versionCode": 2,
+      "versionCode": 3,
       "icon": "./assets/images/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
