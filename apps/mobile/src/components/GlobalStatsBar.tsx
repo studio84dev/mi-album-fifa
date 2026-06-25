@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { View, Text, Animated } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 
@@ -84,13 +84,10 @@ export default function GlobalStatsBar({
   const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL + PANINI_TOTAL
   const pct = Math.round((overallCollected / overallTotal) * 100)
 
-  const progressAnim = useRef(new Animated.Value(0)).current
-  const [displayPct, setDisplayPct] = useState(0)
-
+  const progressAnim = useMemo(() => new Animated.Value(0), [])
   useEffect(() => {
     if (loading) {
       progressAnim.setValue(0)
-      setDisplayPct(0)
       return
     }
     Animated.timing(progressAnim, {
@@ -98,9 +95,7 @@ export default function GlobalStatsBar({
       duration: 800,
       useNativeDriver: false,
     }).start()
-    const timer = setTimeout(() => setDisplayPct(pct), 50)
-    return () => clearTimeout(timer)
-  }, [loading, pct])
+  }, [loading, pct, progressAnim])
 
   const containerStyle = compact
     ? { backgroundColor: 'transparent', borderWidth: 0, padding: 4 }

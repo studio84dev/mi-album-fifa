@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const flags: Record<string, unknown> = {
   mx: require('../../assets/flags/mx.svg'),
   za: require('../../assets/flags/za.svg'),

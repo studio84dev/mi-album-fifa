@@ -17,9 +17,9 @@ interface CollectionState {
 
 interface CollectionDispatch {
   updateEntry: (
-    countryCode: string,
-    stickerNumber: number | string,
-    data: { collected: boolean; repeated?: number }
+    _countryCode: string,
+    _stickerNumber: number | string,
+    _data: { collected: boolean; repeated?: number }
   ) => void
 }
 

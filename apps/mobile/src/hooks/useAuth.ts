@@ -72,10 +72,11 @@ export function useAuth() {
       const hashParams = Object.fromEntries(new URLSearchParams(hash).entries())
       const accessToken = params['access_token'] ?? hashParams['access_token']
       const refreshToken = params['refresh_token'] ?? hashParams['refresh_token']
+      // eslint-disable-next-line no-console
       console.log('callback url:', url, {
         accessToken: !!accessToken,
         refreshToken: !!refreshToken,
-      }) // eslint-disable-line no-console
+      })
       if (accessToken && refreshToken) {
         await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
       }

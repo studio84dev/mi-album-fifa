@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { View, Text, Pressable, Animated, type ViewStyle, type TextStyle } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 
@@ -9,9 +9,9 @@ interface StickerCardProps {
   isRepeated: boolean
   repeatedCount: number
   isHighlighted?: boolean
-  onPress: (num: number) => void
-  onLongPress: (num: number) => void
-  onPressIn: (num: number) => void
+  onPress: (_num: number) => void
+  onLongPress: (_num: number) => void
+  onPressIn: (_num: number) => void
   onPressOut: () => void
   delayLongPress: number
 }
@@ -51,7 +51,7 @@ const StickerCard = React.memo(function StickerCard({
   delayLongPress,
 }: StickerCardProps) {
   const { theme } = useTheme()
-  const pulseAnim = useRef(new Animated.Value(1)).current
+  const pulseAnim = useMemo(() => new Animated.Value(1), [])
 
   useEffect(() => {
     if (!isHighlighted) {
@@ -67,7 +67,7 @@ const StickerCard = React.memo(function StickerCard({
     )
     pulse.start()
     return () => pulse.stop()
-  }, [isHighlighted])
+  }, [isHighlighted, pulseAnim])
 
   const { bgColor, borderColor, textColor, borderWidth } = useMemo(() => {
     if (isCollected && isRepeated) {

@@ -58,7 +58,7 @@ interface ThemeContextValue {
   themeMode: ThemeMode
   effectiveTheme: 'light' | 'dark'
   toggleTheme: () => void
-  setTheme: (mode: ThemeMode) => void
+  setTheme: (_mode: ThemeMode) => void
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)

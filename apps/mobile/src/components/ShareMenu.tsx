@@ -1,6 +1,6 @@
 import { Pressable, Share } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
-import Svg, { Path, Circle, Line } from 'react-native-svg'
+import Svg, { Circle, Line } from 'react-native-svg'
 
 const ShareIcon = ({ color }: { color: string }) => (
   <Svg

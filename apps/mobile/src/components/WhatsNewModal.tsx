@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import { useTheme } from '../hooks/useTheme'
 import ScrollableModal from './ScrollableModal'
-import { FEATURES, WHATS_NEW_STORAGE_KEY as STORAGE_KEY } from '../data/whatsNewFeatures'
+import { FEATURES } from '../data/whatsNewFeatures'
 
 function formatDate(isoDate: string, locale: string) {
   const [y, m, d] = isoDate.split('-')

@@ -47,7 +47,7 @@ interface StickerPanelProps {
   stickerNumbers?: number[]
   initialData: Record<string, CollectionEntry>
   highlightNumber?: number | null
-  onCollectionChange: (countryCode: string, number: number, data: CollectionEntry) => void
+  onCollectionChange: (_countryCode: string, _number: number, _data: CollectionEntry) => void
 }
 
 function StickerPanel({
@@ -71,24 +71,31 @@ function StickerPanel({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState(buildState(initialData))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryCode])
 
-  const { collected, repeated } = state
+  const { collected: _collected, repeated: _repeated } = state
 
   // Refs para mantener handlers estables y evitar re-render de StickerCards
   const stateRef = useRef(state)
+  // eslint-disable-next-line react-hooks/refs
   stateRef.current = state
   const countryCodeRef = useRef(countryCode)
+  // eslint-disable-next-line react-hooks/refs
   countryCodeRef.current = countryCode
   const onCollectionChangeRef = useRef(onCollectionChange)
+  // eslint-disable-next-line react-hooks/refs
   onCollectionChangeRef.current = onCollectionChange
   const userRef = useRef(user)
+  // eslint-disable-next-line react-hooks/refs
   userRef.current = user
   const cardWidthRef = useRef(cardWidth)
+  // eslint-disable-next-line react-hooks/refs
   cardWidthRef.current = cardWidth
   const highlightNumberRef = useRef(highlightNumber)
+  // eslint-disable-next-line react-hooks/refs
   highlightNumberRef.current = highlightNumber
 
   const setSticker = useCallback((number: number, collected: boolean, repeated: number) => {
@@ -154,10 +161,10 @@ function StickerPanel({
       })
       await syncSupabase(number, next, 0)
     },
-    [setSticker, syncSupabase]
+    [openModal, setSticker, syncSupabase]
   )
 
-  const handleStickerLongPress = useCallback((number: number) => openModal(number), [])
+  const handleStickerLongPress = useCallback((number: number) => openModal(number), [openModal])
 
   const applyModalAction = useCallback(
     async (action: string) => {
@@ -185,9 +192,12 @@ function StickerPanel({
     [modal, modalRepeated, closeModal, setSticker, syncSupabase]
   )
 
-  const handleLongPressIn = useCallback((number: number) => {
-    longPressTimer.current = setTimeout(() => openModal(number), LONG_PRESS_MS)
-  }, [])
+  const handleLongPressIn = useCallback(
+    (number: number) => {
+      longPressTimer.current = setTimeout(() => openModal(number), LONG_PRESS_MS)
+    },
+    [openModal]
+  )
 
   const handleLongPressOut = useCallback(() => {
     if (longPressTimer.current) {

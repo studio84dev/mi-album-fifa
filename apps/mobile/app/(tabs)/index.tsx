@@ -48,7 +48,7 @@ interface StickerResult {
   iso: string | null
 }
 
-type ListItem = TeamItem | StickerResult
+type _ListItem = TeamItem | StickerResult
 
 interface SearchableSticker {
   _kind: 'sticker'

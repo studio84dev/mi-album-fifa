@@ -66,7 +66,7 @@ interface TeamCardProps {
   item: TeamItem
   collectedCount?: number
   repeatedCount?: number
-  onPress?: (code: string) => void
+  onPress?: (_code: string) => void
 }
 
 function TeamCard({ item, collectedCount = 0, repeatedCount = 0, onPress }: TeamCardProps) {

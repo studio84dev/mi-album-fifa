@@ -48,7 +48,7 @@ interface AuthBarProps {
 
 export default function AuthBar({
   user,
-  loading,
+  loading: _loading,
   onSignIn,
   onSignOut,
   onImport,
@@ -63,7 +63,7 @@ export default function AuthBar({
 
   if (user) {
     const name = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? ''
-    const firstName = name.split(' ')[0]
+    const _firstName = name.split(' ')[0]
 
     return (
       <View

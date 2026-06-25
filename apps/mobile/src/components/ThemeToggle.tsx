@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native'
+import { View, Pressable } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
 
@@ -24,7 +24,7 @@ interface ThemeToggleProps {
   onToggle: () => void
 }
 
-export default function ThemeToggle({ themeMode, onToggle }: ThemeToggleProps) {
+export default function ThemeToggle({ themeMode: _themeMode, onToggle }: ThemeToggleProps) {
   const { theme, isDark } = useTheme()
   const isLight = !isDark
 

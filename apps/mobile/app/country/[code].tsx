@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
@@ -60,7 +60,12 @@ function CountryScreen() {
     [countryStickers]
   )
 
-  const { collectedData, collectedCount, repeatedCount, isComplete } = useMemo(() => {
+  const {
+    collectedData,
+    collectedCount,
+    repeatedCount,
+    isComplete: _isComplete,
+  } = useMemo(() => {
     const rawData = {
       ...(code === '00' ? (collection['null'] ?? {}) : {}),
       ...(collection[code ?? ''] ?? {}),
