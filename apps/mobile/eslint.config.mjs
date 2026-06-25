@@ -57,6 +57,6 @@ export default [
     },
   },
   {
-    ignores: ['node_modules/', 'dist/', '.expo/', 'android/', 'ios/'],
+    ignores: ['node_modules/', 'dist/', '.expo/', 'android/', 'ios/', 'scripts/'],
   },
 ]
