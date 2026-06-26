@@ -19,10 +19,13 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["apps/web/src/*"],
+      "@mi-album-fifa/shared": ["packages/shared/src/index.ts"],
+      "@mi-album-fifa/shared/*": ["packages/shared/src/*"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["apps/web/src/**/*", "packages/shared/src/**/*"],
+  "exclude": ["node_modules", "**/dist"]
 }
