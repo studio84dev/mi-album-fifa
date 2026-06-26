@@ -2,11 +2,9 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   StatusBar,
   TouchableOpacity,
-  Pressable,
   Keyboard,
   type TextInput as TextInputType,
 } from 'react-native'
@@ -19,6 +17,7 @@ import TeamCard from '@/src/components/TeamCard'
 import type { TeamItem } from '@/src/components/TeamCard'
 import AuthBar from '@/src/components/AuthBar'
 import Footer from '@/src/components/Footer'
+import SearchBar from '@/src/components/SearchBar'
 import WhatsNewModal from '@/src/components/WhatsNewModal'
 import AboutModal from '@/src/components/AboutModal'
 import SuggestionModal from '@/src/components/SuggestionModal'
@@ -309,48 +308,12 @@ export default function HomeScreen() {
         totals={totals}
         collectionLoading={collectionLoading}
       />
-      <View style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: theme.bgPrimary }}>
-        <View
-          style={{
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: theme.bgTertiary,
-            borderWidth: 1,
-            borderColor: theme.borderColor,
-            borderRadius: 12,
-          }}
-        >
-          <Text style={{ color: theme.textMuted, marginRight: 8 }}>🔍</Text>
-          <TextInput
-            ref={searchInputRef}
-            style={{ flex: 1, color: theme.textPrimary, fontSize: 14, paddingVertical: 0 }}
-            placeholder={t('searchPlaceholder')}
-            placeholderTextColor={theme.textMuted}
-            value={inputValue}
-            onChangeText={handleChange}
-            autoCapitalize="none"
-            autoCorrect={false}
-            multiline={false}
-          />
-          {inputValue.length > 0 && (
-            <Pressable onPress={handleClearSearch} hitSlop={8}>
-              <Text
-                style={{
-                  color: theme.textSecondary,
-                  marginLeft: 8,
-                  fontSize: 16,
-                  fontWeight: '700',
-                  lineHeight: 20,
-                }}
-              >
-                ✕
-              </Text>
-            </Pressable>
-          )}
-        </View>
-      </View>
+      <SearchBar
+        ref={searchInputRef}
+        value={inputValue}
+        onChangeText={handleChange}
+        onClear={handleClearSearch}
+      />
       {/* Countries list — always mounted, never unmounts TeamCards */}
       <FlatList
         data={allCountries}
