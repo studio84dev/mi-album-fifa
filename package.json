@@ -14,6 +14,9 @@
     "build:mobile:android": "cd apps/mobile && npx eas build --platform android --profile production",
     "build:mobile:ios": "cd apps/mobile && npx eas build --platform ios --profile production",
     "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p apps/mobile/tsconfig.json",
+    "typecheck:web": "tsc --noEmit",
+    "typecheck:mobile": "tsc --noEmit -p apps/mobile/tsconfig.json",
     "format": "prettier --write ."
   },
   "devDependencies": {
