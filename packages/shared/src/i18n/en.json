@@ -10,6 +10,8 @@
   "lessBrowsing": "Less browsing 📖 = More years of life for your album 😉",
   "searchBackAriaLabel": "Back to list",
   "searchClearAriaLabel": "Clear search",
+  "viewModeCards": "Card view",
+  "viewModePanels": "Panel view",
   "searchPlaceholder": "Search: MEX, Argentina, Messi...",
   "resultsCount": "result",
   "resultsCountPlural": "results",

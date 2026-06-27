@@ -20,12 +20,14 @@ import AuthBar from '@/src/components/AuthBar'
 import Footer from '@/src/components/Footer'
 import SearchBar from '@/src/components/SearchBar'
 import ScrollTopButton from '@/src/components/ScrollTopButton'
+import ViewToggle from '@/src/components/ViewToggle'
+import AllPanelsView from '@/src/components/AllPanelsView'
 import WhatsNewModal from '@/src/components/WhatsNewModal'
 import AboutModal from '@/src/components/AboutModal'
 import SuggestionModal from '@/src/components/SuggestionModal'
 import ImportCollectionModal from '@/src/components/ImportCollectionModal'
 import { useAuth } from '@/src/hooks/useAuth'
-import { useCollectionState } from '@/src/context/CollectionContext'
+import { useCollectionState, useCollectionDispatch } from '@/src/context/CollectionContext'
 import { useI18n } from '@/src/hooks/useI18n'
 import { useTheme } from '@/src/hooks/useTheme'
 import { useWhatsNew } from '@/src/hooks/useWhatsNew'
@@ -49,8 +51,6 @@ interface StickerResult {
   iso: string | null
 }
 
-type _ListItem = TeamItem | StickerResult
-
 interface SearchableSticker {
   _kind: 'sticker'
   code: string
@@ -66,10 +66,16 @@ interface SearchableTeam extends TeamItem {
   pageStr: string
 }
 
+interface CountryDetails {
+  stickerCount: number
+  stickerNumbers: number[]
+}
+
 function buildSearchData() {
   const teamsObj: Record<string, SearchableTeam> = {}
   const stickerByCode = new Map<string, Sticker>()
   const searchableStickers: SearchableSticker[] = []
+  const countryDetails: Record<string, CountryDetails> = {}
 
   for (const sticker of allStickers) {
     const key = sticker.country_code ?? sticker.code
@@ -110,6 +116,14 @@ function buildSearchData() {
       teamsObj[key].count++
     }
 
+    if (!countryDetails[key]) {
+      countryDetails[key] = { stickerCount: 0, stickerNumbers: [] }
+    }
+    countryDetails[key].stickerCount++
+    if (sticker.number != null) {
+      countryDetails[key].stickerNumbers.push(sticker.number === 0 ? 1 : sticker.number)
+    }
+
     if (sticker.number != null && sticker.country_code != null) {
       stickerByCode.set(`${sticker.country_code}-${sticker.number}`, sticker)
       if (sticker.card_type !== 'team_logo' && sticker.card_type !== 'team_photo') {
@@ -130,13 +144,16 @@ function buildSearchData() {
     allCountries: Object.values(teamsObj) as SearchableTeam[],
     stickerByCode,
     searchableStickers,
+    countryDetails,
   }
 }
 
 export default function HomeScreen() {
   const searchInputRef = useRef<TextInputType>(null)
   const flatListRef = useRef<FlatList>(null)
+  const panelsFlatListRef = useRef<FlatList>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [viewMode, setViewMode] = useState<'cards' | 'panels'>('cards')
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch] = useState('')
   const handleChange = useCallback((text: string) => {
@@ -156,8 +173,13 @@ export default function HomeScreen() {
   }, [])
 
   const scrollToTop = useCallback(() => {
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
-  }, [])
+    if (search.trim().length > 0) return
+    if (viewMode === 'cards') {
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+    } else {
+      panelsFlatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+    }
+  }, [search, viewMode])
   const { showWhatsNew, setShowWhatsNew, hasUnread, openWhatsNew } = useWhatsNew()
   const [showAbout, setShowAbout] = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
@@ -165,10 +187,14 @@ export default function HomeScreen() {
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   const { collection, totals, loading: collectionLoading } = useCollectionState()
+  const { updateEntry } = useCollectionDispatch()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
-  const { allCountries, stickerByCode, searchableStickers } = useMemo(() => buildSearchData(), [])
+  const { allCountries, stickerByCode, searchableStickers, countryDetails } = useMemo(
+    () => buildSearchData(),
+    []
+  )
 
   const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
   const totalCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
@@ -180,8 +206,14 @@ export default function HomeScreen() {
     return stickerByCode.get(`${parsed.prefix}-${parsed.number}`) ?? null
   }, [search, stickerByCode])
 
-  const searchResults = useMemo((): (TeamItem | StickerResult)[] => {
-    if (!search.trim()) return allCountries
+  const { searchResults, matchedCountryCodes, panelHighlightByCountry } = useMemo(() => {
+    if (!search.trim()) {
+      return {
+        searchResults: allCountries,
+        matchedCountryCodes: null,
+        panelHighlightByCountry: null,
+      }
+    }
     const q = search.trim().toUpperCase()
 
     const matchedTeams = allCountries.filter(
@@ -196,20 +228,47 @@ export default function HomeScreen() {
       }
     }
 
-    if (matchedTeams.length === 0 && matchedStickers.length === 0 && exactMatch) {
-      return [
-        {
-          _kind: 'sticker' as const,
-          code: exactMatch.code,
-          country_code: exactMatch.country_code!,
-          number: exactMatch.number!,
-          description: exactMatch.description,
-          iso: exactMatch.iso,
-        },
-      ]
+    const matchedCountryCodes = new Set<string>([
+      ...matchedTeams.map((c) => c.code),
+      ...matchedStickers.map((s) => s.country_code),
+    ])
+    if (exactMatch) {
+      matchedCountryCodes.add(exactMatch.country_code!)
     }
 
-    return [...matchedTeams, ...matchedStickers]
+    const panelHighlightByCountry: Record<string, number> = {}
+    if (exactMatch) {
+      panelHighlightByCountry[exactMatch.country_code!] = exactMatch.number!
+    } else {
+      for (const sticker of matchedStickers) {
+        if (!panelHighlightByCountry[sticker.country_code]) {
+          panelHighlightByCountry[sticker.country_code] = sticker.number
+        }
+      }
+    }
+
+    if (matchedTeams.length === 0 && matchedStickers.length === 0 && exactMatch) {
+      return {
+        searchResults: [
+          {
+            _kind: 'sticker' as const,
+            code: exactMatch.code,
+            country_code: exactMatch.country_code!,
+            number: exactMatch.number!,
+            description: exactMatch.description,
+            iso: exactMatch.iso,
+          },
+        ],
+        matchedCountryCodes,
+        panelHighlightByCountry,
+      }
+    }
+
+    return {
+      searchResults: [...matchedTeams, ...matchedStickers],
+      matchedCountryCodes,
+      panelHighlightByCountry,
+    }
   }, [search, allCountries, searchableStickers, exactMatch])
 
   const handleCountryPress = useCallback(
@@ -329,42 +388,78 @@ export default function HomeScreen() {
             onChangeText={handleChange}
             onClear={handleClearSearch}
           />
-        </View>
-
-        {/* Countries list — always mounted, never unmounts TeamCards */}
-        <FlatList
-          ref={flatListRef}
-          data={allCountries}
-          extraData={effectiveTheme}
-          keyExtractor={(item) => item.code}
-          renderItem={renderTeamItem}
-          style={isSearching ? { display: 'none' } : undefined}
-          ListFooterComponent={() => (
-            <Footer
-              t={t}
-              locale={locale}
-              toggleLocale={toggleLocale}
-              onShowAbout={() => setShowAbout(true)}
-              onShowSuggestion={() => setShowSuggestion(true)}
-              themeMode={effectiveTheme}
-              onToggleTheme={toggleTheme}
-              user={user}
-              totalCollected={totalCollected}
+          {!isSearching && (
+            <ViewToggle
+              mode={viewMode}
+              onChange={setViewMode}
+              cardsLabel={t('viewModeCards')}
+              panelsLabel={t('viewModePanels')}
+              style={{ marginTop: 8, marginHorizontal: 16 }}
             />
           )}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 32 }}
-          initialNumToRender={15}
-          maxToRenderPerBatch={10}
-          windowSize={5}
-          removeClippedSubviews={true}
-        />
+        </View>
 
-        {/* Search results — only shown when searching */}
-        {isSearching && (
+        {/* Countries list — cards view */}
+        {!isSearching && viewMode === 'cards' && (
+          <FlatList
+            ref={flatListRef}
+            data={allCountries}
+            extraData={effectiveTheme}
+            keyExtractor={(item) => item.code}
+            renderItem={renderTeamItem}
+            ListFooterComponent={() => (
+              <Footer
+                t={t}
+                locale={locale}
+                toggleLocale={toggleLocale}
+                onShowAbout={() => setShowAbout(true)}
+                onShowSuggestion={() => setShowSuggestion(true)}
+                themeMode={effectiveTheme}
+                onToggleTheme={toggleTheme}
+                user={user}
+                totalCollected={totalCollected}
+              />
+            )}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 32 }}
+            initialNumToRender={15}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            removeClippedSubviews={true}
+          />
+        )}
+
+        {/* All panels view */}
+        {!isSearching && viewMode === 'panels' && (
+          <AllPanelsView
+            ref={panelsFlatListRef}
+            allCountries={allCountries}
+            countryDetails={countryDetails}
+            collection={collection}
+            user={user}
+            updateEntry={updateEntry}
+            onScroll={handleScroll}
+            ListFooterComponent={() => (
+              <Footer
+                t={t}
+                locale={locale}
+                toggleLocale={toggleLocale}
+                onShowAbout={() => setShowAbout(true)}
+                onShowSuggestion={() => setShowSuggestion(true)}
+                themeMode={effectiveTheme}
+                onToggleTheme={toggleTheme}
+                user={user}
+                totalCollected={totalCollected}
+              />
+            )}
+          />
+        )}
+
+        {/* Search results — cards view */}
+        {isSearching && viewMode === 'cards' && (
           <FlatList<TeamItem | StickerResult>
             data={searchResults}
             extraData={effectiveTheme}
@@ -377,6 +472,35 @@ export default function HomeScreen() {
             maxToRenderPerBatch={10}
             windowSize={5}
             removeClippedSubviews={true}
+          />
+        )}
+
+        {/* Search results — panels view */}
+        {isSearching && viewMode === 'panels' && (
+          <AllPanelsView
+            ref={panelsFlatListRef}
+            allCountries={allCountries}
+            countryDetails={countryDetails}
+            collection={collection}
+            user={user}
+            updateEntry={updateEntry}
+            searchQuery={search}
+            matchedCountryCodes={matchedCountryCodes}
+            highlightByCountry={panelHighlightByCountry}
+            onScroll={handleScroll}
+            ListFooterComponent={() => (
+              <Footer
+                t={t}
+                locale={locale}
+                toggleLocale={toggleLocale}
+                onShowAbout={() => setShowAbout(true)}
+                onShowSuggestion={() => setShowSuggestion(true)}
+                themeMode={effectiveTheme}
+                onToggleTheme={toggleTheme}
+                user={user}
+                totalCollected={totalCollected}
+              />
+            )}
           />
         )}
 

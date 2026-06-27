@@ -11,6 +11,8 @@
   "searchPlaceholder": "Busca: MEX, Argentina, Messi...",
   "searchBackAriaLabel": "Volver al listado",
   "searchClearAriaLabel": "Limpiar búsqueda",
+  "viewModeCards": "Vista de tarjetas",
+  "viewModePanels": "Vista de paneles",
   "resultsCount": "resultado",
   "resultsCountPlural": "resultados",
   "noResults": "No se encontraron resultados",
