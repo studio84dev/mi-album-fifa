@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Keyboard,
   type TextInput as TextInputType,
+  type NativeSyntheticEvent,
+  type NativeScrollEvent,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -17,6 +19,7 @@ import type { TeamItem } from '@/src/components/TeamCard'
 import AuthBar from '@/src/components/AuthBar'
 import Footer from '@/src/components/Footer'
 import SearchBar from '@/src/components/SearchBar'
+import ScrollTopButton from '@/src/components/ScrollTopButton'
 import WhatsNewModal from '@/src/components/WhatsNewModal'
 import AboutModal from '@/src/components/AboutModal'
 import SuggestionModal from '@/src/components/SuggestionModal'
@@ -132,6 +135,8 @@ function buildSearchData() {
 
 export default function HomeScreen() {
   const searchInputRef = useRef<TextInputType>(null)
+  const flatListRef = useRef<FlatList>(null)
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch] = useState('')
   const handleChange = useCallback((text: string) => {
@@ -144,6 +149,14 @@ export default function HomeScreen() {
       setSearch('')
       searchInputRef.current?.focus()
     }, 0)
+  }, [])
+
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setShowScrollTop(e.nativeEvent.contentOffset.y > 300)
+  }, [])
+
+  const scrollToTop = useCallback(() => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
   }, [])
   const { showWhatsNew, setShowWhatsNew, hasUnread, openWhatsNew } = useWhatsNew()
   const [showAbout, setShowAbout] = useState(false)
@@ -295,93 +308,99 @@ export default function HomeScreen() {
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={theme.bgPrimary}
       />
-      <AuthBar
-        user={user}
-        loading={authLoading}
-        onSignIn={signInWithGoogle}
-        onSignOut={signOut}
-        onImport={() => setShowImport(true)}
-        onWhatsNew={openWhatsNew}
-        whatsNewUnread={hasUnread}
-        updateAvailable={updateAvailable}
-        totals={totals}
-        collectionLoading={collectionLoading}
-      />
-
-      <View style={{ marginBottom: 12 }}>
-        <SearchBar
-          ref={searchInputRef}
-          value={inputValue}
-          onChangeText={handleChange}
-          onClear={handleClearSearch}
+      <View style={{ flex: 1, position: 'relative' }}>
+        <AuthBar
+          user={user}
+          loading={authLoading}
+          onSignIn={signInWithGoogle}
+          onSignOut={signOut}
+          onImport={() => setShowImport(true)}
+          onWhatsNew={openWhatsNew}
+          whatsNewUnread={hasUnread}
+          updateAvailable={updateAvailable}
+          totals={totals}
+          collectionLoading={collectionLoading}
         />
-      </View>
 
-      {/* Countries list — always mounted, never unmounts TeamCards */}
-      <FlatList
-        data={allCountries}
-        extraData={effectiveTheme}
-        keyExtractor={(item) => item.code}
-        renderItem={renderTeamItem}
-        style={isSearching ? { display: 'none' } : undefined}
-        ListFooterComponent={() => (
-          <Footer
-            t={t}
-            locale={locale}
-            toggleLocale={toggleLocale}
-            onShowAbout={() => setShowAbout(true)}
-            onShowSuggestion={() => setShowSuggestion(true)}
-            themeMode={effectiveTheme}
-            onToggleTheme={toggleTheme}
-            user={user}
-            totalCollected={totalCollected}
+        <View style={{ marginBottom: 12 }}>
+          <SearchBar
+            ref={searchInputRef}
+            value={inputValue}
+            onChangeText={handleChange}
+            onClear={handleClearSearch}
           />
-        )}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 32 }}
-        initialNumToRender={15}
-        maxToRenderPerBatch={10}
-        windowSize={5}
-        removeClippedSubviews={true}
-      />
+        </View>
 
-      {/* Search results — only shown when searching */}
-      {isSearching && (
-        <FlatList<TeamItem | StickerResult>
-          data={searchResults}
+        {/* Countries list — always mounted, never unmounts TeamCards */}
+        <FlatList
+          ref={flatListRef}
+          data={allCountries}
           extraData={effectiveTheme}
-          keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
-          renderItem={renderSearchItem}
+          keyExtractor={(item) => item.code}
+          renderItem={renderTeamItem}
+          style={isSearching ? { display: 'none' } : undefined}
+          ListFooterComponent={() => (
+            <Footer
+              t={t}
+              locale={locale}
+              toggleLocale={toggleLocale}
+              onShowAbout={() => setShowAbout(true)}
+              onShowSuggestion={() => setShowSuggestion(true)}
+              themeMode={effectiveTheme}
+              onToggleTheme={toggleTheme}
+              user={user}
+              totalCollected={totalCollected}
+            />
+          )}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
+          contentContainerStyle={{ paddingBottom: 32 }}
           initialNumToRender={15}
           maxToRenderPerBatch={10}
           windowSize={5}
           removeClippedSubviews={true}
         />
-      )}
 
-      <WhatsNewModal
-        visible={showWhatsNew}
-        onClose={() => setShowWhatsNew(false)}
-        t={t}
-        locale={locale}
-      />
+        {/* Search results — only shown when searching */}
+        {isSearching && (
+          <FlatList<TeamItem | StickerResult>
+            data={searchResults}
+            extraData={effectiveTheme}
+            keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
+            renderItem={renderSearchItem}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
+            initialNumToRender={15}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            removeClippedSubviews={true}
+          />
+        )}
 
-      <AboutModal visible={showAbout} onClose={() => setShowAbout(false)} t={t} />
+        <WhatsNewModal
+          visible={showWhatsNew}
+          onClose={() => setShowWhatsNew(false)}
+          t={t}
+          locale={locale}
+        />
 
-      <SuggestionModal visible={showSuggestion} onClose={() => setShowSuggestion(false)} t={t} />
+        <AboutModal visible={showAbout} onClose={() => setShowAbout(false)} t={t} />
 
-      <ImportCollectionModal
-        visible={showImport}
-        onClose={() => setShowImport(false)}
-        onSuccess={() => {
-          // Refresh collection data
-        }}
-        t={t}
-      />
+        <SuggestionModal visible={showSuggestion} onClose={() => setShowSuggestion(false)} t={t} />
+
+        <ImportCollectionModal
+          visible={showImport}
+          onClose={() => setShowImport(false)}
+          onSuccess={() => {
+            // Refresh collection data
+          }}
+          t={t}
+        />
+        <ScrollTopButton visible={showScrollTop && !isSearching} onPress={scrollToTop} />
+      </View>
     </SafeAreaView>
   )
 }
