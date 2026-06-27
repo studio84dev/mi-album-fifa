@@ -22,6 +22,7 @@ import StickerList from './components/StickerList.tsx'
 import Footer from './components/Footer.tsx'
 import ScrollTopButton from './components/ScrollTopButton.tsx'
 import RedirectBanner from './components/RedirectBanner.tsx'
+import AndroidBanner from './components/AndroidBanner.tsx'
 import LoginBar from './components/LoginBar.tsx'
 import SharePrompt, { STORAGE_KEY as SHARE_PROMPT_KEY } from './components/SharePrompt.tsx'
 import WelcomeModal from './components/WelcomeModal.tsx'
@@ -65,6 +66,8 @@ function App() {
     setShowImportModal,
     showRedirectBanner,
     dismissRedirectBanner,
+    showAndroidBanner,
+    dismissAndroidBanner,
   } = useBanners(user)
 
   // SEO meta tags
@@ -128,6 +131,7 @@ function App() {
         collectionLoading={collectionLoading}
       />
 
+      {showAndroidBanner && <AndroidBanner onDismiss={dismissAndroidBanner} t={t} />}
       {showRedirectBanner && <RedirectBanner onDismiss={dismissRedirectBanner} t={t} />}
 
       {!user && !authLoading && <LoginBar onLogin={signInWithGoogle} t={t} />}

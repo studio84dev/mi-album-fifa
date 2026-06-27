@@ -16,6 +16,9 @@ export function useBanners(user: { id?: string } | null) {
     if (dismissed) return false
     return new URLSearchParams(window.location.search).get('ref') === 'old'
   })
+  const [showAndroidBanner, setShowAndroidBanner] = useState(
+    () => !sessionStorage.getItem('android-banner-dismissed')
+  )
 
   useEffect(() => {
     if (user) {
@@ -33,6 +36,11 @@ export function useBanners(user: { id?: string } | null) {
   const dismissRedirectBanner = useCallback(() => {
     sessionStorage.setItem('redirect-banner-dismissed', '1')
     setShowRedirectBanner(false)
+  }, [])
+
+  const dismissAndroidBanner = useCallback(() => {
+    sessionStorage.setItem('android-banner-dismissed', '1')
+    setShowAndroidBanner(false)
   }, [])
 
   const openWhatsNew = useCallback(() => {
@@ -57,5 +65,7 @@ export function useBanners(user: { id?: string } | null) {
     setShowImportModal,
     showRedirectBanner,
     dismissRedirectBanner,
+    showAndroidBanner,
+    dismissAndroidBanner,
   }
 }
