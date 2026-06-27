@@ -12,7 +12,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
 import type { CardType, Sticker } from '@mi-album-fifa/shared'
-import CommunityStats from '@/src/components/CommunityStats'
 import TeamCard from '@/src/components/TeamCard'
 import type { TeamItem } from '@/src/components/TeamCard'
 import AuthBar from '@/src/components/AuthBar'
@@ -308,12 +307,16 @@ export default function HomeScreen() {
         totals={totals}
         collectionLoading={collectionLoading}
       />
-      <SearchBar
-        ref={searchInputRef}
-        value={inputValue}
-        onChangeText={handleChange}
-        onClear={handleClearSearch}
-      />
+
+      <View style={{ marginBottom: 12 }}>
+        <SearchBar
+          ref={searchInputRef}
+          value={inputValue}
+          onChangeText={handleChange}
+          onClear={handleClearSearch}
+        />
+      </View>
+
       {/* Countries list — always mounted, never unmounts TeamCards */}
       <FlatList
         data={allCountries}
@@ -321,35 +324,6 @@ export default function HomeScreen() {
         keyExtractor={(item) => item.code}
         renderItem={renderTeamItem}
         style={isSearching ? { display: 'none' } : undefined}
-        ListHeaderComponent={
-          <View style={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 8 }}>
-            <Text
-              style={{
-                fontSize: 26,
-                fontWeight: '800',
-                color: theme.textPrimary,
-                textAlign: 'center',
-                lineHeight: 32,
-                letterSpacing: -0.5,
-                marginBottom: 16,
-              }}
-            >
-              ⚽ {t('title')}
-            </Text>
-            <Text
-              style={{
-                fontSize: 13,
-                color: theme.textMuted,
-                textAlign: 'center',
-                marginBottom: 16,
-                lineHeight: 20,
-              }}
-            >
-              {t('description')}
-            </Text>
-            <CommunityStats />
-          </View>
-        }
         ListFooterComponent={() => (
           <Footer
             t={t}

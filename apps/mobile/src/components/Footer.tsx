@@ -3,6 +3,7 @@ import { useTheme, colors } from '../hooks/useTheme'
 import ShareMenu from './ShareMenu'
 import ThemeToggle from './ThemeToggle'
 import Svg, { Path } from 'react-native-svg'
+import CommunityStats from './CommunityStats'
 
 const GitHubIcon = ({ color }: { color: string }) => (
   <Svg width={20} height={20} viewBox="0 0 24 24" fill={color}>
@@ -189,6 +190,9 @@ export default function Footer({
       <View style={{ alignItems: 'center', marginBottom: 16 }}>
         <ShareMenu shareTitle={t('shareTitle')} shareText={t('shareText')} />
       </View>
+
+      {/* Community Stats */}
+      <CommunityStats />
 
       {/* Disclaimer */}
       <Text
