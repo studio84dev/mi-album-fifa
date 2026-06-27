@@ -35,7 +35,7 @@ function Header({
   collectionLoading,
 }: HeaderProps) {
   return (
-    <div className="flex justify-end items-center w-full mb-4 pt-3 gap-2 sticky top-0 z-[100] bg-bg-primary">
+    <div className="flex justify-end items-center w-full mb-4 pt-3 gap-2">
       <div className="flex gap-2 items-center mr-auto">
         {whatsNewUnread && (
           <button

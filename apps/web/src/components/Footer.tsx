@@ -1,5 +1,6 @@
 import ShareMenu from './ShareMenu.tsx'
 import ThemeToggle from './ThemeToggle.tsx'
+import CommunityStats from './CommunityStats.tsx'
 
 interface FooterProps {
   t: (_key: string) => string
@@ -91,6 +92,10 @@ function Footer({
 
       <div className="flex justify-center mt-4">
         <ShareMenu t={t} share={share} shareOptions={shareOptions} />
+      </div>
+
+      <div className="flex justify-center mt-4">
+        <CommunityStats t={t} />
       </div>
 
       <p className="mt-6 text-[0.7rem] text-text-muted text-center max-w-[480px] mx-auto leading-relaxed opacity-70">
