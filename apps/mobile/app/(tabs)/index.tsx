@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import Footer from '@/src/components/Footer'
 import SearchBar from '@/src/components/SearchBar'
 import ScrollTopButton from '@/src/components/ScrollTopButton'
 import ViewToggle from '@/src/components/ViewToggle'
+import StickerFilter, { type StickerFilterMode } from '@/src/components/StickerFilter'
 import AllPanelsView from '@/src/components/AllPanelsView'
 import WhatsNewModal from '@/src/components/WhatsNewModal'
 import AboutModal from '@/src/components/AboutModal'
@@ -154,6 +155,7 @@ export default function HomeScreen() {
   const panelsFlatListRef = useRef<FlatList>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'panels'>('cards')
+  const [stickerFilter, setStickerFilter] = useState<StickerFilterMode>('all')
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch] = useState('')
   const handleChange = useCallback((text: string) => {
@@ -349,6 +351,12 @@ export default function HomeScreen() {
 
   const isSearching = search.trim().length > 0
 
+  useEffect(() => {
+    if (viewMode === 'panels') {
+      panelsFlatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+    }
+  }, [stickerFilter, viewMode])
+
   const renderSearchItem = useCallback(
     ({ item }: { item: TeamItem | StickerResult }) => {
       if ('_kind' in item) return renderStickerItem({ item })
@@ -388,15 +396,32 @@ export default function HomeScreen() {
             onChangeText={handleChange}
             onClear={handleClearSearch}
           />
-          {!isSearching && (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 8,
+              marginHorizontal: 16,
+              gap: 8,
+            }}
+          >
             <ViewToggle
               mode={viewMode}
               onChange={setViewMode}
               cardsLabel={t('viewModeCards')}
               panelsLabel={t('viewModePanels')}
-              style={{ marginTop: 8, marginHorizontal: 16 }}
+              style={{ alignSelf: 'center' }}
             />
-          )}
+            {viewMode === 'panels' && (
+              <StickerFilter
+                mode={stickerFilter}
+                onChange={setStickerFilter}
+                allLabel={t('stickerFilterAll')}
+                missingLabel={t('stickerFilterMissing')}
+                repeatedLabel={t('stickerFilterRepeated')}
+              />
+            )}
+          </View>
         </View>
 
         {/* Countries list — cards view */}
@@ -441,6 +466,7 @@ export default function HomeScreen() {
             collection={collection}
             user={user}
             updateEntry={updateEntry}
+            stickerFilter={stickerFilter}
             onScroll={handleScroll}
             ListFooterComponent={() => (
               <Footer
@@ -487,6 +513,7 @@ export default function HomeScreen() {
             searchQuery={search}
             matchedCountryCodes={matchedCountryCodes}
             highlightByCountry={panelHighlightByCountry}
+            stickerFilter={stickerFilter}
             onScroll={handleScroll}
             ListFooterComponent={() => (
               <Footer

@@ -7,12 +7,13 @@ import {
   type NativeScrollEvent,
 } from 'react-native'
 import type { User } from '@supabase/supabase-js'
-import type { CollectionMap } from '@mi-album-fifa/shared'
+import type { CollectionEntry, CollectionMap } from '@mi-album-fifa/shared'
 import type { TeamItem } from './TeamCard'
 import StickerPanel from './StickerPanel'
 import flags from '../data/flags'
 import { useTheme } from '../hooks/useTheme'
 import { useI18n } from '../hooks/useI18n'
+import type { StickerFilterMode } from './StickerFilter'
 
 interface CountryDetails {
   stickerCount: number
@@ -34,6 +35,7 @@ interface AllPanelsViewProps {
   highlightByCountry?: Record<string, number> | null
   onScroll?: (_event: NativeSyntheticEvent<NativeScrollEvent>) => void
   ListFooterComponent?: React.ComponentType | React.ReactElement | null
+  stickerFilter: StickerFilterMode
 }
 
 function getCountryCollection(collection: CollectionMap, code: string) {
@@ -43,22 +45,37 @@ function getCountryCollection(collection: CollectionMap, code: string) {
   }
 }
 
+function filterVisibleStickers(
+  numbers: number[],
+  data: Record<string, CollectionEntry>,
+  filter: StickerFilterMode
+): number[] {
+  if (filter === 'all') return numbers
+  return numbers.filter((num) => {
+    const entry = data[String(num)]
+    if (filter === 'missing') return !entry?.collected
+    return (entry?.repeated ?? 0) > 0
+  })
+}
+
 interface CountrySectionProps {
   item: TeamItem
   details: CountryDetails
-  collection: CollectionMap
   user: User | null
   updateEntry: AllPanelsViewProps['updateEntry']
   highlightNumber: number | null
+  initialData: Record<string, CollectionEntry>
+  filteredNumbers: number[]
 }
 
 function CountrySection({
   item,
-  details,
-  collection,
+  details: _details,
   user,
   updateEntry,
   highlightNumber,
+  initialData,
+  filteredNumbers,
 }: CountrySectionProps) {
   const { theme } = useTheme()
   const { t } = useI18n()
@@ -70,11 +87,6 @@ function CountrySection({
         height: number
       }>)
     : null
-
-  const initialData = useMemo(
-    () => getCountryCollection(collection, item.code),
-    [collection, item.code]
-  )
 
   return (
     <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
@@ -109,8 +121,8 @@ function CountrySection({
       <StickerPanel
         countryCode={item.code}
         user={user}
-        stickerCount={details.stickerCount}
-        stickerNumbers={details.stickerNumbers}
+        stickerCount={filteredNumbers.length}
+        stickerNumbers={filteredNumbers}
         initialData={initialData}
         highlightNumber={highlightNumber}
         onCollectionChange={updateEntry}
@@ -131,6 +143,7 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
     highlightByCountry,
     onScroll,
     ListFooterComponent,
+    stickerFilter,
   },
   ref
 ) {
@@ -144,27 +157,44 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
     return allCountries.filter((c) => matchedCountryCodes.has(c.code))
   }, [allCountries, matchedCountryCodes, isSearching])
 
+  const visibleCountries = useMemo(() => {
+    if (stickerFilter === 'all') return filteredCountries
+    return filteredCountries.filter((c) => {
+      const details = countryDetails[c.code]
+      if (!details) return false
+      const data = getCountryCollection(collection, c.code)
+      return filterVisibleStickers(details.stickerNumbers, data, stickerFilter).length > 0
+    })
+  }, [filteredCountries, countryDetails, collection, stickerFilter])
+
   const renderItem = useCallback(
     ({ item }: { item: TeamItem }) => {
       const details = countryDetails[item.code]
       if (!details) return null
+      const initialData = getCountryCollection(collection, item.code)
+      const filteredNumbers = filterVisibleStickers(
+        details.stickerNumbers,
+        initialData,
+        stickerFilter
+      )
       return (
         <CountrySection
           item={item}
           details={details}
-          collection={collection}
           user={user}
           updateEntry={updateEntry}
           highlightNumber={highlightByCountry?.[item.code] ?? null}
+          initialData={initialData}
+          filteredNumbers={filteredNumbers}
         />
       )
     },
-    [collection, countryDetails, user, updateEntry, highlightByCountry]
+    [collection, countryDetails, user, updateEntry, highlightByCountry, stickerFilter]
   )
 
   const keyExtractor = useCallback((item: TeamItem) => item.code, [])
 
-  if (isSearching && filteredCountries.length === 0) {
+  if (isSearching && visibleCountries.length === 0) {
     return (
       <View
         style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
@@ -191,7 +221,7 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
   return (
     <FlatList
       ref={ref}
-      data={filteredCountries}
+      data={visibleCountries}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       extraData={collection}
