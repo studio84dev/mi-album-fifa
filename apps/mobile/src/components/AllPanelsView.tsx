@@ -20,6 +20,12 @@ interface CountryDetails {
   stickerNumbers: number[]
 }
 
+interface VisiblePanelItem {
+  country: TeamItem
+  initialData: Record<string, CollectionEntry>
+  filteredNumbers: number[]
+}
+
 interface AllPanelsViewProps {
   allCountries: TeamItem[]
   countryDetails: Record<string, CountryDetails>
@@ -59,8 +65,7 @@ function filterVisibleStickers(
 }
 
 interface CountrySectionProps {
-  item: TeamItem
-  details: CountryDetails
+  country: TeamItem
   user: User | null
   updateEntry: AllPanelsViewProps['updateEntry']
   highlightNumber: number | null
@@ -68,9 +73,8 @@ interface CountrySectionProps {
   filteredNumbers: number[]
 }
 
-function CountrySection({
-  item,
-  details: _details,
+const CountrySection = React.memo(function CountrySection({
+  country,
   user,
   updateEntry,
   highlightNumber,
@@ -80,7 +84,7 @@ function CountrySection({
   const { theme } = useTheme()
   const { t } = useI18n()
 
-  const rawFlag = item.iso ? flags[item.iso] : null
+  const rawFlag = country.iso ? flags[country.iso] : null
   const FlagSvg = rawFlag
     ? (((rawFlag as { default?: unknown }).default ?? rawFlag) as React.FC<{
         width: number
@@ -108,18 +112,18 @@ function CountrySection({
         )}
         <View style={{ flex: 1 }}>
           <Text style={{ color: theme.textPrimary, fontWeight: '700', fontSize: 15 }}>
-            {item.code} — {item.team_name}
+            {country.code} — {country.team_name}
           </Text>
-          {item.page != null && (
+          {country.page != null && (
             <Text style={{ color: theme.textMuted, fontSize: 11 }}>
-              {t('stickerPanelPageLabel')} {item.page}
+              {t('stickerPanelPageLabel')} {country.page}
             </Text>
           )}
         </View>
       </View>
 
       <StickerPanel
-        countryCode={item.code}
+        countryCode={country.code}
         user={user}
         stickerCount={filteredNumbers.length}
         stickerNumbers={filteredNumbers}
@@ -129,7 +133,7 @@ function CountrySection({
       />
     </View>
   )
-}
+})
 
 const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanelsView(
   {
@@ -157,44 +161,62 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
     return allCountries.filter((c) => matchedCountryCodes.has(c.code))
   }, [allCountries, matchedCountryCodes, isSearching])
 
-  const visibleCountries = useMemo(() => {
-    if (stickerFilter === 'all') return filteredCountries
-    return filteredCountries.filter((c) => {
-      const details = countryDetails[c.code]
-      if (!details) return false
-      const data = getCountryCollection(collection, c.code)
-      return filterVisibleStickers(details.stickerNumbers, data, stickerFilter).length > 0
-    })
-  }, [filteredCountries, countryDetails, collection, stickerFilter])
+  const countryInitialData = useMemo(() => {
+    const map: Record<string, Record<string, CollectionEntry>> = {}
+    for (const c of filteredCountries) {
+      map[c.code] = getCountryCollection(collection, c.code)
+    }
+    return map
+  }, [filteredCountries, collection])
 
-  const renderItem = useCallback(
-    ({ item }: { item: TeamItem }) => {
-      const details = countryDetails[item.code]
-      if (!details) return null
-      const initialData = getCountryCollection(collection, item.code)
+  const visibleItems = useMemo(() => {
+    if (stickerFilter === 'all') {
+      return filteredCountries.map((c) => {
+        const details = countryDetails[c.code]
+        return {
+          country: c,
+          initialData: countryInitialData[c.code],
+          filteredNumbers: details?.stickerNumbers ?? [],
+        }
+      })
+    }
+    const items: VisiblePanelItem[] = []
+    for (const c of filteredCountries) {
+      const details = countryDetails[c.code]
+      const initialData = countryInitialData[c.code]
+      if (!details || !initialData) continue
       const filteredNumbers = filterVisibleStickers(
         details.stickerNumbers,
         initialData,
         stickerFilter
       )
+      if (filteredNumbers.length > 0) {
+        items.push({ country: c, initialData, filteredNumbers })
+      }
+    }
+    return items
+  }, [filteredCountries, countryDetails, countryInitialData, stickerFilter])
+
+  const renderItem = useCallback(
+    ({ item }: { item: VisiblePanelItem }) => {
+      if (!item.country) return null
       return (
         <CountrySection
-          item={item}
-          details={details}
+          country={item.country}
           user={user}
           updateEntry={updateEntry}
-          highlightNumber={highlightByCountry?.[item.code] ?? null}
-          initialData={initialData}
-          filteredNumbers={filteredNumbers}
+          highlightNumber={highlightByCountry?.[item.country.code] ?? null}
+          initialData={item.initialData}
+          filteredNumbers={item.filteredNumbers}
         />
       )
     },
-    [collection, countryDetails, user, updateEntry, highlightByCountry, stickerFilter]
+    [user, updateEntry, highlightByCountry]
   )
 
-  const keyExtractor = useCallback((item: TeamItem) => item.code, [])
+  const keyExtractor = useCallback((item: VisiblePanelItem) => item.country.code, [])
 
-  if (isSearching && visibleCountries.length === 0) {
+  if (isSearching && visibleItems.length === 0) {
     return (
       <View
         style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}
@@ -221,7 +243,7 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
   return (
     <FlatList
       ref={ref}
-      data={visibleCountries}
+      data={visibleItems}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       extraData={collection}
@@ -231,12 +253,12 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{ paddingBottom: 32 }}
       ListFooterComponent={ListFooterComponent}
-      initialNumToRender={5}
-      maxToRenderPerBatch={5}
+      initialNumToRender={3}
+      maxToRenderPerBatch={3}
       windowSize={5}
       removeClippedSubviews={true}
     />
   )
 })
 
-export default AllPanelsView
+export default React.memo(AllPanelsView)

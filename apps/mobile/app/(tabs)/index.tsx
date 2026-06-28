@@ -11,6 +11,7 @@ import {
   type NativeScrollEvent,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRouter } from 'expo-router'
 import { allStickers } from '@mi-album-fifa/shared'
 import type { CardType, Sticker } from '@mi-album-fifa/shared'
@@ -152,12 +153,35 @@ function buildSearchData() {
 export default function HomeScreen() {
   const searchInputRef = useRef<TextInputType>(null)
   const flatListRef = useRef<FlatList>(null)
-  const panelsFlatListRef = useRef<FlatList>(null)
+  const panelRefs = useRef<Record<string, FlatList | null>>({})
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'panels'>('cards')
+  const [viewModeLoaded, setViewModeLoaded] = useState(false)
   const [stickerFilter, setStickerFilter] = useState<StickerFilterMode>('all')
+
+  useEffect(() => {
+    AsyncStorage.getItem('mi-album-fifa.viewMode').then((value) => {
+      if (value === 'cards' || value === 'panels') {
+        setViewMode(value)
+      }
+      setViewModeLoaded(true)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!viewModeLoaded) return
+    AsyncStorage.setItem('mi-album-fifa.viewMode', viewMode)
+  }, [viewMode, viewModeLoaded])
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch] = useState('')
+  const searchMode = search.trim().length > 0 ? 'search' : 'noSearch'
+  const activeViewKey =
+    viewMode === 'cards' ? `${searchMode}-cards` : `${searchMode}-${stickerFilter}`
+  const [mountedViews, setMountedViews] = useState<Set<string>>(() => new Set([activeViewKey]))
+  if (!mountedViews.has(activeViewKey)) {
+    setMountedViews(new Set(mountedViews).add(activeViewKey))
+  }
+
   const handleChange = useCallback((text: string) => {
     setInputValue(text)
     setSearch(text)
@@ -179,9 +203,10 @@ export default function HomeScreen() {
     if (viewMode === 'cards') {
       flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
     } else {
-      panelsFlatListRef.current?.scrollToOffset({ offset: 0, animated: true })
+      const activeKey = `${searchMode}-${stickerFilter}`
+      panelRefs.current[activeKey]?.scrollToOffset({ offset: 0, animated: true })
     }
-  }, [search, viewMode])
+  }, [search, viewMode, searchMode, stickerFilter])
   const { showWhatsNew, setShowWhatsNew, hasUnread, openWhatsNew } = useWhatsNew()
   const [showAbout, setShowAbout] = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
@@ -351,11 +376,47 @@ export default function HomeScreen() {
 
   const isSearching = search.trim().length > 0
 
+  const handleShowAbout = useCallback(() => setShowAbout(true), [])
+  const handleShowSuggestion = useCallback(() => setShowSuggestion(true), [])
+  const handleShowImport = useCallback(() => setShowImport(true), [])
+  const toggleLocale = useCallback(() => toggleI18nLocale(), [toggleI18nLocale])
+
+  const listFooter = useMemo(
+    () => (
+      <Footer
+        t={t}
+        locale={locale}
+        toggleLocale={toggleLocale}
+        onShowAbout={handleShowAbout}
+        onShowSuggestion={handleShowSuggestion}
+        themeMode={effectiveTheme}
+        onToggleTheme={toggleTheme}
+        user={user}
+        totalCollected={totalCollected}
+      />
+    ),
+    [
+      t,
+      locale,
+      toggleLocale,
+      handleShowAbout,
+      handleShowSuggestion,
+      effectiveTheme,
+      toggleTheme,
+      user,
+      totalCollected,
+    ]
+  )
+
   useEffect(() => {
-    if (viewMode === 'panels') {
-      panelsFlatListRef.current?.scrollToOffset({ offset: 0, animated: true })
-    }
-  }, [stickerFilter, viewMode])
+    if (viewMode !== 'panels') return
+    const activeKey = `${searchMode}-${stickerFilter}`
+    const targetRef = panelRefs.current[activeKey]
+    const id = requestAnimationFrame(() => {
+      targetRef?.scrollToOffset({ offset: 0, animated: false })
+    })
+    return () => cancelAnimationFrame(id)
+  }, [stickerFilter, viewMode, searchMode])
 
   const renderSearchItem = useCallback(
     ({ item }: { item: TeamItem | StickerResult }) => {
@@ -364,10 +425,6 @@ export default function HomeScreen() {
     },
     [renderTeamItem, renderStickerItem]
   )
-
-  const toggleLocale = () => {
-    toggleI18nLocale()
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.bgPrimary }}>
@@ -381,7 +438,7 @@ export default function HomeScreen() {
           loading={authLoading}
           onSignIn={signInWithGoogle}
           onSignOut={signOut}
-          onImport={() => setShowImport(true)}
+          onImport={handleShowImport}
           onWhatsNew={openWhatsNew}
           whatsNewUnread={hasUnread}
           updateAvailable={updateAvailable}
@@ -424,112 +481,230 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Countries list — cards view */}
-        {!isSearching && viewMode === 'cards' && (
-          <FlatList
-            ref={flatListRef}
-            data={allCountries}
-            extraData={effectiveTheme}
-            keyExtractor={(item) => item.code}
-            renderItem={renderTeamItem}
-            ListFooterComponent={() => (
-              <Footer
-                t={t}
-                locale={locale}
-                toggleLocale={toggleLocale}
-                onShowAbout={() => setShowAbout(true)}
-                onShowSuggestion={() => setShowSuggestion(true)}
-                themeMode={effectiveTheme}
-                onToggleTheme={toggleTheme}
-                user={user}
-                totalCollected={totalCollected}
+        <View style={{ flex: 1 }}>
+          {/* Cards view — no search */}
+          {mountedViews.has('noSearch-cards') && (
+            <View
+              style={{
+                flex: 1,
+                display: searchMode === 'noSearch' && viewMode === 'cards' ? 'flex' : 'none',
+              }}
+            >
+              <FlatList
+                ref={flatListRef}
+                data={allCountries}
+                extraData={effectiveTheme}
+                keyExtractor={(item) => item.code}
+                renderItem={renderTeamItem}
+                ListFooterComponent={listFooter}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ paddingBottom: 32 }}
+                initialNumToRender={15}
+                maxToRenderPerBatch={10}
+                windowSize={5}
+                removeClippedSubviews={true}
               />
-            )}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 32 }}
-            initialNumToRender={15}
-            maxToRenderPerBatch={10}
-            windowSize={5}
-            removeClippedSubviews={true}
-          />
-        )}
+            </View>
+          )}
 
-        {/* All panels view */}
-        {!isSearching && viewMode === 'panels' && (
-          <AllPanelsView
-            ref={panelsFlatListRef}
-            allCountries={allCountries}
-            countryDetails={countryDetails}
-            collection={collection}
-            user={user}
-            updateEntry={updateEntry}
-            stickerFilter={stickerFilter}
-            onScroll={handleScroll}
-            ListFooterComponent={() => (
-              <Footer
-                t={t}
-                locale={locale}
-                toggleLocale={toggleLocale}
-                onShowAbout={() => setShowAbout(true)}
-                onShowSuggestion={() => setShowSuggestion(true)}
-                themeMode={effectiveTheme}
-                onToggleTheme={toggleTheme}
-                user={user}
-                totalCollected={totalCollected}
+          {/* Cards view — search */}
+          {mountedViews.has('search-cards') && (
+            <View
+              style={{
+                flex: 1,
+                display: searchMode === 'search' && viewMode === 'cards' ? 'flex' : 'none',
+              }}
+            >
+              <FlatList<TeamItem | StickerResult>
+                data={searchResults}
+                extraData={effectiveTheme}
+                keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
+                renderItem={renderSearchItem}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
+                initialNumToRender={15}
+                maxToRenderPerBatch={10}
+                windowSize={5}
+                removeClippedSubviews={true}
               />
-            )}
-          />
-        )}
+            </View>
+          )}
 
-        {/* Search results — cards view */}
-        {isSearching && viewMode === 'cards' && (
-          <FlatList<TeamItem | StickerResult>
-            data={searchResults}
-            extraData={effectiveTheme}
-            keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
-            renderItem={renderSearchItem}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
-            initialNumToRender={15}
-            maxToRenderPerBatch={10}
-            windowSize={5}
-            removeClippedSubviews={true}
-          />
-        )}
-
-        {/* Search results — panels view */}
-        {isSearching && viewMode === 'panels' && (
-          <AllPanelsView
-            ref={panelsFlatListRef}
-            allCountries={allCountries}
-            countryDetails={countryDetails}
-            collection={collection}
-            user={user}
-            updateEntry={updateEntry}
-            searchQuery={search}
-            matchedCountryCodes={matchedCountryCodes}
-            highlightByCountry={panelHighlightByCountry}
-            stickerFilter={stickerFilter}
-            onScroll={handleScroll}
-            ListFooterComponent={() => (
-              <Footer
-                t={t}
-                locale={locale}
-                toggleLocale={toggleLocale}
-                onShowAbout={() => setShowAbout(true)}
-                onShowSuggestion={() => setShowSuggestion(true)}
-                themeMode={effectiveTheme}
-                onToggleTheme={toggleTheme}
+          {/* Panels view — no search, all */}
+          {mountedViews.has('noSearch-all') && (
+            <View
+              style={{
+                flex: 1,
+                display:
+                  searchMode === 'noSearch' && viewMode === 'panels' && stickerFilter === 'all'
+                    ? 'flex'
+                    : 'none',
+              }}
+            >
+              <AllPanelsView
+                ref={(ref) => {
+                  panelRefs.current['noSearch-all'] = ref
+                }}
+                allCountries={allCountries}
+                countryDetails={countryDetails}
+                collection={collection}
                 user={user}
-                totalCollected={totalCollected}
+                updateEntry={updateEntry}
+                stickerFilter="all"
+                onScroll={handleScroll}
+                ListFooterComponent={listFooter}
               />
-            )}
-          />
-        )}
+            </View>
+          )}
+
+          {/* Panels view — no search, missing */}
+          {mountedViews.has('noSearch-missing') && (
+            <View
+              style={{
+                flex: 1,
+                display:
+                  searchMode === 'noSearch' && viewMode === 'panels' && stickerFilter === 'missing'
+                    ? 'flex'
+                    : 'none',
+              }}
+            >
+              <AllPanelsView
+                ref={(ref) => {
+                  panelRefs.current['noSearch-missing'] = ref
+                }}
+                allCountries={allCountries}
+                countryDetails={countryDetails}
+                collection={collection}
+                user={user}
+                updateEntry={updateEntry}
+                stickerFilter="missing"
+                onScroll={handleScroll}
+                ListFooterComponent={listFooter}
+              />
+            </View>
+          )}
+
+          {/* Panels view — no search, repeated */}
+          {mountedViews.has('noSearch-repeated') && (
+            <View
+              style={{
+                flex: 1,
+                display:
+                  searchMode === 'noSearch' && viewMode === 'panels' && stickerFilter === 'repeated'
+                    ? 'flex'
+                    : 'none',
+              }}
+            >
+              <AllPanelsView
+                ref={(ref) => {
+                  panelRefs.current['noSearch-repeated'] = ref
+                }}
+                allCountries={allCountries}
+                countryDetails={countryDetails}
+                collection={collection}
+                user={user}
+                updateEntry={updateEntry}
+                stickerFilter="repeated"
+                onScroll={handleScroll}
+                ListFooterComponent={listFooter}
+              />
+            </View>
+          )}
+
+          {/* Panels view — search, all */}
+          {mountedViews.has('search-all') && (
+            <View
+              style={{
+                flex: 1,
+                display:
+                  searchMode === 'search' && viewMode === 'panels' && stickerFilter === 'all'
+                    ? 'flex'
+                    : 'none',
+              }}
+            >
+              <AllPanelsView
+                ref={(ref) => {
+                  panelRefs.current['search-all'] = ref
+                }}
+                allCountries={allCountries}
+                countryDetails={countryDetails}
+                collection={collection}
+                user={user}
+                updateEntry={updateEntry}
+                searchQuery={search}
+                matchedCountryCodes={matchedCountryCodes}
+                highlightByCountry={panelHighlightByCountry}
+                stickerFilter="all"
+                onScroll={handleScroll}
+                ListFooterComponent={listFooter}
+              />
+            </View>
+          )}
+
+          {/* Panels view — search, missing */}
+          {mountedViews.has('search-missing') && (
+            <View
+              style={{
+                flex: 1,
+                display:
+                  searchMode === 'search' && viewMode === 'panels' && stickerFilter === 'missing'
+                    ? 'flex'
+                    : 'none',
+              }}
+            >
+              <AllPanelsView
+                ref={(ref) => {
+                  panelRefs.current['search-missing'] = ref
+                }}
+                allCountries={allCountries}
+                countryDetails={countryDetails}
+                collection={collection}
+                user={user}
+                updateEntry={updateEntry}
+                searchQuery={search}
+                matchedCountryCodes={matchedCountryCodes}
+                highlightByCountry={panelHighlightByCountry}
+                stickerFilter="missing"
+                onScroll={handleScroll}
+                ListFooterComponent={listFooter}
+              />
+            </View>
+          )}
+
+          {/* Panels view — search, repeated */}
+          {mountedViews.has('search-repeated') && (
+            <View
+              style={{
+                flex: 1,
+                display:
+                  searchMode === 'search' && viewMode === 'panels' && stickerFilter === 'repeated'
+                    ? 'flex'
+                    : 'none',
+              }}
+            >
+              <AllPanelsView
+                ref={(ref) => {
+                  panelRefs.current['search-repeated'] = ref
+                }}
+                allCountries={allCountries}
+                countryDetails={countryDetails}
+                collection={collection}
+                user={user}
+                updateEntry={updateEntry}
+                searchQuery={search}
+                matchedCountryCodes={matchedCountryCodes}
+                highlightByCountry={panelHighlightByCountry}
+                stickerFilter="repeated"
+                onScroll={handleScroll}
+                ListFooterComponent={listFooter}
+              />
+            </View>
+          )}
+        </View>
 
         <WhatsNewModal
           visible={showWhatsNew}

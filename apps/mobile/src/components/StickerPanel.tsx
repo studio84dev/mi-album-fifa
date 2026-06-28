@@ -1,24 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import {
-  View,
-  Text,
-  FlatList,
-  Modal,
-  Pressable,
-  TouchableOpacity,
-  useWindowDimensions,
-  type ListRenderItem,
-} from 'react-native'
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native'
 import { supabase } from '../lib/supabaseClient'
 import { useTheme, colors } from '../hooks/useTheme'
 import { useI18n } from '../hooks/useI18n'
+import ScrollableModal from './ScrollableModal'
 import StickerCard from './StickerCard'
 
 const LONG_PRESS_MS = 500
-const keyExtractor = (num: number) => String(num)
-const contentContainerStyle = { paddingTop: 16, paddingBottom: 24 }
-const columnWrapperStyle = { gap: 5 }
-const ItemSeparatorComponent = () => <View style={{ height: 5 }} />
 
 interface CollectionEntry {
   collected: boolean
@@ -29,6 +17,73 @@ interface StickerState {
   collected: Record<number, boolean>
   repeated: Record<number, number>
 }
+
+interface StickerRowProps {
+  rowNumbers: number[]
+  countryCode: string
+  state: StickerState
+  highlightNumber: number | null
+  cardWidth: number
+  onPress: (_num: number) => void
+  onLongPress: (_num: number) => void
+  onPressIn: (_num: number) => void
+  onPressOut: () => void
+}
+
+function areStickerRowsEqual(prev: StickerRowProps, next: StickerRowProps) {
+  if (prev.countryCode !== next.countryCode) return false
+  if (prev.highlightNumber !== next.highlightNumber) return false
+  if (prev.cardWidth !== next.cardWidth) return false
+  if (prev.rowNumbers.length !== next.rowNumbers.length) return false
+  if (prev.rowNumbers !== next.rowNumbers) {
+    for (let i = 0; i < prev.rowNumbers.length; i++) {
+      if (prev.rowNumbers[i] !== next.rowNumbers[i]) return false
+    }
+  }
+  if (prev.onPress !== next.onPress) return false
+  if (prev.onLongPress !== next.onLongPress) return false
+  if (prev.onPressIn !== next.onPressIn) return false
+  if (prev.onPressOut !== next.onPressOut) return false
+  for (const num of prev.rowNumbers) {
+    if (prev.state.collected[num] !== next.state.collected[num]) return false
+    if (prev.state.repeated[num] !== next.state.repeated[num]) return false
+  }
+  return true
+}
+
+const StickerRow = React.memo(function StickerRow({
+  rowNumbers,
+  countryCode,
+  state,
+  highlightNumber,
+  cardWidth,
+  onPress,
+  onLongPress,
+  onPressIn,
+  onPressOut,
+}: StickerRowProps) {
+  return (
+    <View style={{ flexDirection: 'row', gap: 5 }}>
+      {rowNumbers.map((num) => (
+        <View key={num} style={{ width: cardWidth }}>
+          <StickerCard
+            num={num}
+            countryCode={countryCode}
+            isCollected={!!state.collected[num]}
+            isRepeated={(state.repeated[num] ?? 0) > 0}
+            repeatedCount={state.repeated[num] ?? 0}
+            isHighlighted={highlightNumber === num}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            delayLongPress={LONG_PRESS_MS}
+          />
+        </View>
+      ))}
+    </View>
+  )
+}, areStickerRowsEqual)
 
 function buildState(data: Record<string, CollectionEntry>): StickerState {
   const collected: Record<number, boolean> = {}
@@ -65,18 +120,13 @@ function StickerPanel({
   // 16px paddingH each side + 4 gaps of 5px between 5 columns
   const cardWidth = Math.floor((screenWidth - 32 - 20) / 5)
 
-  const [state, setState] = useState<StickerState>(() => buildState(initialData))
+  // Derive collected/repeated directly from initialData (source of truth is the context).
+  // updateEntry already does an optimistic setCollection, so initialData is always current.
+  const state = useMemo(() => buildState(initialData), [initialData])
+
   const [modal, setModal] = useState<number | null>(null)
   const [modalRepeated, setModalRepeated] = useState(0)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(buildState(initialData))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countryCode])
-
-  const { collected: _collected, repeated: _repeated } = state
 
   // Refs para mantener handlers estables y evitar re-render de StickerCards
   const stateRef = useRef(state)
@@ -91,19 +141,6 @@ function StickerPanel({
   const userRef = useRef(user)
   // eslint-disable-next-line react-hooks/refs
   userRef.current = user
-  const cardWidthRef = useRef(cardWidth)
-  // eslint-disable-next-line react-hooks/refs
-  cardWidthRef.current = cardWidth
-  const highlightNumberRef = useRef(highlightNumber)
-  // eslint-disable-next-line react-hooks/refs
-  highlightNumberRef.current = highlightNumber
-
-  const setSticker = useCallback((number: number, collected: boolean, repeated: number) => {
-    setState((prev) => ({
-      collected: { ...prev.collected, [number]: collected },
-      repeated: { ...prev.repeated, [number]: repeated },
-    }))
-  }, [])
 
   const openModal = useCallback((number: number) => {
     const current = stateRef.current.repeated[number] ?? 0
@@ -147,6 +184,10 @@ function StickerPanel({
 
   const handleStickerPress = useCallback(
     async (number: number) => {
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current)
+        longPressTimer.current = null
+      }
       const currentState = stateRef.current
       if (currentState.repeated[number] > 0) {
         openModal(number)
@@ -154,14 +195,13 @@ function StickerPanel({
       }
       const current = !!currentState.collected[number]
       const next = !current
-      setSticker(number, next, 0)
       onCollectionChangeRef.current(countryCodeRef.current, number, {
         collected: next,
         repeated: 0,
       })
       await syncSupabase(number, next, 0)
     },
-    [openModal, setSticker, syncSupabase]
+    [openModal, syncSupabase]
   )
 
   const handleStickerLongPress = useCallback((number: number) => openModal(number), [openModal])
@@ -173,7 +213,6 @@ function StickerPanel({
       closeModal()
 
       if (action === 'none') {
-        setSticker(number, false, 0)
         onCollectionChangeRef.current(countryCodeRef.current, number, {
           collected: false,
           repeated: 0,
@@ -182,14 +221,13 @@ function StickerPanel({
         return
       }
 
-      setSticker(number, true, rep)
       onCollectionChangeRef.current(countryCodeRef.current, number, {
         collected: true,
         repeated: rep,
       })
       await syncSupabase(number, true, rep)
     },
-    [modal, modalRepeated, closeModal, setSticker, syncSupabase]
+    [modal, modalRepeated, closeModal, syncSupabase]
   )
 
   const handleLongPressIn = useCallback(
@@ -206,226 +244,175 @@ function StickerPanel({
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current)
+        longPressTimer.current = null
+      }
+    }
+  }, [])
+
   const data = useMemo(
     () => stickerNumbers ?? Array.from({ length: stickerCount }, (_, i) => i + 1),
     [stickerNumbers, stickerCount]
   )
 
-  const renderItem: ListRenderItem<number> = useCallback(
-    ({ item: num }) => {
-      const currentState = stateRef.current
-      const currentHighlight = highlightNumberRef.current
-      return (
-        <View style={{ width: cardWidthRef.current }}>
-          <StickerCard
-            num={num}
-            countryCode={countryCodeRef.current}
-            isCollected={!!currentState.collected[num]}
-            isRepeated={(currentState.repeated[num] ?? 0) > 0}
-            repeatedCount={currentState.repeated[num] ?? 0}
-            isHighlighted={currentHighlight === num}
+  const rows = useMemo(() => {
+    const chunks: number[][] = []
+    for (let i = 0; i < data.length; i += 5) {
+      chunks.push(data.slice(i, i + 5))
+    }
+    return chunks
+  }, [data])
+
+  return (
+    <>
+      <View style={{ paddingTop: 16, paddingBottom: 24, gap: 5 }}>
+        {rows.map((rowNumbers, index) => (
+          <StickerRow
+            key={index}
+            rowNumbers={rowNumbers}
+            countryCode={countryCode}
+            state={state}
+            highlightNumber={highlightNumber ?? null}
+            cardWidth={cardWidth}
             onPress={handleStickerPress}
             onLongPress={handleStickerLongPress}
             onPressIn={handleLongPressIn}
             onPressOut={handleLongPressOut}
-            delayLongPress={LONG_PRESS_MS}
           />
-        </View>
-      )
-    },
-    [handleStickerPress, handleStickerLongPress, handleLongPressIn, handleLongPressOut]
-  )
-
-  const getItemLayout = useCallback(
-    (_: unknown, index: number) => ({
-      length: cardWidthRef.current,
-      offset: cardWidthRef.current * (index % 5),
-      index,
-    }),
-    []
-  )
-
-  return (
-    <>
-      <FlatList
-        data={data}
-        numColumns={5}
-        keyExtractor={keyExtractor}
-        scrollEnabled={false}
-        contentContainerStyle={contentContainerStyle}
-        columnWrapperStyle={columnWrapperStyle}
-        ItemSeparatorComponent={ItemSeparatorComponent}
-        renderItem={renderItem}
-        getItemLayout={getItemLayout}
-        extraData={state}
-        initialNumToRender={20}
-        maxToRenderPerBatch={20}
-        windowSize={5}
-        removeClippedSubviews={true}
-      />
+        ))}
+      </View>
 
       <Text style={{ color: theme.textDisabled, fontSize: 12, textAlign: 'center', marginTop: 8 }}>
         {t('hintTouch')}
       </Text>
 
-      <Modal visible={modal !== null} transparent animationType="fade" onRequestClose={closeModal}>
-        <Pressable
+      <ScrollableModal
+        visible={modal !== null}
+        onClose={closeModal}
+        title={`${countryCode} #${modal} · ${t('modalTitle')}`}
+        scrollable={false}
+        contentPadding={24}
+      >
+        <View
           style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.65)',
+            flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: `${colors.accentOrange}1A`,
+            borderWidth: 1,
+            borderColor: `${colors.accentOrange}4D`,
+            borderRadius: 12,
             paddingHorizontal: 16,
+            paddingVertical: 12,
+            marginBottom: 8,
           }}
-          onPress={closeModal}
         >
-          <Pressable
-            style={{
-              backgroundColor: theme.cardBg,
-              borderWidth: 1,
-              borderColor: theme.borderColor,
-              borderRadius: 16,
-              padding: 24,
-              width: '100%',
-              maxWidth: 320,
-            }}
-            onPress={(e) => e.stopPropagation()}
-          >
+          <Text style={{ color: colors.accentOrange, fontWeight: '600', fontSize: 14 }}>
+            {t('modalRepeatedLabel')}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+            <TouchableOpacity
+              onPress={() => setModalRepeated((v) => Math.max(0, v - 1))}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: `${colors.accentOrange}66`,
+                backgroundColor: `${colors.accentOrange}1A`,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text style={{ color: colors.accentOrange, fontSize: 16, fontWeight: '700' }}>−</Text>
+            </TouchableOpacity>
             <Text
               style={{
                 color: theme.textPrimary,
+                fontSize: 20,
                 fontWeight: '700',
-                fontSize: 15,
+                minWidth: 24,
                 textAlign: 'center',
-                marginBottom: 16,
               }}
             >
-              {countryCode} #{modal} · {t('modalTitle')}
+              {modalRepeated}
             </Text>
-
-            <View
+            <TouchableOpacity
+              onPress={() => setModalRepeated((v) => v + 1)}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: `${colors.accentOrange}1A`,
+                width: 32,
+                height: 32,
+                borderRadius: 16,
                 borderWidth: 1,
-                borderColor: `${colors.accentOrange}4D`,
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                marginBottom: 8,
+                borderColor: `${colors.accentOrange}66`,
+                backgroundColor: `${colors.accentOrange}1A`,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <Text style={{ color: colors.accentOrange, fontWeight: '600', fontSize: 14 }}>
-                {t('modalRepeatedLabel')}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-                <TouchableOpacity
-                  onPress={() => setModalRepeated((v) => Math.max(0, v - 1))}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: `${colors.accentOrange}66`,
-                    backgroundColor: `${colors.accentOrange}1A`,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ color: colors.accentOrange, fontSize: 16, fontWeight: '700' }}>
-                    −
-                  </Text>
-                </TouchableOpacity>
-                <Text
-                  style={{
-                    color: theme.textPrimary,
-                    fontSize: 20,
-                    fontWeight: '700',
-                    minWidth: 24,
-                    textAlign: 'center',
-                  }}
-                >
-                  {modalRepeated}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setModalRepeated((v) => v + 1)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: `${colors.accentOrange}66`,
-                    backgroundColor: `${colors.accentOrange}1A`,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text style={{ color: colors.accentOrange, fontSize: 16, fontWeight: '700' }}>
-                    +
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {modalRepeated === 0 && (
-              <Text
-                style={{
-                  color: theme.textMuted,
-                  fontSize: 12,
-                  textAlign: 'center',
-                  marginBottom: 8,
-                }}
-              >
-                {t('modalHintRemove')}
-              </Text>
-            )}
-
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  backgroundColor: colors.accentBlue,
-                  borderRadius: 8,
-                  paddingVertical: 12,
-                  alignItems: 'center',
-                }}
-                onPress={() => applyModalAction('collected')}
-              >
-                <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
-                  {modalRepeated === 0
-                    ? t('modalBtnCollectedZero')
-                    : t('modalBtnCollectedRep').replace('{count}', String(modalRepeated))}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  borderRadius: 8,
-                  paddingVertical: 12,
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: `${colors.errorRed}4D`,
-                  backgroundColor: `${colors.errorRed}1A`,
-                }}
-                onPress={() => applyModalAction('none')}
-              >
-                <Text style={{ color: colors.errorRed, fontWeight: '600', fontSize: 14 }}>
-                  {t('modalBtnNone')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-              onPress={closeModal}
-              style={{ marginTop: 16, paddingVertical: 8, alignItems: 'center' }}
-            >
-              <Text style={{ color: theme.textMuted, fontSize: 14 }}>{t('modalCancel')}</Text>
+              <Text style={{ color: colors.accentOrange, fontSize: 16, fontWeight: '700' }}>+</Text>
             </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      </Modal>
+          </View>
+        </View>
+
+        {modalRepeated === 0 && (
+          <Text
+            style={{
+              color: theme.textMuted,
+              fontSize: 12,
+              textAlign: 'center',
+              marginBottom: 8,
+            }}
+          >
+            {t('modalHintRemove')}
+          </Text>
+        )}
+
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              backgroundColor: colors.accentBlue,
+              borderRadius: 8,
+              paddingVertical: 12,
+              alignItems: 'center',
+            }}
+            onPress={() => applyModalAction('collected')}
+          >
+            <Text style={{ color: '#ffffff', fontWeight: '600', fontSize: 14 }}>
+              {modalRepeated === 0
+                ? t('modalBtnCollectedZero')
+                : t('modalBtnCollectedRep').replace('{count}', String(modalRepeated))}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              borderRadius: 8,
+              paddingVertical: 12,
+              alignItems: 'center',
+              borderWidth: 1,
+              borderColor: `${colors.errorRed}4D`,
+              backgroundColor: `${colors.errorRed}1A`,
+            }}
+            onPress={() => applyModalAction('none')}
+          >
+            <Text style={{ color: colors.errorRed, fontWeight: '600', fontSize: 14 }}>
+              {t('modalBtnNone')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          onPress={closeModal}
+          style={{ marginTop: 16, paddingVertical: 8, alignItems: 'center' }}
+        >
+          <Text style={{ color: theme.textMuted, fontSize: 14 }}>{t('modalCancel')}</Text>
+        </TouchableOpacity>
+      </ScrollableModal>
     </>
   )
 }
