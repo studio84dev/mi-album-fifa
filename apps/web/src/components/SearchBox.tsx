@@ -22,7 +22,7 @@ function SearchBox({
   t,
 }: SearchBoxProps) {
   return (
-    <div className="w-full mb-6 flex items-center gap-2">
+    <div className="w-full mb-4 flex items-center gap-2">
       {search && (
         <button
           className="flex-shrink-0 w-10 h-10 rounded-full border border-border-color bg-bg-tertiary text-text-muted cursor-pointer flex items-center justify-center transition-[background,border-color,color] duration-base hover:bg-bg-quaternary hover:border-border-strong hover:text-text-primary"

@@ -27,7 +27,8 @@ import LoginBar from './components/LoginBar.tsx'
 import SharePrompt, { STORAGE_KEY as SHARE_PROMPT_KEY } from './components/SharePrompt.tsx'
 import WelcomeModal from './components/WelcomeModal.tsx'
 import AboutModal from './components/AboutModal.tsx'
-import CommunityStats from './components/CommunityStats.tsx'
+import ViewToggle from './components/ViewToggle.tsx'
+import AllPanelsView from './components/AllPanelsView.tsx'
 
 function App() {
   const { locale, t, toggleLocale } = useI18n()
@@ -43,14 +44,18 @@ function App() {
     selectCountry,
     selectStickerCard,
     clearSearch,
-    searchFocused,
-    setSearchFocused,
     searchInputRef,
     searchResults,
     activeCountry,
     matchedNumber,
     matchedSticker,
+    teamsData,
+    countryDetails,
+    panelMatchedCountryCodes,
+    panelHighlightByCountry,
   } = useSearchResults()
+
+  const [viewMode, setViewMode] = useState<'cards' | 'panels'>('cards')
   const {
     showWhatsNew,
     setShowWhatsNew,
@@ -118,37 +123,53 @@ function App() {
 
   return (
     <div className="max-w-[760px] mx-auto px-4 pb-12 flex flex-col items-center min-h-screen w-full">
-      <Header
-        t={t}
-        user={user}
-        authLoading={authLoading}
-        whatsNewUnread={whatsNewUnread}
-        onOpenWhatsNew={openWhatsNew}
-        onSignIn={signInWithGoogle}
-        onSignOut={signOut}
-        onImport={() => setShowImportModal(true)}
-        totals={totals}
-        collectionLoading={collectionLoading}
-      />
+      <div className="sticky top-0 z-[100] bg-bg-primary w-full">
+        <Header
+          t={t}
+          user={user}
+          authLoading={authLoading}
+          whatsNewUnread={whatsNewUnread}
+          onOpenWhatsNew={openWhatsNew}
+          onSignIn={signInWithGoogle}
+          onSignOut={signOut}
+          onImport={() => setShowImportModal(true)}
+          totals={totals}
+          collectionLoading={collectionLoading}
+        />
+
+        {!user && !authLoading && <LoginBar onLogin={signInWithGoogle} t={t} />}
+
+        <SearchBox
+          search={search}
+          onChange={setSearch}
+          onClear={handleClearSearch}
+          onBack={handleBackSearch}
+          inputRef={searchInputRef}
+          placeholder={t('searchPlaceholder')}
+          t={t}
+        />
+
+        {!activeCountry && !search && (
+          <div className="self-start mb-4 transition-[margin,opacity,max-height] duration-slow">
+            <ViewToggle
+              mode={viewMode}
+              onChange={(mode) => {
+                setViewMode(mode)
+                if (mode === 'panels') {
+                  selectCountry('')
+                }
+              }}
+              cardsLabel={t('viewModeCards')}
+              panelsLabel={t('viewModePanels')}
+            />
+          </div>
+        )}
+      </div>
 
       {showAndroidBanner && <AndroidBanner onDismiss={dismissAndroidBanner} t={t} />}
       {showRedirectBanner && <RedirectBanner onDismiss={dismissRedirectBanner} t={t} />}
 
-      {!user && !authLoading && <LoginBar onLogin={signInWithGoogle} t={t} />}
-
       {showWelcomeModal && <WelcomeModal onClose={dismissWelcomeModal} t={t} />}
-
-      <header
-        className={`text-center mt-8 transition-[margin,opacity,max-height] duration-slow${searchFocused ? ' max-[600px]:max-h-0 max-[600px]:overflow-hidden max-[600px]:opacity-0 max-[600px]:m-0 max-[600px]:p-0' : ''}`}
-      >
-        <h1 className="text-[1.8rem] min-[601px]:text-[2rem] font-extrabold transition-all duration-slow text-text-primary tracking-[-0.03em] mb-2 leading-[1.2]">
-          <span>⚽</span> {t('title')}
-        </h1>
-        <p className="transition-all duration-slow text-text-muted text-[1rem] min-[601px]:text-base max-w-[460px] leading-[1.6] mx-auto text-center font-normal">
-          {t('description')}
-        </p>
-        <CommunityStats t={t} />
-      </header>
 
       {showSharePrompt && (
         <SharePrompt t={t} share={share} onDismiss={() => setShowSharePrompt(false)} />
@@ -177,26 +198,29 @@ function App() {
         />
       )}
 
-      <SearchBox
-        search={search}
-        onChange={setSearch}
-        onClear={handleClearSearch}
-        onBack={handleBackSearch}
-        inputRef={searchInputRef}
-        onFocus={() => setSearchFocused(true)}
-        onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
-        placeholder={t('searchPlaceholder')}
-        t={t}
-      />
+      {!activeCountry && viewMode === 'cards' && (
+        <>
+          {search && <ResultsCount count={searchResults.length} t={t} />}
+          <StickerList
+            results={searchResults}
+            onSelect={handleSelectCountry}
+            collection={collection}
+            selectedCode={selectedCode}
+            t={t}
+          />
+        </>
+      )}
 
-      {!activeCountry && search && <ResultsCount count={searchResults.length} t={t} />}
-
-      {!activeCountry && (
-        <StickerList
-          results={searchResults}
-          onSelect={handleSelectCountry}
+      {!activeCountry && viewMode === 'panels' && (
+        <AllPanelsView
+          allCountries={teamsData}
+          countryDetails={countryDetails}
           collection={collection}
-          selectedCode={selectedCode}
+          user={user}
+          updateEntry={updateEntry}
+          searchQuery={search}
+          matchedCountryCodes={panelMatchedCountryCodes}
+          highlightByCountry={panelHighlightByCountry}
           t={t}
         />
       )}

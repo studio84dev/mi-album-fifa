@@ -13,7 +13,7 @@ function parseExactCode(query: string): { prefix: string; number: number } | nul
   return { prefix: match[1].toUpperCase(), number: parseInt(match[2], 10) }
 }
 
-interface TeamSummary {
+export interface TeamSummary {
   code: string
   team_name: string | null
   group: string | null
@@ -47,6 +47,11 @@ export interface StickerCardLike {
   country_code: string | null
 }
 
+interface CountryDetails {
+  stickerCount: number
+  stickerNumbers: number[]
+}
+
 function buildSearchData(allStickers: Sticker[]) {
   const teamsObj = allStickers.reduce<Record<string, TeamSummary>>((acc, sticker) => {
     const key = sticker.country_code ?? sticker.code
@@ -66,6 +71,18 @@ function buildSearchData(allStickers: Sticker[]) {
     return acc
   }, {})
 
+  const countryDetails = allStickers.reduce<Record<string, CountryDetails>>((acc, sticker) => {
+    const key = sticker.country_code ?? sticker.code
+    if (!acc[key]) {
+      acc[key] = { stickerCount: 0, stickerNumbers: [] }
+    }
+    acc[key].stickerCount++
+    if (sticker.number != null) {
+      acc[key].stickerNumbers.push(sticker.number === 0 ? 1 : sticker.number)
+    }
+    return acc
+  }, {})
+
   const stickerByCode = new Map<string, Sticker>()
   for (const sticker of allStickers) {
     if (sticker.number != null) {
@@ -75,6 +92,7 @@ function buildSearchData(allStickers: Sticker[]) {
 
   return {
     teamsData: Object.values(teamsObj) as TeamSummary[],
+    countryDetails,
     stickerByCode,
   }
 }
@@ -87,7 +105,10 @@ export function useSearchResults() {
   const [searchFocused, setSearchFocused] = useState(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
 
-  const { teamsData, stickerByCode } = useMemo(() => buildSearchData(allStickers), [])
+  const { teamsData, countryDetails, stickerByCode } = useMemo(
+    () => buildSearchData(allStickers),
+    []
+  )
 
   /* ── Search results (list view) ─────────────────────────── */
   const searchResults = useMemo((): SearchResult[] => {
@@ -169,6 +190,56 @@ export function useSearchResults() {
   const matchedNumber = matchedStickerInfo ? matchedStickerInfo.number : null
   const matchedSticker = matchedStickerInfo
 
+  /* ── Panel view search data (filter + highlight) ─────────── */
+  const { panelMatchedCountryCodes, panelHighlightByCountry } = useMemo(() => {
+    if (!search.trim()) {
+      return { panelMatchedCountryCodes: null, panelHighlightByCountry: null }
+    }
+    const query = search.trim().toUpperCase()
+
+    const matchedTeams = teamsData.filter(
+      (s) =>
+        s.code.includes(query) ||
+        (s.team_name && s.team_name.toUpperCase().includes(query)) ||
+        s.page.toString().includes(query)
+    )
+
+    const matchedStickerCards = allStickers.filter((sticker) => {
+      const descMatch = sticker.description.toUpperCase().includes(query)
+      const notInTeamResults = !matchedTeams.some((t) => t.code === sticker.country_code)
+      const isHiddenType = sticker.card_type === 'team_logo' || sticker.card_type === 'team_photo'
+      return (
+        descMatch &&
+        notInTeamResults &&
+        !isHiddenType &&
+        sticker.number != null &&
+        sticker.country_code != null
+      )
+    })
+
+    const codes = new Set<string>([
+      ...matchedTeams.map((t) => t.code),
+      ...matchedStickerCards.map((s) => s.country_code).filter((c): c is string => c != null),
+    ])
+    if (exactMatch) {
+      codes.add(exactMatch.country_code!)
+    }
+
+    const highlightByCountry: Record<string, number> = {}
+    if (exactMatch) {
+      highlightByCountry[exactMatch.country_code!] = exactMatch.number!
+    } else {
+      for (const sticker of matchedStickerCards) {
+        const code = sticker.country_code as string
+        if (!highlightByCountry[code]) {
+          highlightByCountry[code] = sticker.number as number
+        }
+      }
+    }
+
+    return { panelMatchedCountryCodes: codes, panelHighlightByCountry: highlightByCountry }
+  }, [search, teamsData, exactMatch])
+
   /* ── Handlers ───────────────────────────────────────────── */
   const clearSearch = useCallback(() => {
     setSelectedCode(null)
@@ -204,5 +275,9 @@ export function useSearchResults() {
     activeCountry,
     matchedNumber,
     matchedSticker,
+    teamsData,
+    countryDetails,
+    panelMatchedCountryCodes,
+    panelHighlightByCountry,
   }
 }
