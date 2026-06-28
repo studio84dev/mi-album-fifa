@@ -8,10 +8,11 @@ interface SearchBarProps {
   value: string
   onChangeText: (_text: string) => void
   onClear: () => void
+  placeholder?: string
 }
 
 const SearchBar = forwardRef<TextInputType, SearchBarProps>(function SearchBar(
-  { value, onChangeText, onClear },
+  { value, onChangeText, onClear, placeholder },
   ref
 ) {
   const { theme } = useTheme()
@@ -35,7 +36,7 @@ const SearchBar = forwardRef<TextInputType, SearchBarProps>(function SearchBar(
         <TextInput
           ref={ref}
           style={{ flex: 1, color: theme.textPrimary, fontSize: 14, paddingVertical: 0 }}
-          placeholder={t('searchPlaceholder')}
+          placeholder={placeholder ?? t('searchPlaceholder')}
           placeholderTextColor={theme.textMuted}
           value={value}
           onChangeText={onChangeText}

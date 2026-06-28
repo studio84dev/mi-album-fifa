@@ -233,14 +233,33 @@ export default function HomeScreen() {
     return stickerByCode.get(`${parsed.prefix}-${parsed.number}`) ?? null
   }, [search, stickerByCode])
 
-  const { searchResults, matchedCountryCodes, panelHighlightByCountry } = useMemo(() => {
+  // Panel search: countries only (+ exact sticker highlight). Never shows StickerResult cards.
+  const { matchedCountryCodes, panelHighlightByCountry } = useMemo(() => {
     if (!search.trim()) {
-      return {
-        searchResults: allCountries,
-        matchedCountryCodes: null,
-        panelHighlightByCountry: null,
-      }
+      return { matchedCountryCodes: null, panelHighlightByCountry: null }
     }
+    const q = search.trim().toUpperCase()
+
+    const matchedTeams = allCountries.filter(
+      (c) => c.code.includes(q) || c.teamNameUpper.includes(q) || c.pageStr.includes(q)
+    )
+
+    const matchedCountryCodes = new Set<string>(matchedTeams.map((c) => c.code))
+    if (exactMatch?.country_code) {
+      matchedCountryCodes.add(exactMatch.country_code)
+    }
+
+    const panelHighlightByCountry: Record<string, number> = {}
+    if (exactMatch?.country_code && exactMatch.number != null) {
+      panelHighlightByCountry[exactMatch.country_code] = exactMatch.number
+    }
+
+    return { matchedCountryCodes, panelHighlightByCountry }
+  }, [search, allCountries, exactMatch])
+
+  // Card search: countries + individual sticker results.
+  const cardSearchResults = useMemo((): (TeamItem | StickerResult)[] => {
+    if (!search.trim()) return allCountries
     const q = search.trim().toUpperCase()
 
     const matchedTeams = allCountries.filter(
@@ -255,47 +274,20 @@ export default function HomeScreen() {
       }
     }
 
-    const matchedCountryCodes = new Set<string>([
-      ...matchedTeams.map((c) => c.code),
-      ...matchedStickers.map((s) => s.country_code),
-    ])
-    if (exactMatch) {
-      matchedCountryCodes.add(exactMatch.country_code!)
-    }
-
-    const panelHighlightByCountry: Record<string, number> = {}
-    if (exactMatch) {
-      panelHighlightByCountry[exactMatch.country_code!] = exactMatch.number!
-    } else {
-      for (const sticker of matchedStickers) {
-        if (!panelHighlightByCountry[sticker.country_code]) {
-          panelHighlightByCountry[sticker.country_code] = sticker.number
-        }
-      }
-    }
-
     if (matchedTeams.length === 0 && matchedStickers.length === 0 && exactMatch) {
-      return {
-        searchResults: [
-          {
-            _kind: 'sticker' as const,
-            code: exactMatch.code,
-            country_code: exactMatch.country_code!,
-            number: exactMatch.number!,
-            description: exactMatch.description,
-            iso: exactMatch.iso,
-          },
-        ],
-        matchedCountryCodes,
-        panelHighlightByCountry,
-      }
+      return [
+        {
+          _kind: 'sticker' as const,
+          code: exactMatch.code,
+          country_code: exactMatch.country_code!,
+          number: exactMatch.number!,
+          description: exactMatch.description,
+          iso: exactMatch.iso,
+        },
+      ]
     }
 
-    return {
-      searchResults: [...matchedTeams, ...matchedStickers],
-      matchedCountryCodes,
-      panelHighlightByCountry,
-    }
+    return [...matchedTeams, ...matchedStickers]
   }, [search, allCountries, searchableStickers, exactMatch])
 
   const handleCountryPress = useCallback(
@@ -452,6 +444,9 @@ export default function HomeScreen() {
             value={inputValue}
             onChangeText={handleChange}
             onClear={handleClearSearch}
+            placeholder={
+              viewMode === 'panels' ? t('searchPlaceholderPanels') : t('searchPlaceholder')
+            }
           />
           <View
             style={{
@@ -519,7 +514,7 @@ export default function HomeScreen() {
               }}
             >
               <FlatList<TeamItem | StickerResult>
-                data={searchResults}
+                data={cardSearchResults}
                 extraData={effectiveTheme}
                 keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
                 renderItem={renderSearchItem}

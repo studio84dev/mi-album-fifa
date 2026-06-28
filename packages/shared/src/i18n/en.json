@@ -16,6 +16,7 @@
   "stickerFilterMissing": "Missing",
   "stickerFilterRepeated": "Duplicates",
   "searchPlaceholder": "Search: MEX, Argentina, Messi...",
+  "searchPlaceholderPanels": "Search by country: MEX, Argentina...",
   "resultsCount": "result",
   "resultsCountPlural": "results",
   "noResults": "No results found",
