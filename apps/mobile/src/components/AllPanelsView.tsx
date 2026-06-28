@@ -64,6 +64,12 @@ function filterVisibleStickers(
   })
 }
 
+type ThemeColors = {
+  borderColor: string
+  textPrimary: string
+  textMuted: string
+}
+
 interface CountrySectionProps {
   country: TeamItem
   user: User | null
@@ -71,6 +77,7 @@ interface CountrySectionProps {
   highlightNumber: number | null
   initialData: Record<string, CollectionEntry>
   filteredNumbers: number[]
+  theme: ThemeColors
 }
 
 const CountrySection = React.memo(function CountrySection({
@@ -80,8 +87,8 @@ const CountrySection = React.memo(function CountrySection({
   highlightNumber,
   initialData,
   filteredNumbers,
+  theme,
 }: CountrySectionProps) {
-  const { theme } = useTheme()
   const { t } = useI18n()
 
   const rawFlag = country.iso ? flags[country.iso] : null
@@ -208,10 +215,11 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
           highlightNumber={highlightByCountry?.[item.country.code] ?? null}
           initialData={item.initialData}
           filteredNumbers={item.filteredNumbers}
+          theme={theme}
         />
       )
     },
-    [user, updateEntry, highlightByCountry]
+    [user, updateEntry, highlightByCountry, theme]
   )
 
   const keyExtractor = useCallback((item: VisiblePanelItem) => item.country.code, [])
@@ -246,7 +254,7 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
       data={visibleItems}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
-      extraData={collection}
+      extraData={[collection, theme]}
       onScroll={onScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}

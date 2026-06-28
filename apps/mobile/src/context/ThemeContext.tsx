@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { useColorScheme } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -52,16 +52,22 @@ export const colors = {
 type ThemeMode = 'light' | 'dark' | 'system'
 type ThemeColors = typeof light
 
-interface ThemeContextValue {
+interface ThemeState {
   theme: ThemeColors
   isDark: boolean
   themeMode: ThemeMode
   effectiveTheme: 'light' | 'dark'
+}
+
+interface ThemeDispatch {
   toggleTheme: () => void
   setTheme: (_mode: ThemeMode) => void
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+interface ThemeContextValue extends ThemeState, ThemeDispatch {}
+
+const ThemeStateContext = createContext<ThemeState | null>(null)
+const ThemeDispatchContext = createContext<ThemeDispatch | null>(null)
 
 const THEME_STORAGE_KEY = 'theme_mode'
 
@@ -86,27 +92,43 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const isDark = effectiveTheme === 'dark'
 
   const toggleTheme = useCallback(() => {
-    const newMode = effectiveTheme === 'light' ? 'dark' : 'light'
-    setThemeMode(newMode)
-    AsyncStorage.setItem(THEME_STORAGE_KEY, newMode).catch(() => null)
-  }, [effectiveTheme])
+    setThemeMode((prev) => {
+      const currentEffective =
+        prev === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : prev
+      const newMode = currentEffective === 'light' ? 'dark' : 'light'
+      AsyncStorage.setItem(THEME_STORAGE_KEY, newMode).catch(() => null)
+      return newMode
+    })
+  }, [systemScheme])
 
   const setTheme = useCallback((mode: ThemeMode) => {
     setThemeMode(mode)
     AsyncStorage.setItem(THEME_STORAGE_KEY, mode).catch(() => null)
   }, [])
 
+  const state = useMemo(
+    () => ({ theme, isDark, themeMode, effectiveTheme }),
+    [theme, isDark, themeMode, effectiveTheme]
+  )
+
+  const dispatch = useMemo(() => ({ toggleTheme, setTheme }), [toggleTheme, setTheme])
+
   return (
-    <ThemeContext.Provider
-      value={{ theme, isDark, themeMode, effectiveTheme, toggleTheme, setTheme }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <ThemeStateContext.Provider value={state}>
+      <ThemeDispatchContext.Provider value={dispatch}>{children}</ThemeDispatchContext.Provider>
+    </ThemeStateContext.Provider>
   )
 }
 
 export function useTheme(): ThemeContextValue {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used within ThemeProvider')
+  const state = useContext(ThemeStateContext)
+  const dispatch = useContext(ThemeDispatchContext)
+  if (!state || !dispatch) throw new Error('useTheme must be used within ThemeProvider')
+  return { ...state, ...dispatch }
+}
+
+export function useThemeDispatch(): ThemeDispatch {
+  const ctx = useContext(ThemeDispatchContext)
+  if (!ctx) throw new Error('useThemeDispatch must be used within ThemeProvider')
   return ctx
 }

@@ -1,1 +1,1 @@
-export { useTheme, colors } from '../context/ThemeContext'
+export { useTheme, useThemeDispatch, colors } from '../context/ThemeContext'
