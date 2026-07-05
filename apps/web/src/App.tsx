@@ -166,7 +166,7 @@ function App() {
         )}
       </div>
 
-      {showAndroidBanner && <AndroidBanner onDismiss={dismissAndroidBanner} t={t} />}
+      {/* {showAndroidBanner && <AndroidBanner onDismiss={dismissAndroidBanner} t={t} />} */}
       {showRedirectBanner && <RedirectBanner onDismiss={dismissRedirectBanner} t={t} />}
 
       {showWelcomeModal && <WelcomeModal onClose={dismissWelcomeModal} t={t} />}
