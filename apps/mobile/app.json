@@ -36,6 +36,12 @@
         }
       ],
       [
+        "expo-navigation-bar",
+        {
+          "style": "light"
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {

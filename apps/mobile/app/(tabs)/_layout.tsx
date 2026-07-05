@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
 import { Tabs } from 'expo-router'
-import { useColorScheme } from 'react-native'
+import { Platform, useColorScheme, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import * as NavigationBar from 'expo-navigation-bar'
 import Svg, { Path, Rect } from 'react-native-svg'
 
 const LIGHT = { bg: '#ffffff', border: '#e2e8f0', active: '#3b82f6', inactive: '#94a3b8' }
@@ -30,41 +33,63 @@ function QrTabIcon({ color }: { color: string }) {
   )
 }
 
+const TAB_BAR_BASE_HEIGHT = 60
+
 export default function TabLayout() {
   const scheme = useColorScheme()
   const c = scheme === 'dark' ? DARK : LIGHT
+  const insets = useSafeAreaInsets()
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return
+    void NavigationBar.setStyle('light')
+  }, [])
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: c.bg,
-          borderTopColor: c.border,
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 6,
-        },
-        tabBarActiveTintColor: c.active,
-        tabBarInactiveTintColor: c.inactive,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Álbum',
-          tabBarIcon: ({ color }) => <AlbumIcon color={color as string} />,
+    <View style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: c.bg,
+            borderTopColor: c.border,
+            borderTopWidth: 1,
+            height: TAB_BAR_BASE_HEIGHT + insets.bottom,
+            paddingBottom: insets.bottom + 8,
+            paddingTop: 6,
+          },
+          tabBarActiveTintColor: c.active,
+          tabBarInactiveTintColor: c.inactive,
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         }}
-      />
-      <Tabs.Screen
-        name="exchange"
-        options={{
-          title: 'Intercambio',
-          tabBarIcon: ({ color }) => <QrTabIcon color={color as string} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Álbum',
+            tabBarIcon: ({ color }) => <AlbumIcon color={color as string} />,
+          }}
+        />
+        <Tabs.Screen
+          name="exchange"
+          options={{
+            title: 'Intercambio',
+            tabBarIcon: ({ color }) => <QrTabIcon color={color as string} />,
+          }}
+        />
+      </Tabs>
+      {Platform.OS === 'android' && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: insets.bottom,
+            backgroundColor: '#000000',
+          }}
+        />
+      )}
+    </View>
   )
 }

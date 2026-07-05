@@ -6,6 +6,7 @@ const VERSION_URL =
 
 interface VersionInfo {
   androidVersionCode: number
+  published: boolean
 }
 
 interface UseUpdateAvailabilityResult {
@@ -30,7 +31,7 @@ export function useUpdateAvailability(): UseUpdateAvailabilityResult {
         const data = (await response.json()) as VersionInfo
 
         if (!cancelled) {
-          setUpdateAvailable(localVersionCode < (data.androidVersionCode ?? 0))
+          setUpdateAvailable(data.published && localVersionCode < (data.androidVersionCode ?? 0))
           setError(null)
         }
       } catch (err) {
