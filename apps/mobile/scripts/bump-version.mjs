@@ -82,7 +82,8 @@ console.log(`✅  app.json version: ${oldVersion} → ${newVersion}`)
 const supabaseUrl = 'https://jmgiooeiimjyyltpgrna.supabase.co'
 const bucket = 'app-updates'
 const filePath = 'version.json'
-const body = JSON.stringify({ androidVersionCode: nextVersionCode }, null, 2) + '\n'
+const body =
+  JSON.stringify({ androidVersionCode: nextVersionCode, published: false }, null, 2) + '\n'
 
 const uploadResponse = await fetch(`${supabaseUrl}/storage/v1/object/${bucket}/${filePath}`, {
   method: 'PUT',
