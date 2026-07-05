@@ -19,10 +19,17 @@ import { useTheme, colors } from '@/src/hooks/useTheme'
 import { useI18n } from '@/src/hooks/useI18n'
 import ScrollableModal from '@/src/components/ScrollableModal'
 import { supabase } from '@/src/lib/supabaseClient'
-import { decodeQR, encodeQR, computeMatch } from '@/src/lib/qrCodec'
-import type { MatchResult } from '@/src/lib/qrCodec'
+import {
+  decodeQR,
+  encodeQR,
+  computeMatch,
+  detectQRType,
+  encodeTradeQR,
+  decodeTradeQR,
+} from '@/src/lib/qrCodec'
+import type { MatchResult, TradeData, TradeStickerRef } from '@/src/lib/qrCodec'
 
-type Screen = 'home' | 'scanner' | 'match' | 'success'
+type Screen = 'home' | 'scanner' | 'match' | 'trade_qr' | 'finalize' | 'trade_confirm' | 'success'
 
 interface SuccessData {
   given: number
@@ -201,6 +208,63 @@ function StickerSection({
   )
 }
 
+interface StickerLabelListProps {
+  title: string
+  items: TradeStickerRef[]
+  accentColor: string
+  theme: ReturnType<typeof useTheme>['theme']
+}
+
+function StickerLabelList({ title, items, accentColor, theme }: StickerLabelListProps) {
+  return (
+    <View
+      style={{
+        backgroundColor: theme.bgSecondary,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: theme.borderColor,
+        overflow: 'hidden',
+        marginBottom: 12,
+      }}
+    >
+      <View
+        style={{
+          paddingHorizontal: 14,
+          paddingVertical: 10,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.borderColor,
+          backgroundColor: `${accentColor}11`,
+        }}
+      >
+        <Text style={{ color: theme.textPrimary, fontWeight: '700', fontSize: 14 }}>{title}</Text>
+        <Text style={{ color: theme.textMuted, fontSize: 12, marginTop: 2 }}>
+          {items.length} figurita(s)
+        </Text>
+      </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: 10 }}>
+        {items.map((item) => (
+          <View
+            key={item.key}
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 20,
+              borderWidth: 1.5,
+              borderColor: accentColor,
+              backgroundColor: `${accentColor}22`,
+              margin: 3,
+            }}
+          >
+            <Text style={{ fontSize: 12, fontWeight: '700', color: accentColor }}>
+              {item.label}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  )
+}
+
 export default function ExchangeScreen() {
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
@@ -218,6 +282,8 @@ export default function ExchangeScreen() {
   const [confirming, setConfirming] = useState(false)
   const [successData, setSuccessData] = useState<SuccessData | null>(null)
   const [scanError, setScanError] = useState<string | null>(null)
+  const [tradeQrValue, setTradeQrValue] = useState('')
+  const [incomingTrade, setIncomingTrade] = useState<TradeData | null>(null)
 
   const [permission, requestPermission] = useCameraPermissions()
   const scannedRef = useRef(false)
@@ -232,18 +298,37 @@ export default function ExchangeScreen() {
       if (scannedRef.current) return
       scannedRef.current = true
 
-      const result = decodeQR(data)
-      if (!result) {
-        setScanError(t('exchangeInvalidQr'))
-        scannedRef.current = false
+      const type = detectQRType(data)
+
+      if (type === 'trade') {
+        const tradeData = decodeTradeQR(data)
+        if (!tradeData) {
+          setScanError(t('exchangeInvalidQr'))
+          scannedRef.current = false
+          return
+        }
+        setIncomingTrade(tradeData)
+        setScreen('trade_confirm')
         return
       }
 
-      const matchResult = computeMatch(collection, result)
-      setMatch(matchResult)
-      setSelectedReceive(new Set())
-      setSelectedGive(new Set())
-      setScreen('match')
+      if (type === 'collection') {
+        const result = decodeQR(data)
+        if (!result) {
+          setScanError(t('exchangeInvalidQr'))
+          scannedRef.current = false
+          return
+        }
+        const matchResult = computeMatch(collection, result)
+        setMatch(matchResult)
+        setSelectedReceive(new Set())
+        setSelectedGive(new Set())
+        setScreen('match')
+        return
+      }
+
+      setScanError(t('exchangeInvalidQr'))
+      scannedRef.current = false
     },
     [collection, t]
   )
@@ -295,10 +380,11 @@ export default function ExchangeScreen() {
 
   const canConfirm = selectedReceive.size > 0 && selectedGive.size > 0
 
-  const handleConfirm = useCallback(async () => {
-    if (!match) return
-    setConfirming(true)
-    try {
+  const applyTrade = useCallback(
+    async (
+      receiveItems: Array<{ code: string; number: number; key: string }>,
+      giveItems: Array<{ code: string; number: number; key: string }>
+    ) => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -333,31 +419,71 @@ export default function ExchangeScreen() {
         }
       }
 
-      for (const item of match.theyCanGive) {
-        if (!selectedReceive.has(item.key)) continue
+      for (const item of receiveItems) {
         const currentEntry = collection[item.code]?.[item.number]
         if (!currentEntry?.collected) {
           await applyEntry(item.code, item.number, true, 0)
         }
       }
 
-      for (const item of match.iCanGive) {
-        if (!selectedGive.has(item.key)) continue
+      for (const item of giveItems) {
         const currentEntry = collection[item.code]?.[item.number]
         const currentRepeated = currentEntry?.repeated ?? 0
         const newRepeated = Math.max(0, currentRepeated - 1)
         await applyEntry(item.code, item.number, true, newRepeated)
       }
+    },
+    [collection, updateEntry]
+  )
 
+  const handleConfirm = useCallback(() => {
+    if (!match) return
+
+    const givingItems: TradeStickerRef[] = match.iCanGive
+      .filter((i) => selectedGive.has(i.key))
+      .map((i) => ({ key: i.key, code: i.code, number: i.number, label: i.label }))
+    const receivingItems: TradeStickerRef[] = match.theyCanGive
+      .filter((i) => selectedReceive.has(i.key))
+      .map((i) => ({ key: i.key, code: i.code, number: i.number, label: i.label }))
+
+    const qr = encodeTradeQR(givingItems, receivingItems)
+    setTradeQrValue(qr)
+    setShowConfirm(false)
+    setScreen('trade_qr')
+  }, [match, selectedGive, selectedReceive])
+
+  const handleFinalize = useCallback(async () => {
+    if (!match) return
+    setConfirming(true)
+    try {
+      const givingItems = match.iCanGive.filter((i) => selectedGive.has(i.key))
+      const receivingItems = match.theyCanGive.filter((i) => selectedReceive.has(i.key))
+      await applyTrade(receivingItems, givingItems)
       setSuccessData({ given: selectedGive.size, received: selectedReceive.size })
-      setShowConfirm(false)
       setScreen('success')
     } catch {
       Alert.alert('Error', 'No se pudo completar el intercambio. Intenta de nuevo.')
     } finally {
       setConfirming(false)
     }
-  }, [match, selectedReceive, selectedGive, collection, updateEntry])
+  }, [match, selectedGive, selectedReceive, applyTrade])
+
+  const handleTradeConfirm = useCallback(async () => {
+    if (!incomingTrade) return
+    setConfirming(true)
+    try {
+      await applyTrade(incomingTrade.giving, incomingTrade.receiving)
+      setSuccessData({
+        given: incomingTrade.receiving.length,
+        received: incomingTrade.giving.length,
+      })
+      setScreen('success')
+    } catch {
+      Alert.alert('Error', 'No se pudo completar el intercambio. Intenta de nuevo.')
+    } finally {
+      setConfirming(false)
+    }
+  }, [incomingTrade, applyTrade])
 
   const handleReset = useCallback(() => {
     setScreen('home')
@@ -366,6 +492,8 @@ export default function ExchangeScreen() {
     setSelectedGive(new Set())
     setSuccessData(null)
     setScanError(null)
+    setTradeQrValue('')
+    setIncomingTrade(null)
     scannedRef.current = false
   }, [])
 
@@ -647,6 +775,187 @@ export default function ExchangeScreen() {
           </View>
         )}
 
+      {/* TRADE QR */}
+      {screen === 'trade_qr' && tradeQrValue && (
+        <ScrollView
+          contentContainerStyle={{ padding: 16, alignItems: 'center', gap: 16 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text
+            style={{ color: theme.textMuted, fontSize: 14, textAlign: 'center', lineHeight: 20 }}
+          >
+            {t('exchangeTradeQrSubtitle')}
+          </Text>
+          <View style={{ backgroundColor: '#fff', padding: 16, borderRadius: 12 }}>
+            <QRCode value={tradeQrValue} size={Math.min(width - 120, 240)} />
+          </View>
+          <Text style={{ color: theme.textSecondary, fontSize: 13, textAlign: 'center' }}>
+            {t('exchangeYouGive')}: {selectedGive.size} · {t('exchangeYouReceive')}:{' '}
+            {selectedReceive.size}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setScreen('finalize')}
+            style={{
+              backgroundColor: colors.accentBlue,
+              borderRadius: 12,
+              paddingVertical: 14,
+              paddingHorizontal: 32,
+              width: '100%',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>
+              {t('exchangeTradeContinue')}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
+
+      {/* FINALIZE */}
+      {screen === 'finalize' && (
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 }}
+        >
+          <Text style={{ fontSize: 48 }}>✅</Text>
+          <Text
+            style={{
+              color: theme.textPrimary,
+              fontWeight: '700',
+              fontSize: 18,
+              textAlign: 'center',
+            }}
+          >
+            {t('exchangeFinalizeTitle')}
+          </Text>
+          <Text
+            style={{
+              color: theme.textSecondary,
+              fontSize: 15,
+              textAlign: 'center',
+              lineHeight: 22,
+            }}
+          >
+            {t('exchangeFinalizeDesc')}
+          </Text>
+          {confirming ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.accentBlue}
+              style={{ marginVertical: 16 }}
+            />
+          ) : (
+            <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+              <TouchableOpacity
+                onPress={handleReset}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: theme.borderColor,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: theme.textSecondary, fontWeight: '600' }}>
+                  {t('exchangeTradeCancel')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleFinalize}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  backgroundColor: colors.accentOrange,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>
+                  {t('exchangeFinalizeBtn')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* TRADE CONFIRM (receiver) */}
+      {screen === 'trade_confirm' && incomingTrade && (
+        <ScrollView
+          contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <StickerLabelList
+            title={t('exchangeYouReceive')}
+            items={incomingTrade.giving}
+            accentColor={colors.accentBlue}
+            theme={theme}
+          />
+          <StickerLabelList
+            title={t('exchangeYouGive')}
+            items={incomingTrade.receiving}
+            accentColor={colors.accentOrange}
+            theme={theme}
+          />
+        </ScrollView>
+      )}
+
+      {/* TRADE CONFIRM bottom bar */}
+      {screen === 'trade_confirm' && incomingTrade && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: 16,
+            backgroundColor: theme.bgPrimary,
+            borderTopWidth: 1,
+            borderTopColor: theme.borderColor,
+          }}
+        >
+          {confirming ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.accentBlue}
+              style={{ marginVertical: 14 }}
+            />
+          ) : (
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TouchableOpacity
+                onPress={handleReset}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: theme.borderColor,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: theme.textSecondary, fontWeight: '600' }}>
+                  {t('exchangeTradeCancel')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleTradeConfirm}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  backgroundColor: colors.accentBlue,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>
+                  {t('exchangeConfirmYes')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
+
       {/* SUCCESS */}
       {screen === 'success' && successData && (
         <View
@@ -723,10 +1032,9 @@ export default function ExchangeScreen() {
       {/* Confirm trade Modal */}
       <ScrollableModal
         visible={showConfirm}
-        onClose={() => !confirming && setShowConfirm(false)}
+        onClose={() => setShowConfirm(false)}
         title={t('exchangeConfirmTitle')}
         scrollable={false}
-        closeOnBackdrop={!confirming}
         contentPadding={24}
       >
         <View style={{ gap: 16 }}>
@@ -738,48 +1046,40 @@ export default function ExchangeScreen() {
               textAlign: 'center',
             }}
           >
-            {t('exchangeConfirmDesc')
+            {t('exchangeConfirmTradeDesc')
               .replace('{given}', String(selectedGive.size))
               .replace('{received}', String(selectedReceive.size))}
           </Text>
 
-          {confirming ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.accentBlue}
-              style={{ marginVertical: 16 }}
-            />
-          ) : (
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TouchableOpacity
-                onPress={() => setShowConfirm(false)}
-                style={{
-                  flex: 1,
-                  paddingVertical: 12,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: theme.borderColor,
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{ color: theme.textSecondary, fontWeight: '600' }}>
-                  {t('exchangeConfirmCancel')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleConfirm}
-                style={{
-                  flex: 1,
-                  paddingVertical: 12,
-                  borderRadius: 8,
-                  backgroundColor: colors.accentBlue,
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{ color: '#fff', fontWeight: '700' }}>{t('exchangeConfirmYes')}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity
+              onPress={() => setShowConfirm(false)}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: theme.borderColor,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: theme.textSecondary, fontWeight: '600' }}>
+                {t('exchangeConfirmCancel')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleConfirm}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                backgroundColor: colors.accentBlue,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700' }}>{t('exchangeConfirmYes')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollableModal>
     </SafeAreaView>

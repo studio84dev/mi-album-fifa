@@ -3,6 +3,7 @@ import { allStickers } from '@mi-album-fifa/shared'
 import type { CollectionMap } from '@mi-album-fifa/shared'
 
 const PREFIX = '⋋^'
+const TRADE_PREFIX = '⋋T^'
 const SEP = ';'
 
 export interface OtherCollectionData {
@@ -152,10 +153,107 @@ export function computeMatch(myCollection: CollectionMap, other: OtherCollection
       theyCanGive.push({ key, code, number: num, label, count: theyRepeatedCount })
     }
 
-    if (!theyMissing && myRepeated > 0) {
+    if (theyMissing && myRepeated > 0) {
       iCanGive.push({ key, code, number: num, label, count: myRepeated })
     }
   })
 
   return { theyCanGive, iCanGive }
+}
+
+export type QRType = 'collection' | 'trade' | null
+
+export function detectQRType(raw: string): QRType {
+  const trimmed = raw.trim()
+  if (trimmed.startsWith(TRADE_PREFIX)) return 'trade'
+  if (trimmed.startsWith(PREFIX)) return 'collection'
+  return null
+}
+
+export interface TradeStickerRef {
+  key: string
+  code: string
+  number: number
+  label: string
+}
+
+export interface TradeData {
+  giving: TradeStickerRef[]
+  receiving: TradeStickerRef[]
+}
+
+export function encodeTradeQR(giving: TradeStickerRef[], receiving: TradeStickerRef[]): string {
+  const totalStickers = stickerList.length
+  const byteCount = Math.ceil(totalStickers / 8)
+
+  const givingBits = new Uint8Array(byteCount)
+  const receivingBits = new Uint8Array(byteCount)
+
+  const givingKeys = new Set(giving.map((g) => g.key))
+  const receivingKeys = new Set(receiving.map((r) => r.key))
+
+  stickerList.forEach((sticker, idx) => {
+    const byteIdx = Math.floor(idx / 8)
+    const bitIdx = 7 - (idx % 8)
+    const key = getStickerKey(sticker.country_code, sticker.number!)
+
+    if (givingKeys.has(key)) {
+      givingBits[byteIdx] |= 1 << bitIdx
+    }
+
+    if (receivingKeys.has(key)) {
+      receivingBits[byteIdx] |= 1 << bitIdx
+    }
+  })
+
+  const block1 = deflateBlock(givingBits)
+  const block2 = deflateBlock(receivingBits)
+
+  return `${TRADE_PREFIX}${block1}${SEP}${block2}`
+}
+
+export function decodeTradeQR(raw: string): TradeData | null {
+  try {
+    let payload = raw.trim()
+    if (payload.startsWith(TRADE_PREFIX)) {
+      payload = payload.slice(TRADE_PREFIX.length)
+    }
+
+    const parts = payload.split(SEP)
+    if (parts.length < 2) return null
+
+    const givingBytes = inflateBlock(parts[0])
+    const receivingBytes = inflateBlock(parts[1])
+
+    const giving: TradeStickerRef[] = []
+    const receiving: TradeStickerRef[] = []
+
+    stickerList.forEach((sticker, idx) => {
+      const byteIdx = Math.floor(idx / 8)
+      const bitIdx = 7 - (idx % 8)
+
+      const key = getStickerKey(sticker.country_code, sticker.number!)
+      const code = sticker.country_code ?? 'null'
+      const num = sticker.number!
+      const label = sticker.code
+
+      if (givingBytes && byteIdx < givingBytes.length) {
+        const bit = (givingBytes[byteIdx] >> bitIdx) & 1
+        if (bit === 1) {
+          giving.push({ key, code, number: num, label })
+        }
+      }
+
+      if (receivingBytes && byteIdx < receivingBytes.length) {
+        const bit = (receivingBytes[byteIdx] >> bitIdx) & 1
+        if (bit === 1) {
+          receiving.push({ key, code, number: num, label })
+        }
+      }
+    })
+
+    return { giving, receiving }
+  } catch {
+    return null
+  }
 }

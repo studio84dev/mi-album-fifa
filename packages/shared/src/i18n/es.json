@@ -215,5 +215,14 @@
   "exchangeCameraPermissionDenied": "Sin acceso a la cámara. Actívalo en los ajustes del dispositivo.",
   "exchangeScanning": "Apunta la cámara al código QR",
   "exchangeNewScan": "Escanear otro QR",
-  "exchangeSelectAtLeastOne": "Selecciona al menos una figurita de cada sección para continuar."
+  "exchangeSelectAtLeastOne": "Selecciona al menos una figurita de cada sección para continuar.",
+  "exchangeConfirmTradeDesc": "Vas a dar {given} figurita(s) y recibir {received} figurita(s). Se generará un QR para que el otro usuario lo escanee y confirme el intercambio.",
+  "exchangeTradeQrSubtitle": "Muéstrale este QR al otro usuario para que escanee y confirme el intercambio en su dispositivo.",
+  "exchangeTradeContinue": "Continuar",
+  "exchangeFinalizeTitle": "¿El otro usuario confirmó el intercambio?",
+  "exchangeFinalizeDesc": "Presiona finalizar para actualizar tu colección con las figuritas intercambiadas.",
+  "exchangeFinalizeBtn": "Finalizar",
+  "exchangeTradeCancel": "Cancelar",
+  "exchangeYouReceive": "Vas a recibir",
+  "exchangeYouGive": "Vas a entregar"
 }

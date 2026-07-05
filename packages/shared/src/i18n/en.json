@@ -215,5 +215,14 @@
   "exchangeCameraPermissionDenied": "No camera access. Enable it in your device settings.",
   "exchangeScanning": "Point the camera at the QR code",
   "exchangeNewScan": "Scan another QR",
-  "exchangeSelectAtLeastOne": "Select at least one sticker from each section to continue."
+  "exchangeSelectAtLeastOne": "Select at least one sticker from each section to continue.",
+  "exchangeConfirmTradeDesc": "You will give {given} sticker(s) and receive {received} sticker(s). A QR will be generated for the other user to scan and confirm the trade.",
+  "exchangeTradeQrSubtitle": "Show this QR to the other user so they can scan and confirm the trade on their device.",
+  "exchangeTradeContinue": "Continue",
+  "exchangeFinalizeTitle": "Did the other user confirm the trade?",
+  "exchangeFinalizeDesc": "Press finalize to update your collection with the traded stickers.",
+  "exchangeFinalizeBtn": "Finalize",
+  "exchangeTradeCancel": "Cancel",
+  "exchangeYouReceive": "You will receive",
+  "exchangeYouGive": "You will give"
 }
