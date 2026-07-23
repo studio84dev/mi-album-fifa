@@ -1,5 +1,7 @@
 export { createSupabaseClient, createInvokeFunction } from './lib/supabaseClient'
 export type { SupabaseConfig } from './lib/supabaseClient'
+export { decodePaniniQR } from './lib/paniniQR'
+export type { AlbumState, StickerState } from './types/paniniQR'
 
 export { createUseAuth } from './hooks/useAuth'
 export { createUseCommunityStats } from './hooks/useCommunityStats'
