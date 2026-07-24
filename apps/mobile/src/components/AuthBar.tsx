@@ -33,6 +33,7 @@ interface AuthBarProps {
   onSignIn: () => void
   onSignOut: () => void
   onImport?: () => void
+  onImportQR?: () => void
   onWhatsNew?: () => void
   whatsNewUnread?: boolean
   updateAvailable?: boolean
@@ -52,6 +53,7 @@ export default function AuthBar({
   onSignIn,
   onSignOut,
   onImport,
+  onImportQR,
   onWhatsNew,
   whatsNewUnread = false,
   updateAvailable = false,
@@ -111,6 +113,7 @@ export default function AuthBar({
             user={user}
             onSignOut={onSignOut}
             onImport={onImport || (() => {})}
+            onImportQR={onImportQR || (() => {})}
             t={t}
             totals={
               totals || {

@@ -28,6 +28,7 @@ import WhatsNewModal from '@/src/components/WhatsNewModal'
 import AboutModal from '@/src/components/AboutModal'
 import SuggestionModal from '@/src/components/SuggestionModal'
 import ImportCollectionModal from '@/src/components/ImportCollectionModal'
+import ImportQRModal from '@/src/components/ImportQRModal'
 import { useAuth } from '@/src/hooks/useAuth'
 import { useCollectionState, useCollectionDispatch } from '@/src/context/CollectionContext'
 import { useI18n } from '@/src/hooks/useI18n'
@@ -211,6 +212,7 @@ export default function HomeScreen() {
   const [showAbout, setShowAbout] = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [showImport, setShowImport] = useState(false)
+  const [showImportQR, setShowImportQR] = useState(false)
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   const { collection, totals, loading: collectionLoading } = useCollectionState()
@@ -371,6 +373,7 @@ export default function HomeScreen() {
   const handleShowAbout = useCallback(() => setShowAbout(true), [])
   const handleShowSuggestion = useCallback(() => setShowSuggestion(true), [])
   const handleShowImport = useCallback(() => setShowImport(true), [])
+  const handleShowImportQR = useCallback(() => setShowImportQR(true), [])
   const toggleLocale = useCallback(() => toggleI18nLocale(), [toggleI18nLocale])
 
   const listFooter = useMemo(
@@ -431,6 +434,7 @@ export default function HomeScreen() {
           onSignIn={signInWithGoogle}
           onSignOut={signOut}
           onImport={handleShowImport}
+          onImportQR={handleShowImportQR}
           onWhatsNew={openWhatsNew}
           whatsNewUnread={hasUnread}
           updateAvailable={updateAvailable}
@@ -720,6 +724,9 @@ export default function HomeScreen() {
           }}
           t={t}
         />
+
+        <ImportQRModal visible={showImportQR} onClose={() => setShowImportQR(false)} />
+
         <ScrollTopButton visible={showScrollTop && !isSearching} onPress={scrollToTop} />
       </View>
     </SafeAreaView>

@@ -100,7 +100,7 @@ function getBitValueLSB(bytes: Uint8Array, bitIndex: number): boolean {
   return (bytes[byteIndex] & mask) !== 0
 }
 
-export function decodePaniniQR(qrText: string): AlbumState {
+export function decodeExternalQR(qrText: string): AlbumState {
   try {
     let payload = qrText.trim()
     if (payload.startsWith(PREFIX)) {
@@ -117,10 +117,6 @@ export function decodePaniniQR(qrText: string): AlbumState {
     const part2Bytes = parts[2] ? inflateBlock(parts[2]) : new Uint8Array(0)
 
     const result: AlbumState = {}
-
-    for (const cardCode of CARD_CODES) {
-      result[cardCode] = { owned: [], repeated: [] }
-    }
 
     // Construir mapa de Part2: bitIndex -> repetidas
     // Part1 (LSB) indica qué stickers tienen repetidas
@@ -148,6 +144,9 @@ export function decodePaniniQR(qrText: string): AlbumState {
       const isBitSet = getBitValueLSB(part0Bytes, bitIndex)
 
       if (!isBitSet) {
+        if (!result[cardCode]) {
+          result[cardCode] = { owned: [], repeated: [] }
+        }
         result[cardCode].owned.push(stickerNumber)
         const repeatedCount = part2Map.get(bitIndex) ?? 0
         result[cardCode].repeated.push(repeatedCount)
@@ -156,6 +155,6 @@ export function decodePaniniQR(qrText: string): AlbumState {
 
     return result
   } catch (error) {
-    throw new Error(`Failed to decode Panini QR: ${error instanceof Error ? error.message : String(error)}`)
+    throw new Error(`Failed to decode external QR: ${error instanceof Error ? error.message : String(error)}`)
   }
 }
