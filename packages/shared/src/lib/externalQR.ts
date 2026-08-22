@@ -1,5 +1,5 @@
 import { gunzipSync } from 'fflate'
-import type { AlbumState } from '../types/paniniQR'
+import type { AlbumState } from '../types/externalQR'
 
 const PREFIX = '⋋^'
 const SEP = ';'
@@ -81,8 +81,9 @@ function buildIndexMap(): Map<number, { cardCode: string; stickerNumber: number 
 
   for (const cardCode of CARD_CODES) {
     const count = stickersPerCard(cardCode)
-    for (let stickerNumber = 1; stickerNumber <= count; stickerNumber++) {
-      map.set(bitIndex, { cardCode, stickerNumber })
+    const startNumber = cardCode === 'FWC' ? 0 : 1
+    for (let i = 0; i < count; i++) {
+      map.set(bitIndex, { cardCode, stickerNumber: startNumber + i })
       bitIndex++
     }
   }

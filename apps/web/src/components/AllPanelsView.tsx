@@ -70,6 +70,7 @@ function CountrySection({
         countryCode={team.code}
         user={user}
         stickerCount={details.stickerCount}
+        stickerNumbers={details.stickerNumbers}
         page={team.page ?? null}
         initialData={initialData}
         highlightNumber={highlightNumber}

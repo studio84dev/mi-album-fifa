@@ -11,7 +11,6 @@ interface UserMenuProps {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
   collectionLoading: boolean

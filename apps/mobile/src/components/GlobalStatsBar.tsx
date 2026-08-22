@@ -58,7 +58,6 @@ interface GlobalStatsBarProps {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
   loading: boolean
@@ -73,15 +72,14 @@ export default function GlobalStatsBar({
   compact = false,
 }: GlobalStatsBarProps) {
   const { theme } = useTheme()
-  const { teamCollected, fwcCollected, ccCollected, paniniCollected, totalRepeated } = totals
+  const { teamCollected, fwcCollected, ccCollected, totalRepeated } = totals
 
   const TEAM_TOTAL = 960
-  const FWC_TOTAL = 19
+  const FWC_TOTAL = 20
   const CC_TOTAL = 14
-  const PANINI_TOTAL = 1
 
-  const overallCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
-  const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL + PANINI_TOTAL
+  const overallCollected = teamCollected + fwcCollected + ccCollected
+  const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL
   const pct = Math.round((overallCollected / overallTotal) * 100)
 
   const progressAnim = useMemo(() => new Animated.Value(0), [])
@@ -270,38 +268,6 @@ export default function GlobalStatsBar({
             CC
           </Text>
         </View>
-
-        {/* 00 PANINI - only in full mode */}
-        {!compact && (
-          <View
-            style={{
-              flex: 1,
-              minWidth: `${100 / gridCols}%`,
-              alignItems: 'center',
-              paddingVertical: 8,
-              paddingHorizontal: 4,
-            }}
-          >
-            <StatValue
-              collected={paniniCollected}
-              total={PANINI_TOTAL}
-              loading={loading}
-              compact={compact}
-            />
-            <Text
-              style={{
-                fontSize: labelSize,
-                color: theme.textMuted,
-                fontWeight: '500',
-                textTransform: 'uppercase',
-                letterSpacing: 0.5,
-                marginTop: 2,
-              }}
-            >
-              00 PANINI
-            </Text>
-          </View>
-        )}
 
         {/* Repeated */}
         <View

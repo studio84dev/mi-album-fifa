@@ -82,10 +82,7 @@ function buildSearchData() {
 
   for (const sticker of allStickers) {
     const key = sticker.country_code ?? sticker.code
-    const isSpecial =
-      sticker.card_type === 'fwc_special' ||
-      sticker.card_type === 'cc' ||
-      sticker.card_type === 'panini_logo'
+    const isSpecial = sticker.card_type === 'fwc_special' || sticker.card_type === 'cc'
 
     if (!isSpecial) {
       if (!teamsObj[key]) {
@@ -124,7 +121,7 @@ function buildSearchData() {
     }
     countryDetails[key].stickerCount++
     if (sticker.number != null) {
-      countryDetails[key].stickerNumbers.push(sticker.number === 0 ? 1 : sticker.number)
+      countryDetails[key].stickerNumbers.push(sticker.number)
     }
 
     if (sticker.number != null && sticker.country_code != null) {
@@ -225,8 +222,8 @@ export default function HomeScreen() {
     []
   )
 
-  const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
-  const totalCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
+  const { teamCollected, fwcCollected, ccCollected } = totals
+  const totalCollected = teamCollected + fwcCollected + ccCollected
 
   const exactMatch = useMemo(() => {
     if (!search.trim()) return null

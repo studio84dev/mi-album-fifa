@@ -10,7 +10,6 @@ interface CollectionState {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
 }

@@ -68,17 +68,6 @@ const CC_ICON = (
   </svg>
 )
 
-const PANINI_ICON = (
-  <svg
-    className={ICON_CLASS}
-    viewBox="-6.5 0 32 32"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="#6366F1"
-  >
-    <path d="M2.531 4.781h13.563c1.406 0 2.531 1.156 2.531 2.531v14.844c0 1.344-1.094 2.469-2.438 2.531v-1.688c0.406-0.063 0.75-0.438 0.75-0.844v-14.844c0-0.438-0.406-0.813-0.844-0.813h-13.563c-0.438 0-0.844 0.375-0.844 0.813 0.156-0.031 0.375-0.063 0.563-0.063 0.156 0 0.281 0 0.438 0.031l10.156 1.531c1.375 0.25 2.375 1.5 2.375 2.875v13.219c0 1.313-0.938 2.281-2.219 2.281-0.125 0-0.313 0-0.469-0.031l-10.125-1.531c-1.344-0.25-2.406-1.5-2.406-2.844v-15.469c0-1.375 1.156-2.531 2.531-2.531zM3.031 12.75l8.906 1.313 0.219-1.531-8.906-1.313zM4.906 14.094l-0.125 0.938 4.938 0.75 0.125-0.938z" />
-  </svg>
-)
-
 interface TeamCardProps {
   team: {
     code: string
@@ -134,16 +123,12 @@ function TeamCard({ team, stats, isComplete, isActive, onClick, single }: TeamCa
     )
   }
 
-  const isSpecial =
-    team.card_type === 'panini_logo' || team.card_type === 'fwc_special' || team.card_type === 'cc'
+  const isSpecial = team.card_type === 'fwc_special' || team.card_type === 'cc'
 
   if (isSpecial) {
-    const icon =
-      team.card_type === 'fwc_special' ? FWC_ICON : team.card_type === 'cc' ? CC_ICON : PANINI_ICON
-    const label =
-      team.card_type === 'fwc_special' ? 'FWC' : team.card_type === 'cc' ? 'CC' : '00 PANINI'
-    const codeColor =
-      team.card_type === 'fwc_special' ? '#3b82f6' : team.card_type === 'cc' ? '#e84040' : undefined
+    const icon = team.card_type === 'fwc_special' ? FWC_ICON : CC_ICON
+    const label = team.card_type === 'fwc_special' ? 'FWC' : 'CC'
+    const codeColor = team.card_type === 'fwc_special' ? '#3b82f6' : '#e84040'
     const total = team.count
     return (
       <div className={`${cardBase} justify-start`} onClick={onClick}>

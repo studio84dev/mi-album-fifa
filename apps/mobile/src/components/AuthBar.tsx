@@ -41,7 +41,6 @@ interface AuthBarProps {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
   collectionLoading?: boolean
@@ -120,7 +119,6 @@ export default function AuthBar({
                 teamCollected: 0,
                 fwcCollected: 0,
                 ccCollected: 0,
-                paniniCollected: 0,
                 totalRepeated: 0,
               }
             }
