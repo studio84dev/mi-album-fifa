@@ -19,7 +19,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
 
     const userId = user?.id ?? null
 
-    useEffect(() => {
+    const refresh = useCallback(() => {
       if (!userId) {
         setCollection({})
         return
@@ -57,6 +57,10 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
           setLoading(false)
         })
     }, [userId])
+
+    useEffect(() => {
+      refresh()
+    }, [refresh])
 
     const updateEntry = useCallback(
       (
@@ -103,6 +107,6 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       return { teamCollected, fwcCollected, ccCollected, totalRepeated }
     }, [collection])
 
-    return { collection, loading, updateEntry, totals }
+    return { collection, loading, updateEntry, totals, refresh }
   }
 }

@@ -1,21 +1,25 @@
 import { useState, useRef, useCallback } from 'react'
-import { View, Text, Modal, Pressable, ScrollView } from 'react-native'
+import { View, Text, Modal, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import { decodeExternalQR } from '@mi-album-fifa/shared'
 import type { AlbumState } from '@mi-album-fifa/shared'
-import { useTheme } from '../hooks/useTheme'
+import { useTheme, colors } from '../hooks/useTheme'
+import { supabase } from '../lib/supabaseClient'
 
 interface ImportQRModalProps {
   visible: boolean
   onClose: () => void
+  user: { id: string } | null
+  onImported: () => void
 }
 
 type Screen = 'input' | 'scanner'
 
-export default function ImportQRModal({ visible, onClose }: ImportQRModalProps) {
+export default function ImportQRModal({ visible, onClose, user, onImported }: ImportQRModalProps) {
   const [decodedResult, setDecodedResult] = useState<AlbumState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [screen, setScreen] = useState<Screen>('input')
+  const [importing, setImporting] = useState(false)
   const { theme } = useTheme()
   const [permission, requestPermission] = useCameraPermissions()
   const scannedRef = useRef(false)
@@ -55,6 +59,111 @@ export default function ImportQRModal({ visible, onClose }: ImportQRModalProps) 
     scannedRef.current = false
     setScreen('scanner')
   }, [permission, requestPermission])
+
+  const handleImport = useCallback(() => {
+    if (!decodedResult || !user) return
+
+    Alert.alert(
+      '¿Importar colección?',
+      'Se sobreescribirá tu colección actual con los datos del QR. Esta acción no se puede deshacer.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Importar',
+          style: 'destructive',
+          onPress: async () => {
+            setImporting(true)
+            setError(null)
+
+            try {
+              // 1. Backup de la colección actual
+              const { data: backupStickers, error: backupError } = await supabase
+                .from('sticker_collection')
+                .select('country_code, sticker_number, repeated')
+                .eq('user_id', user.id)
+
+              if (backupError) {
+                setError('Error al crear backup')
+                setImporting(false)
+                return
+              }
+
+              // 2. Delete de todos los stickers del usuario
+              const { error: deleteError } = await supabase
+                .from('sticker_collection')
+                .delete()
+                .eq('user_id', user.id)
+
+              if (deleteError) {
+                setError('Error al limpiar colección')
+                setImporting(false)
+                return
+              }
+
+              // 3. Construir filas a insertar desde el AlbumState
+              const rowsToInsert: Array<{
+                user_id: string
+                country_code: string
+                sticker_number: number
+                repeated: number
+                updated_at: string
+              }> = []
+
+              for (const [countryCode, { owned, repeated }] of Object.entries(decodedResult)) {
+                owned.forEach((stickerNumber, i) => {
+                  rowsToInsert.push({
+                    user_id: user.id,
+                    country_code: countryCode,
+                    sticker_number: stickerNumber,
+                    repeated: repeated[i] ?? 0,
+                    updated_at: new Date().toISOString(),
+                  })
+                })
+              }
+
+              // 4. Insert batch
+              if (rowsToInsert.length > 0) {
+                const { error: insertError } = await supabase
+                  .from('sticker_collection')
+                  .insert(rowsToInsert)
+
+                if (insertError) {
+                  // 5. Restore backup si falla
+                  if (backupStickers && backupStickers.length > 0) {
+                    const restoreRows = backupStickers.map(
+                      ({ country_code, sticker_number, repeated }) => ({
+                        user_id: user.id,
+                        country_code,
+                        sticker_number,
+                        repeated,
+                        updated_at: new Date().toISOString(),
+                      })
+                    )
+                    await supabase.from('sticker_collection').insert(restoreRows)
+                  }
+                  setError('Error al importar. Se restauró tu colección anterior.')
+                  setImporting(false)
+                  return
+                }
+              }
+
+              // 6. Éxito
+              setImporting(false)
+              setDecodedResult(null)
+              onImported()
+              onClose()
+            } catch (_err) {
+              setError('Error inesperado al importar')
+              setImporting(false)
+            }
+          },
+        },
+      ]
+    )
+  }, [decodedResult, user, onImported, onClose])
 
   const handleClose = () => {
     setDecodedResult(null)
@@ -241,6 +350,33 @@ export default function ImportQRModal({ visible, onClose }: ImportQRModalProps) 
                   >
                     {JSON.stringify(decodedResult, null, 2)}
                   </Text>
+
+                  {/* Import Button */}
+                  <Pressable
+                    onPress={handleImport}
+                    disabled={importing}
+                    style={{
+                      backgroundColor: importing ? '#999' : colors.accentOrange,
+                      paddingVertical: 10,
+                      borderRadius: 8,
+                      alignItems: 'center',
+                      marginTop: 12,
+                    }}
+                  >
+                    {importing ? (
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    ) : (
+                      <Text
+                        style={{
+                          color: '#ffffff',
+                          fontSize: 14,
+                          fontWeight: '600',
+                        }}
+                      >
+                        Importar colección
+                      </Text>
+                    )}
+                  </Pressable>
                 </View>
               )}
 

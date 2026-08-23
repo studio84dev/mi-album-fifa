@@ -213,7 +213,7 @@ export default function HomeScreen() {
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   const { collection, totals, loading: collectionLoading } = useCollectionState()
-  const { updateEntry } = useCollectionDispatch()
+  const { updateEntry, refresh } = useCollectionDispatch()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
@@ -717,12 +717,19 @@ export default function HomeScreen() {
           visible={showImport}
           onClose={() => setShowImport(false)}
           onSuccess={() => {
-            // Refresh collection data
+            refresh()
           }}
           t={t}
         />
 
-        <ImportQRModal visible={showImportQR} onClose={() => setShowImportQR(false)} />
+        <ImportQRModal
+          visible={showImportQR}
+          onClose={() => setShowImportQR(false)}
+          user={user}
+          onImported={() => {
+            refresh()
+          }}
+        />
 
         <ScrollTopButton visible={showScrollTop && !isSearching} onPress={scrollToTop} />
       </View>

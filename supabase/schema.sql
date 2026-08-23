@@ -29,11 +29,12 @@ create table if not exists public.sticker_collection (
   id             uuid primary key default gen_random_uuid(),
   user_id        uuid not null references auth.users(id) on delete cascade,
   country_code   text not null,
-  sticker_number int  not null check (sticker_number between 1 and 20),
+  sticker_number int  not null check (sticker_number between 0 and 20),
   repeated       int  not null default 0,
   updated_at     timestamptz default now(),
   unique (user_id, country_code, sticker_number)
   -- Note: presence of a row = sticker is collected. repeated > 0 means extra copies.
+  -- sticker_number 0 is used for FWC 00 (Panini Logo).
 );
 
 alter table public.sticker_collection enable row level security;
