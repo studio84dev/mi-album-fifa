@@ -729,6 +729,7 @@ export default function HomeScreen() {
           onImported={() => {
             refresh()
           }}
+          t={t}
         />
 
         <ScrollTopButton visible={showScrollTop && !isSearching} onPress={scrollToTop} />

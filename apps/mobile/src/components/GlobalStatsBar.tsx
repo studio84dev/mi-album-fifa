@@ -42,7 +42,21 @@ function StatValue({ collected, total, isRepeated, loading, compact, ccColor }: 
     )
   }
 
-  const complete = total !== undefined && collected >= total
+  if (total === undefined) {
+    return (
+      <Text
+        style={{
+          fontSize,
+          fontWeight: '700',
+          color: colors.accentBlue,
+        }}
+      >
+        {collected}
+      </Text>
+    )
+  }
+
+  const complete = collected >= total
   const accentColor = ccColor ? colors.ccRed : colors.accentBlue
 
   return (
@@ -108,7 +122,6 @@ export default function GlobalStatsBar({
       }
 
   const labelSize = compact ? 10 : 12
-  const gridCols = compact ? 3 : 4
 
   return (
     <View style={containerStyle}>
@@ -178,19 +191,19 @@ export default function GlobalStatsBar({
           gap: compact ? 2 : 8,
         }}
       >
-        {/* Teams */}
+        {/* Collected */}
         <View
           style={{
             flex: 1,
-            minWidth: `${100 / gridCols}%`,
+            minWidth: `${100 / 3}%`,
             alignItems: 'center',
             paddingVertical: compact ? 4 : 8,
             paddingHorizontal: compact ? 2 : 4,
           }}
         >
           <StatValue
-            collected={teamCollected}
-            total={TEAM_TOTAL}
+            collected={overallCollected}
+            total={overallTotal}
             loading={loading}
             compact={compact}
           />
@@ -204,23 +217,22 @@ export default function GlobalStatsBar({
               marginTop: 2,
             }}
           >
-            {t('statTeams')}
+            {t('statCollected')}
           </Text>
         </View>
 
-        {/* FWC */}
+        {/* Missing */}
         <View
           style={{
             flex: 1,
-            minWidth: `${100 / gridCols}%`,
+            minWidth: `${100 / 3}%`,
             alignItems: 'center',
             paddingVertical: compact ? 4 : 8,
             paddingHorizontal: compact ? 2 : 4,
           }}
         >
           <StatValue
-            collected={fwcCollected}
-            total={FWC_TOTAL}
+            collected={overallTotal - overallCollected}
             loading={loading}
             compact={compact}
           />
@@ -234,38 +246,7 @@ export default function GlobalStatsBar({
               marginTop: 2,
             }}
           >
-            FWC
-          </Text>
-        </View>
-
-        {/* CC */}
-        <View
-          style={{
-            flex: 1,
-            minWidth: `${100 / gridCols}%`,
-            alignItems: 'center',
-            paddingVertical: compact ? 4 : 8,
-            paddingHorizontal: compact ? 2 : 4,
-          }}
-        >
-          <StatValue
-            collected={ccCollected}
-            total={CC_TOTAL}
-            loading={loading}
-            compact={compact}
-            ccColor
-          />
-          <Text
-            style={{
-              fontSize: labelSize,
-              color: theme.textMuted,
-              fontWeight: '500',
-              textTransform: 'uppercase',
-              letterSpacing: 0.5,
-              marginTop: 2,
-            }}
-          >
-            CC
+            {t('statMissing')}
           </Text>
         </View>
 
@@ -273,7 +254,7 @@ export default function GlobalStatsBar({
         <View
           style={{
             flex: 1,
-            minWidth: `${100 / gridCols}%`,
+            minWidth: `${100 / 3}%`,
             alignItems: 'center',
             paddingVertical: compact ? 4 : 8,
             paddingHorizontal: compact ? 2 : 4,

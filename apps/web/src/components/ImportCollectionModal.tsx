@@ -21,14 +21,47 @@ function ImportCollectionModal({ onClose, onSuccess, t }: ImportCollectionModalP
     isImportFail?: boolean
   } | null>(null) // null | { restored, backupCount }
   const [importedCount, setImportedCount] = useState(0)
+  const [previewCount, setPreviewCount] = useState<number | null>(null)
 
   const loading = loadingPhase !== null
 
-  const handleCheckEmail = (e: React.FormEvent) => {
+  const handleCheckEmail = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
     setErrorState(null)
-    setStep(2)
+    setLoadingPhase('preview')
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/import-collection`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session!.access_token}`,
+          },
+          body: JSON.stringify({ sourceEmail: email.trim().toLowerCase(), preview: true }),
+        }
+      )
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErrorState({ message: data.error || t('importError') })
+        setLoadingPhase(null)
+        return
+      }
+
+      setPreviewCount(data.count)
+      setStep(2)
+    } catch {
+      setErrorState({ message: t('importError') })
+    } finally {
+      setLoadingPhase(null)
+    }
   }
 
   const handleImport = async (e: React.FormEvent) => {
@@ -118,7 +151,14 @@ function ImportCollectionModal({ onClose, onSuccess, t }: ImportCollectionModalP
           ×
         </button>
 
-        {step === 1 && (
+        {step === 1 && loading && (
+          <div className={bodyClass}>
+            <div className="w-9 h-9 border-[2.5px] border-border-color border-t-accent-blue rounded-full animate-spin flex-shrink-0" />
+            <p className="text-sm text-text-muted text-center m-0">{email}</p>
+          </div>
+        )}
+
+        {step === 1 && !loading && (
           <form className={bodyClass} onSubmit={handleCheckEmail}>
             <div className={iconClass}>📥</div>
             <h2 className={titleClass}>{t('importTitle')}</h2>
@@ -166,6 +206,11 @@ function ImportCollectionModal({ onClose, onSuccess, t }: ImportCollectionModalP
               <p className="mt-2 text-text-secondary text-sm m-0">
                 {t('importWarningSource')} <strong>{email}</strong>
               </p>
+              {previewCount !== null && (
+                <p className="mt-1 text-accent-blue text-sm font-semibold m-0">
+                  {t('importQrStickerCount').replace('{count}', String(previewCount))}
+                </p>
+              )}
             </div>
             <p className="text-sm text-text-secondary self-start m-0">
               {t('importConfirmInstruction')} <strong>{CONFIRM_WORD}</strong>:

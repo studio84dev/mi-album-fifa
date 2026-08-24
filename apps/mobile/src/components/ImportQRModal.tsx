@@ -11,11 +11,18 @@ interface ImportQRModalProps {
   onClose: () => void
   user: { id: string } | null
   onImported: () => void
+  t: (_key: string) => string
 }
 
 type Screen = 'input' | 'scanner'
 
-export default function ImportQRModal({ visible, onClose, user, onImported }: ImportQRModalProps) {
+export default function ImportQRModal({
+  visible,
+  onClose,
+  user,
+  onImported,
+  t,
+}: ImportQRModalProps) {
   const [decodedResult, setDecodedResult] = useState<AlbumState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [screen, setScreen] = useState<Screen>('input')
@@ -343,12 +350,19 @@ export default function ImportQRModal({ visible, onClose, user, onImported }: Im
                   <Text
                     style={{
                       color: theme.textSecondary,
-                      fontSize: 11,
-                      fontFamily: 'monospace',
+                      fontSize: 14,
+                      textAlign: 'center',
                     }}
-                    numberOfLines={10}
                   >
-                    {JSON.stringify(decodedResult, null, 2)}
+                    {t('importQrStickerCount').replace(
+                      '{count}',
+                      String(
+                        Object.values(decodedResult).reduce(
+                          (sum, s) => sum + s.owned.length,
+                          0
+                        )
+                      )
+                    )}
                   </Text>
 
                   {/* Import Button */}
