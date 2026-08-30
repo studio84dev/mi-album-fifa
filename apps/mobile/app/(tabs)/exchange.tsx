@@ -299,6 +299,7 @@ export default function ExchangeScreen() {
       scannedRef.current = true
 
       const type = detectQRType(data)
+      console.log('🔍 QR escaneado:', { type, dataLength: data.length })
 
       if (type === 'trade') {
         const tradeData = decodeTradeQR(data)
@@ -307,6 +308,7 @@ export default function ExchangeScreen() {
           scannedRef.current = false
           return
         }
+        console.log('🤝 Trade QR decodificado:', tradeData)
         setIncomingTrade(tradeData)
         setScreen('trade_confirm')
         return
@@ -319,7 +321,18 @@ export default function ExchangeScreen() {
           scannedRef.current = false
           return
         }
+        console.log('📦 Collection QR decodificado:', {
+          missingCount: result.missing.size,
+          repeatedCount: result.repeated.size,
+          sample: Array.from(result.missing).slice(0, 5),
+        })
         const matchResult = computeMatch(collection, result)
+        console.log('✨ Match result:', {
+          theyCanGive: matchResult.theyCanGive.length,
+          iCanGive: matchResult.iCanGive.length,
+          theyCanGiveSample: matchResult.theyCanGive.slice(0, 3),
+          iCanGiveSample: matchResult.iCanGive.slice(0, 3),
+        })
         setMatch(matchResult)
         setSelectedReceive(new Set())
         setSelectedGive(new Set())
@@ -385,6 +398,7 @@ export default function ExchangeScreen() {
       receiveItems: Array<{ code: string; number: number; key: string }>,
       giveItems: Array<{ code: string; number: number; key: string }>
     ) => {
+      console.log('🔄 Aplicando intercambio a Supabase:', { receiveItems, giveItems })
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -396,6 +410,7 @@ export default function ExchangeScreen() {
         repeated: number
       ) => {
         const dbCode = code === 'null' ? null : code
+        console.log('  📝 applyEntry:', { code, number, collected, repeated })
         updateEntry(code, number, { collected, repeated })
         if (!session?.user?.id) return
         if (collected) {
@@ -432,6 +447,7 @@ export default function ExchangeScreen() {
         const newRepeated = Math.max(0, currentRepeated - 1)
         await applyEntry(item.code, item.number, true, newRepeated)
       }
+      console.log('✅ Intercambio aplicado exitosamente')
     },
     [collection, updateEntry]
   )
@@ -458,6 +474,10 @@ export default function ExchangeScreen() {
     try {
       const givingItems = match.iCanGive.filter((i) => selectedGive.has(i.key))
       const receivingItems = match.theyCanGive.filter((i) => selectedReceive.has(i.key))
+      console.log('✅ Confirmando intercambio:', {
+        giving: givingItems,
+        receiving: receivingItems,
+      })
       await applyTrade(receivingItems, givingItems)
       setSuccessData({ given: selectedGive.size, received: selectedReceive.size })
       setScreen('success')
@@ -472,6 +492,10 @@ export default function ExchangeScreen() {
     if (!incomingTrade) return
     setConfirming(true)
     try {
+      console.log('✅ Confirmando trade QR:', {
+        receiving: incomingTrade.giving, // Lo que el otro me da
+        giving: incomingTrade.receiving, // Lo que yo le doy al otro
+      })
       await applyTrade(incomingTrade.giving, incomingTrade.receiving)
       setSuccessData({
         given: incomingTrade.receiving.length,
