@@ -403,41 +403,13 @@ export default function ExchangeScreen() {
         data: { session },
       } = await supabase.auth.getSession()
 
-      const applyEntry = async (
-        code: string,
-        number: number,
-        collected: boolean,
-        repeated: number
-      ) => {
-        const dbCode = code === 'null' ? null : code
-        console.log('  📝 applyEntry:', { code, number, collected, repeated })
-        updateEntry(code, number, { collected, repeated })
-        if (!session?.user?.id) return
-        if (collected) {
-          await supabase.from('sticker_collection').upsert(
-            {
-              user_id: session.user.id,
-              country_code: dbCode,
-              sticker_number: number,
-              repeated,
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'user_id,country_code,sticker_number' }
-          )
-        } else {
-          await supabase
-            .from('sticker_collection')
-            .delete()
-            .eq('user_id', session.user.id)
-            .eq('country_code', dbCode)
-            .eq('sticker_number', number)
-        }
-      }
+      // Preparar actualizaciones de estado local primero
+      const localUpdates: Array<{ code: string; number: number; collected: boolean; repeated: number }> = []
 
       for (const item of receiveItems) {
         const currentEntry = collection[item.code]?.[item.number]
         if (!currentEntry?.collected) {
-          await applyEntry(item.code, item.number, true, 0)
+          localUpdates.push({ code: item.code, number: item.number, collected: true, repeated: 0 })
         }
       }
 
@@ -445,9 +417,35 @@ export default function ExchangeScreen() {
         const currentEntry = collection[item.code]?.[item.number]
         const currentRepeated = currentEntry?.repeated ?? 0
         const newRepeated = Math.max(0, currentRepeated - 1)
-        await applyEntry(item.code, item.number, true, newRepeated)
+        localUpdates.push({ code: item.code, number: item.number, collected: true, repeated: newRepeated })
       }
-      console.log('✅ Intercambio aplicado exitosamente')
+
+      // Aplicar actualizaciones al estado local
+      for (const update of localUpdates) {
+        updateEntry(update.code, update.number, { collected: update.collected, repeated: update.repeated })
+      }
+
+      // Batch insert a Supabase (una sola request)
+      if (session?.user?.id && localUpdates.length > 0) {
+        const upsertData = localUpdates.map((update) => ({
+          user_id: session.user.id,
+          country_code: update.code === 'null' ? null : update.code,
+          sticker_number: update.number,
+          repeated: update.repeated,
+          updated_at: new Date().toISOString(),
+        }))
+
+        const { error } = await supabase
+          .from('sticker_collection')
+          .upsert(upsertData, { onConflict: 'user_id,country_code,sticker_number' })
+
+        if (error) {
+          console.error('Error en batch upsert:', error)
+          throw error
+        }
+      }
+
+      console.log('✅ Intercambio aplicado exitosamente (1 batch request para', localUpdates.length, 'stickers)')
     },
     [collection, updateEntry]
   )
