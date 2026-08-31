@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { View, ActivityIndicator } from 'react-native'
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { supabase } from '@/src/lib/supabaseClient'
 
@@ -20,8 +20,17 @@ export default function AuthCallback() {
   }, [])
 
   return (
-    <View className="flex-1 bg-black items-center justify-center">
+    <View style={styles.container}>
       <ActivityIndicator color="#3B82F6" size="large" />
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})
