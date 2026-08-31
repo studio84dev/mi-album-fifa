@@ -19,7 +19,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
 
     const userId = user?.id ?? null
 
-    useEffect(() => {
+    const refresh = useCallback(() => {
       if (!userId) {
         setCollection({})
         return
@@ -58,6 +58,10 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
         })
     }, [userId])
 
+    useEffect(() => {
+      refresh()
+    }, [refresh])
+
     const updateEntry = useCallback(
       (
         countryCode: string,
@@ -83,7 +87,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
     )
 
     const totals = useMemo(() => {
-      const SPECIAL_CODES = new Set(['FWC', 'CC', '00'])
+      const SPECIAL_CODES = new Set(['FWC', 'CC'])
       const TEAM_CODES = new Set(Object.keys(collection).filter((c) => !SPECIAL_CODES.has(c)))
       let teamCollected = 0
       TEAM_CODES.forEach((code) => {
@@ -92,9 +96,6 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
 
       const fwcCollected = Object.values(collection['FWC'] ?? {}).filter((e) => e.collected).length
       const ccCollected = Object.values(collection['CC'] ?? {}).filter((e) => e.collected).length
-      const paniniCollected = Object.values(collection['00'] ?? {}).filter(
-        (e) => e.collected
-      ).length
 
       let totalRepeated = 0
       Object.values(collection).forEach((codeMap) => {
@@ -103,9 +104,9 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
         })
       })
 
-      return { teamCollected, fwcCollected, ccCollected, paniniCollected, totalRepeated }
+      return { teamCollected, fwcCollected, ccCollected, totalRepeated }
     }, [collection])
 
-    return { collection, loading, updateEntry, totals }
+    return { collection, loading, updateEntry, totals, refresh }
   }
 }

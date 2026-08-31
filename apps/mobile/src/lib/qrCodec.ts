@@ -1,5 +1,4 @@
 import { gunzipSync, gzipSync } from 'fflate'
-import { allStickers } from '@mi-album-fifa/shared'
 import type { CollectionMap } from '@mi-album-fifa/shared'
 
 const PREFIX = '⋋^'
@@ -38,7 +37,91 @@ function deflateBlock(data: Uint8Array): string {
   return uint8ToBase64(compressed)
 }
 
-const stickerList = allStickers.filter((s) => s.number != null)
+// ---------------------------------------------------------------------------
+// Lista de stickers: mismo formato que externalQR.ts (994 stickers)
+// ---------------------------------------------------------------------------
+
+export const CARD_CODES = [
+  'FWC',
+  'MEX',
+  'RSA',
+  'KOR',
+  'CZE',
+  'CAN',
+  'BIH',
+  'QAT',
+  'SUI',
+  'BRA',
+  'MAR',
+  'HAI',
+  'SCO',
+  'USA',
+  'PAR',
+  'AUS',
+  'TUR',
+  'GER',
+  'CUW',
+  'CIV',
+  'ECU',
+  'NED',
+  'JPN',
+  'SWE',
+  'TUN',
+  'BEL',
+  'EGY',
+  'IRN',
+  'NZL',
+  'ESP',
+  'CPV',
+  'KSA',
+  'URU',
+  'FRA',
+  'SEN',
+  'IRQ',
+  'NOR',
+  'ARG',
+  'ALG',
+  'AUT',
+  'JOR',
+  'POR',
+  'COD',
+  'UZB',
+  'COL',
+  'ENG',
+  'CRO',
+  'GHA',
+  'PAN',
+  'CC',
+]
+
+function stickersPerCard(code: string): number {
+  return code === 'CC' ? 14 : 20
+}
+
+export interface StickerInfo {
+  code: string
+  country_code: string
+  number: number
+}
+
+export function buildStickerList(): StickerInfo[] {
+  const list: StickerInfo[] = []
+  for (const cardCode of CARD_CODES) {
+    const count = stickersPerCard(cardCode)
+    const startNumber = cardCode === 'FWC' ? 0 : 1
+    for (let i = 0; i < count; i++) {
+      const num = startNumber + i
+      list.push({
+        code: `${cardCode} ${num}`,
+        country_code: cardCode,
+        number: num,
+      })
+    }
+  }
+  return list
+}
+
+const stickerList = buildStickerList()
 
 function getStickerKey(countryCode: string | null, number: number): string {
   const code = countryCode ?? '00'
@@ -66,7 +149,7 @@ export function decodeQR(raw: string): OtherCollectionData | null {
 
     stickerList.forEach((sticker, idx) => {
       const byteIdx = Math.floor(idx / 8)
-      const bitIdx = 7 - (idx % 8)
+      const bitIdx = idx % 8
 
       const key = getStickerKey(sticker.country_code, sticker.number!)
 
@@ -104,7 +187,7 @@ export function encodeQR(collection: CollectionMap): string {
 
   stickerList.forEach((sticker, idx) => {
     const byteIdx = Math.floor(idx / 8)
-    const bitIdx = 7 - (idx % 8)
+    const bitIdx = idx % 8
     const code = sticker.country_code ?? 'null'
     const num = sticker.number!
 
@@ -194,7 +277,7 @@ export function encodeTradeQR(giving: TradeStickerRef[], receiving: TradeSticker
 
   stickerList.forEach((sticker, idx) => {
     const byteIdx = Math.floor(idx / 8)
-    const bitIdx = 7 - (idx % 8)
+    const bitIdx = idx % 8
     const key = getStickerKey(sticker.country_code, sticker.number!)
 
     if (givingKeys.has(key)) {
@@ -230,7 +313,7 @@ export function decodeTradeQR(raw: string): TradeData | null {
 
     stickerList.forEach((sticker, idx) => {
       const byteIdx = Math.floor(idx / 8)
-      const bitIdx = 7 - (idx % 8)
+      const bitIdx = idx % 8
 
       const key = getStickerKey(sticker.country_code, sticker.number!)
       const code = sticker.country_code ?? 'null'

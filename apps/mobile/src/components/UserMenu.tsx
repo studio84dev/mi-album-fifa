@@ -13,16 +13,25 @@ const ImportIcon = ({ color }: { color: string }) => (
   </Svg>
 )
 
+const QRIcon = ({ color }: { color: string }) => (
+  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}>
+    <Path d="M3 3h7v7H3z" />
+    <Path d="M14 3h7v7h-7z" />
+    <Path d="M3 14h7v7H3z" />
+    <Path d="M14 14h7v7h-7z" />
+  </Svg>
+)
+
 interface UserMenuProps {
   user: User | null
   onSignOut: () => void
   onImport: () => void
+  onImportQR: () => void
   t: (_key: string) => string
   totals: {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
   collectionLoading: boolean
@@ -32,6 +41,7 @@ export default function UserMenu({
   user,
   onSignOut,
   onImport,
+  onImportQR,
   t,
   totals,
   collectionLoading,
@@ -171,6 +181,32 @@ export default function UserMenu({
                 }}
               >
                 {t('importMenuItem')}
+              </Text>
+            </Pressable>
+
+            {/* Import QR Button */}
+            <Pressable
+              onPress={() => {
+                onImportQR()
+                setShowMenu(false)
+              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                paddingHorizontal: 8,
+                paddingVertical: 12,
+                borderRadius: 8,
+              }}
+            >
+              <QRIcon color={theme.textMuted} />
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textSecondary,
+                }}
+              >
+                Importar QR Externo
               </Text>
             </Pressable>
 

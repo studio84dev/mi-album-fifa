@@ -78,7 +78,7 @@ function buildSearchData(allStickers: Sticker[]) {
     }
     acc[key].stickerCount++
     if (sticker.number != null) {
-      acc[key].stickerNumbers.push(sticker.number === 0 ? 1 : sticker.number)
+      acc[key].stickerNumbers.push(sticker.number)
     }
     return acc
   }, {})

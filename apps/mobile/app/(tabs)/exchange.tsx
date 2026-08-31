@@ -299,6 +299,7 @@ export default function ExchangeScreen() {
       scannedRef.current = true
 
       const type = detectQRType(data)
+      console.log('🔍 QR escaneado:', { type, dataLength: data.length })
 
       if (type === 'trade') {
         const tradeData = decodeTradeQR(data)
@@ -307,6 +308,7 @@ export default function ExchangeScreen() {
           scannedRef.current = false
           return
         }
+        console.log('🤝 Trade QR decodificado:', tradeData)
         setIncomingTrade(tradeData)
         setScreen('trade_confirm')
         return
@@ -319,7 +321,18 @@ export default function ExchangeScreen() {
           scannedRef.current = false
           return
         }
+        console.log('📦 Collection QR decodificado:', {
+          missingCount: result.missing.size,
+          repeatedCount: result.repeated.size,
+          sample: Array.from(result.missing).slice(0, 5),
+        })
         const matchResult = computeMatch(collection, result)
+        console.log('✨ Match result:', {
+          theyCanGive: matchResult.theyCanGive.length,
+          iCanGive: matchResult.iCanGive.length,
+          theyCanGiveSample: matchResult.theyCanGive.slice(0, 3),
+          iCanGiveSample: matchResult.iCanGive.slice(0, 3),
+        })
         setMatch(matchResult)
         setSelectedReceive(new Set())
         setSelectedGive(new Set())
@@ -385,44 +398,18 @@ export default function ExchangeScreen() {
       receiveItems: Array<{ code: string; number: number; key: string }>,
       giveItems: Array<{ code: string; number: number; key: string }>
     ) => {
+      console.log('🔄 Aplicando intercambio a Supabase:', { receiveItems, giveItems })
       const {
         data: { session },
       } = await supabase.auth.getSession()
 
-      const applyEntry = async (
-        code: string,
-        number: number,
-        collected: boolean,
-        repeated: number
-      ) => {
-        const dbCode = code === 'null' ? null : code
-        updateEntry(code, number, { collected, repeated })
-        if (!session?.user?.id) return
-        if (collected) {
-          await supabase.from('sticker_collection').upsert(
-            {
-              user_id: session.user.id,
-              country_code: dbCode,
-              sticker_number: number,
-              repeated,
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'user_id,country_code,sticker_number' }
-          )
-        } else {
-          await supabase
-            .from('sticker_collection')
-            .delete()
-            .eq('user_id', session.user.id)
-            .eq('country_code', dbCode)
-            .eq('sticker_number', number)
-        }
-      }
+      // Preparar actualizaciones de estado local primero
+      const localUpdates: Array<{ code: string; number: number; collected: boolean; repeated: number }> = []
 
       for (const item of receiveItems) {
         const currentEntry = collection[item.code]?.[item.number]
         if (!currentEntry?.collected) {
-          await applyEntry(item.code, item.number, true, 0)
+          localUpdates.push({ code: item.code, number: item.number, collected: true, repeated: 0 })
         }
       }
 
@@ -430,8 +417,35 @@ export default function ExchangeScreen() {
         const currentEntry = collection[item.code]?.[item.number]
         const currentRepeated = currentEntry?.repeated ?? 0
         const newRepeated = Math.max(0, currentRepeated - 1)
-        await applyEntry(item.code, item.number, true, newRepeated)
+        localUpdates.push({ code: item.code, number: item.number, collected: true, repeated: newRepeated })
       }
+
+      // Aplicar actualizaciones al estado local
+      for (const update of localUpdates) {
+        updateEntry(update.code, update.number, { collected: update.collected, repeated: update.repeated })
+      }
+
+      // Batch insert a Supabase (una sola request)
+      if (session?.user?.id && localUpdates.length > 0) {
+        const upsertData = localUpdates.map((update) => ({
+          user_id: session.user.id,
+          country_code: update.code === 'null' ? null : update.code,
+          sticker_number: update.number,
+          repeated: update.repeated,
+          updated_at: new Date().toISOString(),
+        }))
+
+        const { error } = await supabase
+          .from('sticker_collection')
+          .upsert(upsertData, { onConflict: 'user_id,country_code,sticker_number' })
+
+        if (error) {
+          console.error('Error en batch upsert:', error)
+          throw error
+        }
+      }
+
+      console.log('✅ Intercambio aplicado exitosamente (1 batch request para', localUpdates.length, 'stickers)')
     },
     [collection, updateEntry]
   )
@@ -458,6 +472,10 @@ export default function ExchangeScreen() {
     try {
       const givingItems = match.iCanGive.filter((i) => selectedGive.has(i.key))
       const receivingItems = match.theyCanGive.filter((i) => selectedReceive.has(i.key))
+      console.log('✅ Confirmando intercambio:', {
+        giving: givingItems,
+        receiving: receivingItems,
+      })
       await applyTrade(receivingItems, givingItems)
       setSuccessData({ given: selectedGive.size, received: selectedReceive.size })
       setScreen('success')
@@ -472,6 +490,10 @@ export default function ExchangeScreen() {
     if (!incomingTrade) return
     setConfirming(true)
     try {
+      console.log('✅ Confirmando trade QR:', {
+        receiving: incomingTrade.giving, // Lo que el otro me da
+        giving: incomingTrade.receiving, // Lo que yo le doy al otro
+      })
       await applyTrade(incomingTrade.giving, incomingTrade.receiving)
       setSuccessData({
         given: incomingTrade.receiving.length,

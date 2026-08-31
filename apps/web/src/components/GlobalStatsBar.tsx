@@ -31,7 +31,14 @@ function StatValue({
       </span>
     )
   }
-  const complete = total !== undefined && collected >= total
+  if (total === undefined) {
+    return (
+      <span className={`${sizeClass} font-bold leading-[1.1] tracking-[-0.02em] tabular-nums text-accent-blue`}>
+        {collected}
+      </span>
+    )
+  }
+  const complete = collected >= total
   const accentColor = ccColor ? '#e84040' : paniniColor ? '#6366f1' : undefined
   const numClass = complete ? 'text-inherit' : accentColor ? '' : 'text-accent-blue'
   return (
@@ -56,7 +63,6 @@ interface GlobalStatsBarProps {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
   loading: boolean
@@ -65,15 +71,14 @@ interface GlobalStatsBarProps {
 }
 
 function GlobalStatsBar({ totals, loading, t, compact = false }: GlobalStatsBarProps) {
-  const { teamCollected, fwcCollected, ccCollected, paniniCollected, totalRepeated } = totals
+  const { teamCollected, fwcCollected, ccCollected, totalRepeated } = totals
 
-  const TEAM_TOTAL = 960 // 48 teams × 20 stickers
-  const FWC_TOTAL = 19
+  const TEAM_TOTAL = 960
+  const FWC_TOTAL = 20
   const CC_TOTAL = 14
-  const PANINI_TOTAL = 1
 
-  const overallCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
-  const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL + PANINI_TOTAL
+  const overallCollected = teamCollected + fwcCollected + ccCollected
+  const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL
 
   const pct = Math.round((overallCollected / overallTotal) * 100)
 
@@ -114,69 +119,37 @@ function GlobalStatsBar({ totals, loading, t, compact = false }: GlobalStatsBarP
         )}
       </div>
       <div
-        className={`grid gap-1 max-[400px]:grid-cols-2 max-[400px]:gap-3${
-          compact ? ' grid-cols-3 gap-[2px]' : ' grid-cols-4'
-        }`}
+        className={`grid grid-cols-3 gap-1${compact ? ' gap-[2px]' : ''} max-[400px]:grid-cols-3 max-[400px]:gap-3`}
       >
         <div
           className={`flex flex-col items-center gap-px${compact ? ' py-1 px-1 gap-0' : ' py-1'}`}
         >
           <StatValue
-            collected={teamCollected}
-            total={TEAM_TOTAL}
+            collected={overallCollected}
+            total={overallTotal}
             loading={loading}
             compact={compact}
           />
           <span
             className={`text-text-muted font-medium uppercase tracking-[0.06em]${compact ? ' text-[0.65rem]' : ' text-xs'}`}
           >
-            {t('statTeams')}
+            {t('statCollected')}
           </span>
         </div>
         <div
           className={`flex flex-col items-center gap-px${compact ? ' py-1 px-1 gap-0' : ' py-1'}`}
         >
           <StatValue
-            collected={fwcCollected}
-            total={FWC_TOTAL}
+            collected={overallTotal - overallCollected}
             loading={loading}
             compact={compact}
           />
           <span
             className={`text-text-muted font-medium uppercase tracking-[0.06em]${compact ? ' text-[0.65rem]' : ' text-xs'}`}
           >
-            FWC
+            {t('statMissing')}
           </span>
         </div>
-        <div
-          className={`flex flex-col items-center gap-px${compact ? ' py-1 px-1 gap-0' : ' py-1'}`}
-        >
-          <StatValue
-            collected={ccCollected}
-            total={CC_TOTAL}
-            loading={loading}
-            compact={compact}
-            ccColor
-          />
-          <span
-            className={`text-text-muted font-medium uppercase tracking-[0.06em]${compact ? ' text-[0.65rem]' : ' text-xs'}`}
-          >
-            CC
-          </span>
-        </div>
-        {!compact && (
-          <div className="flex flex-col items-center gap-px py-1">
-            <StatValue
-              collected={paniniCollected}
-              total={PANINI_TOTAL}
-              loading={loading}
-              paniniColor
-            />
-            <span className="text-xs text-text-muted font-medium uppercase tracking-[0.06em]">
-              00 PANINI
-            </span>
-          </div>
-        )}
         <div
           className={`flex flex-col items-center gap-px${compact ? ' py-1 px-1 gap-0' : ' py-1'}`}
         >

@@ -28,6 +28,7 @@ import WhatsNewModal from '@/src/components/WhatsNewModal'
 import AboutModal from '@/src/components/AboutModal'
 import SuggestionModal from '@/src/components/SuggestionModal'
 import ImportCollectionModal from '@/src/components/ImportCollectionModal'
+import ImportQRModal from '@/src/components/ImportQRModal'
 import { useAuth } from '@/src/hooks/useAuth'
 import { useCollectionState, useCollectionDispatch } from '@/src/context/CollectionContext'
 import { useI18n } from '@/src/hooks/useI18n'
@@ -81,10 +82,7 @@ function buildSearchData() {
 
   for (const sticker of allStickers) {
     const key = sticker.country_code ?? sticker.code
-    const isSpecial =
-      sticker.card_type === 'fwc_special' ||
-      sticker.card_type === 'cc' ||
-      sticker.card_type === 'panini_logo'
+    const isSpecial = sticker.card_type === 'fwc_special' || sticker.card_type === 'cc'
 
     if (!isSpecial) {
       if (!teamsObj[key]) {
@@ -123,7 +121,7 @@ function buildSearchData() {
     }
     countryDetails[key].stickerCount++
     if (sticker.number != null) {
-      countryDetails[key].stickerNumbers.push(sticker.number === 0 ? 1 : sticker.number)
+      countryDetails[key].stickerNumbers.push(sticker.number)
     }
 
     if (sticker.number != null && sticker.country_code != null) {
@@ -211,10 +209,11 @@ export default function HomeScreen() {
   const [showAbout, setShowAbout] = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [showImport, setShowImport] = useState(false)
+  const [showImportQR, setShowImportQR] = useState(false)
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   const { collection, totals, loading: collectionLoading } = useCollectionState()
-  const { updateEntry } = useCollectionDispatch()
+  const { updateEntry, refresh } = useCollectionDispatch()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
@@ -223,8 +222,8 @@ export default function HomeScreen() {
     []
   )
 
-  const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
-  const totalCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
+  const { teamCollected, fwcCollected, ccCollected } = totals
+  const totalCollected = teamCollected + fwcCollected + ccCollected
 
   const exactMatch = useMemo(() => {
     if (!search.trim()) return null
@@ -371,6 +370,7 @@ export default function HomeScreen() {
   const handleShowAbout = useCallback(() => setShowAbout(true), [])
   const handleShowSuggestion = useCallback(() => setShowSuggestion(true), [])
   const handleShowImport = useCallback(() => setShowImport(true), [])
+  const handleShowImportQR = useCallback(() => setShowImportQR(true), [])
   const toggleLocale = useCallback(() => toggleI18nLocale(), [toggleI18nLocale])
 
   const listFooter = useMemo(
@@ -431,6 +431,7 @@ export default function HomeScreen() {
           onSignIn={signInWithGoogle}
           onSignOut={signOut}
           onImport={handleShowImport}
+          onImportQR={handleShowImportQR}
           onWhatsNew={openWhatsNew}
           whatsNewUnread={hasUnread}
           updateAvailable={updateAvailable}
@@ -716,10 +717,21 @@ export default function HomeScreen() {
           visible={showImport}
           onClose={() => setShowImport(false)}
           onSuccess={() => {
-            // Refresh collection data
+            refresh()
           }}
           t={t}
         />
+
+        <ImportQRModal
+          visible={showImportQR}
+          onClose={() => setShowImportQR(false)}
+          user={user}
+          onImported={() => {
+            refresh()
+          }}
+          t={t}
+        />
+
         <ScrollTopButton visible={showScrollTop && !isSearching} onPress={scrollToTop} />
       </View>
     </SafeAreaView>

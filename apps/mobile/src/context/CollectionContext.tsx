@@ -10,7 +10,6 @@ interface CollectionState {
     teamCollected: number
     fwcCollected: number
     ccCollected: number
-    paniniCollected: number
     totalRepeated: number
   }
 }
@@ -21,6 +20,7 @@ interface CollectionDispatch {
     _stickerNumber: number | string,
     _data: { collected: boolean; repeated?: number }
   ) => void
+  refresh: () => void
 }
 
 interface CollectionContextValue extends CollectionState, CollectionDispatch {}
@@ -29,10 +29,10 @@ const CollectionStateContext = createContext<CollectionState | null>(null)
 const CollectionDispatchContext = createContext<CollectionDispatch | null>(null)
 
 export function CollectionProvider({ user, children }: { user: User | null; children: ReactNode }) {
-  const { collection, loading, updateEntry, totals } = useGlobalCollection(user)
+  const { collection, loading, updateEntry, totals, refresh } = useGlobalCollection(user)
 
   const state = useMemo(() => ({ collection, loading, totals }), [collection, loading, totals])
-  const dispatch = useMemo(() => ({ updateEntry }), [updateEntry])
+  const dispatch = useMemo(() => ({ updateEntry, refresh }), [updateEntry, refresh])
 
   return (
     <CollectionStateContext.Provider value={state}>

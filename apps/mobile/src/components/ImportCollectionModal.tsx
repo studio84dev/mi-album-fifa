@@ -69,13 +69,52 @@ export default function ImportCollectionModal({
     isImportFail?: boolean
   } | null>(null)
   const [importedCount, setImportedCount] = useState(0)
+  const [previewCount, setPreviewCount] = useState<number | null>(null)
 
   const loading = loadingPhase !== null
 
-  const handleCheckEmail = () => {
+  const handleCheckEmail = async () => {
     if (!email.trim()) return
     setErrorState(null)
-    setStep(2)
+    setLoadingPhase('preview')
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        setErrorState({ message: t('importError') })
+        setLoadingPhase(null)
+        return
+      }
+
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/import-collection`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ sourceEmail: email.trim().toLowerCase(), preview: true }),
+        }
+      )
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErrorState({ message: data.error || t('importError') })
+        setLoadingPhase(null)
+        return
+      }
+
+      setPreviewCount(data.count)
+      setStep(2)
+    } catch {
+      setErrorState({ message: t('importError') })
+    } finally {
+      setLoadingPhase(null)
+    }
   }
 
   const handleImport = async () => {
@@ -137,22 +176,22 @@ export default function ImportCollectionModal({
   const handleDone = () => {
     onSuccess?.()
     onClose()
-    // Reset state
     setStep(1)
     setEmail('')
     setConfirmText('')
     setErrorState(null)
+    setPreviewCount(null)
   }
 
   const handleClose = () => {
     if (!loading) {
       onClose()
-      // Reset after animation
       setTimeout(() => {
         setStep(1)
         setEmail('')
         setConfirmText('')
         setErrorState(null)
+        setPreviewCount(null)
       }, 300)
     }
   }
@@ -187,6 +226,22 @@ export default function ImportCollectionModal({
           contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
           style={{ flex: 1 }}
         >
+          {/* Preview loading */}
+          {step === 1 && loading && (
+            <View style={{ alignItems: 'center', paddingVertical: 32, gap: 16 }}>
+              <ActivityIndicator size="large" color={colors.accentBlue} />
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: theme.textMuted,
+                  textAlign: 'center',
+                }}
+              >
+                {email}
+              </Text>
+            </View>
+          )}
+
           {/* Step 1: Email input */}
           {step === 1 && !loading && !errorState && (
             <View style={{ gap: 16 }}>
@@ -296,6 +351,7 @@ export default function ImportCollectionModal({
                   backgroundColor: theme.bgTertiary,
                   padding: 12,
                   borderRadius: 8,
+                  gap: 6,
                 }}
               >
                 <Text style={{ fontSize: 13, color: theme.textMuted }}>
@@ -304,6 +360,11 @@ export default function ImportCollectionModal({
                 <Text style={{ fontSize: 14, fontWeight: '600', color: theme.textPrimary }}>
                   {email}
                 </Text>
+                {previewCount !== null && (
+                  <Text style={{ fontSize: 14, fontWeight: '600', color: colors.accentBlue }}>
+                    {t('importQrStickerCount').replace('{count}', String(previewCount))}
+                  </Text>
+                )}
               </View>
               <Text
                 style={{
@@ -362,8 +423,8 @@ export default function ImportCollectionModal({
             </View>
           )}
 
-          {/* Loading states */}
-          {loading && (
+          {/* Loading states (step 2 only) */}
+          {step === 2 && loading && (
             <View style={{ alignItems: 'center', paddingVertical: 32, gap: 16 }}>
               <ActivityIndicator size="large" color={colors.accentBlue} />
               <Text
@@ -374,7 +435,11 @@ export default function ImportCollectionModal({
                   textAlign: 'center',
                 }}
               >
-                {loadingPhase === 'backup' ? t('importPhaseBackup') : t('importPhaseImporting')}
+                {loadingPhase === 'backup'
+                  ? t('importPhaseBackup')
+                  : loadingPhase === 'preview'
+                    ? t('importContinue')
+                    : t('importPhaseImporting')}
               </Text>
               <Text
                 style={{
@@ -383,7 +448,11 @@ export default function ImportCollectionModal({
                   textAlign: 'center',
                 }}
               >
-                {loadingPhase === 'backup' ? t('importPhaseBackupSub') : t('importLoading')}
+                {loadingPhase === 'backup'
+                  ? t('importPhaseBackupSub')
+                  : loadingPhase === 'preview'
+                    ? ''
+                    : t('importLoading')}
               </Text>
             </View>
           )}

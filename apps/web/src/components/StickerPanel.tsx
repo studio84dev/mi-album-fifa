@@ -12,6 +12,7 @@ interface StickerPanelProps {
   countryCode: string
   user: { id: string } | null
   stickerCount?: number
+  stickerNumbers?: number[]
   initialData?: Record<string, InitialDataEntry>
   onCollectionChange?: (
     _countryCode: string,
@@ -39,6 +40,7 @@ function StickerPanel({
   countryCode,
   user,
   stickerCount = 20,
+  stickerNumbers,
   initialData = {},
   onCollectionChange,
   onInteract,
@@ -269,7 +271,7 @@ function StickerPanel({
       )}
 
       <div className="grid [grid-template-columns:repeat(5,1fr)] gap-[0.35rem] min-[601px]:gap-[0.375rem]">
-        {Array.from({ length: stickerCount }, (_, i) => i + 1).map((num) => {
+        {(stickerNumbers ?? Array.from({ length: stickerCount }, (_, i) => i + 1)).map((num) => {
           const isCollected = !!collected[num]
           const isRepeated = repeated[num] > 0
           const isLastTouched = lastTouched === num
@@ -278,6 +280,8 @@ function StickerPanel({
 
           const isHovered = hoveredNum === num
           const canHover = !isCollected && !isRepeated && !loading
+
+          const displayNum = num === 0 && countryCode === 'FWC' ? '00' : String(num)
 
           let figuritaClass =
             'flex flex-col items-center justify-center gap-[0.1rem] border rounded-md py-2 px-1 cursor-pointer relative touch-pan-y select-none focus:outline-none focus:shadow-none disabled:opacity-40 disabled:cursor-not-allowed [touch-callout:none] [-webkit-tap-highlight-color:transparent]'
@@ -315,7 +319,7 @@ function StickerPanel({
               aria-label={`Figurita ${countryCode} ${num}`}
             >
               <span className="text-[0.9375rem] font-bold leading-none tracking-[-0.01em] pointer-events-none select-none">
-                {num}
+                {displayNum}
               </span>
               <span className="text-[0.5625rem] font-medium tracking-[0.04em] opacity-75 pointer-events-none select-none">
                 {countryCode}

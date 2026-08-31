@@ -22,7 +22,6 @@ import StickerList from './components/StickerList.tsx'
 import Footer from './components/Footer.tsx'
 import ScrollTopButton from './components/ScrollTopButton.tsx'
 import RedirectBanner from './components/RedirectBanner.tsx'
-import AndroidBanner from './components/AndroidBanner.tsx'
 import LoginBar from './components/LoginBar.tsx'
 import SharePrompt, { STORAGE_KEY as SHARE_PROMPT_KEY } from './components/SharePrompt.tsx'
 import WelcomeModal from './components/WelcomeModal.tsx'
@@ -71,8 +70,6 @@ function App() {
     setShowImportModal,
     showRedirectBanner,
     dismissRedirectBanner,
-    showAndroidBanner,
-    dismissAndroidBanner,
   } = useBanners(user)
 
   // SEO meta tags
@@ -94,8 +91,8 @@ function App() {
   }, [locale, t])
 
   const [showSharePrompt, setShowSharePrompt] = useState(false)
-  const { teamCollected, fwcCollected, ccCollected, paniniCollected } = totals
-  const totalCollected = teamCollected + fwcCollected + ccCollected + paniniCollected
+  const { teamCollected, fwcCollected, ccCollected } = totals
+  const totalCollected = teamCollected + fwcCollected + ccCollected
 
   useEffect(() => {
     if (localStorage.getItem(SHARE_PROMPT_KEY)) return
@@ -230,6 +227,7 @@ function App() {
           countryCode={activeCountry.code}
           user={user}
           stickerCount={activeCountry.count ?? 20}
+          stickerNumbers={countryDetails[activeCountry.code]?.stickerNumbers}
           page={activeCountry.page ?? null}
           initialData={collection[activeCountry.code] ?? {}}
           onCollectionChange={updateEntry}

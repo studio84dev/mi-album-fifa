@@ -116,6 +116,8 @@ const StickerCard = React.memo(function StickerCard({
   const handleLongPress = () => onLongPress(num)
   const handlePressIn = () => onPressIn(num)
 
+  const displayNum = num === 0 && countryCode === 'FWC' ? '00' : String(num)
+
   return (
     <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
       <Pressable
@@ -126,7 +128,7 @@ const StickerCard = React.memo(function StickerCard({
         delayLongPress={delayLongPress}
         style={containerStyle}
       >
-        <Text style={{ color: textColor, ...NUM_STYLE }}>{num}</Text>
+        <Text style={{ color: textColor, ...NUM_STYLE }}>{displayNum}</Text>
         <Text style={{ color: textColor, ...CODE_STYLE }}>{countryCode}</Text>
         {isRepeated && (
           <View style={BADGE_STYLE}>

@@ -18,6 +18,9 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p apps/mobile/tsconfig.json",
     "typecheck:web": "tsc --noEmit",
     "typecheck:mobile": "tsc --noEmit -p apps/mobile/tsconfig.json",
+    "test": "vitest run --config packages/shared/vitest.config.ts && vitest run --config apps/mobile/vitest.config.ts",
+    "test:shared": "vitest run --config packages/shared/vitest.config.ts",
+    "test:mobile": "vitest run --config apps/mobile/vitest.config.ts",
     "format": "prettier --write ."
   },
   "devDependencies": {

@@ -56,7 +56,7 @@ function CountryScreen() {
   const isoCode = countryStickers[0]?.iso ?? null
 
   const stickerNumbers = useMemo(
-    () => countryStickers.map((s) => (s.number === 0 ? 1 : s.number!)),
+    () => countryStickers.map((s) => s.number!),
     [countryStickers]
   )
 

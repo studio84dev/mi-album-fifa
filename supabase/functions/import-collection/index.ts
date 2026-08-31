@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { sourceEmail } = await req.json()
+    const { sourceEmail, preview } = await req.json()
     if (!sourceEmail) {
       return new Response(JSON.stringify({ error: 'sourceEmail is required' }), {
         status: 400,
@@ -83,6 +83,13 @@ Deno.serve(async (req) => {
     if (fetchError) {
       return new Response(JSON.stringify({ error: 'Failed to fetch source collection' }), {
         status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (preview) {
+      return new Response(JSON.stringify({ count: sourceStickers?.length ?? 0 }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

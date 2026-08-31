@@ -1,5 +1,7 @@
 export { createSupabaseClient, createInvokeFunction } from './lib/supabaseClient'
 export type { SupabaseConfig } from './lib/supabaseClient'
+export { decodeExternalQR } from './lib/externalQR'
+export type { AlbumState, StickerState } from './types/externalQR'
 
 export { createUseAuth } from './hooks/useAuth'
 export { createUseCommunityStats } from './hooks/useCommunityStats'
