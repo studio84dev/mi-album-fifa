@@ -56,7 +56,8 @@
     "build": "eas build",
     "build:android": "npx eas build --platform android --profile production",
     "build:ios": "npx eas build --platform ios --profile production",
-    "test": "vitest run"
+    "test": "vitest run",
+    "publish-update": "node scripts/publish-update.mjs"
   },
   "private": true
 }

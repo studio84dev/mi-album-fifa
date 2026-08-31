@@ -83,16 +83,63 @@ CI: `.github/workflows/ci.yml` corre tests + typecheck + lint + build web en cad
 
 ## Release Android
 
-`eas.json` usa `appVersionSource: remote`:
+### Proceso completo
 
-1. `npm run bump-version` — lee versionCode remoto, actualiza `app.json`, sube `version.json` al bucket Supabase `app-updates`
-2. `npm run build:mobile:android` — EAS Build (auto-incrementa versionCode)
-3. El banner de actualización in-app solo aparece cuando `published: true` en `version.json`
+El release tiene dos fases: **build** y **publicación**.
 
-Antes de un EAS Build, verificar localmente:
+#### Fase 1 — Build y release automático
+
+Ejecutar **un solo comando**:
+
 ```bash
-npx expo export --platform android   # debe terminar con "Exported: dist"
+npm run release
 ```
+
+Este comando ejecuta en orden:
+
+1. **`export`** — Valida que la app compila correctamente (`npx expo export --platform android`). Si falla, se detiene aquí.
+2. **`bump-version`** — Lee el `versionCode` actual desde EAS (o Supabase como fallback), lo incrementa en 1, actualiza `app.json` (ej: `1.0.24` → `1.0.25`) y sube `version.json` al bucket `app-updates` de Supabase con `published: false`.
+3. **`build:mobile:android`** — EAS Build genera el APK/AAB en la nube usando el `versionCode` recién seteado. Esto tarda varios minutos.
+4. **`release:commit`** — Automáticamente commitea y pushea el cambio en `app.json` con el mensaje `Bump version to 1.0.XX`.
+
+El resultado es:
+- Un archivo `.aab` disponible en [Expo Dashboard](https://expo.dev/accounts/studio84dev/projects/mi-album-fifa/builds) para subir a Play Store
+- `app.json` con la nueva versión commiteada y pusheada a `master`
+- `version.json` en Supabase con `published: false`
+
+#### Fase 2 — Subir a Play Store
+
+1. Ir a [Google Play Console](https://play.google.com/console) → **Producción** → **Crear release nuevo**
+2. Subir el `.aab` generado por EAS
+3. Completar notas de release (si aplica)
+4. Enviar para revisión
+
+#### Fase 3 — Publicar actualización in-app
+
+Una vez que la nueva versión está disponible en Play Store (o cuando quieras que los usuarios vean el banner de actualización):
+
+```bash
+npm run publish-update
+```
+
+Este comando cambia `published: false` → `published: true` en el `version.json` de Supabase. A partir de ese momento, cualquier usuario con una versión instalada menor a la publicada verá el banner de actualización.
+
+### Sistema de versiones
+
+| Archivo | Qué controla | Ejemplo |
+|---------|-------------|---------|
+| `app.json` → `version` | Versión visible (semver) | `1.0.25` |
+| `app.json` → `android.versionCode` | Código numérico (auto por EAS) | `25` |
+| Supabase `version.json` → `androidVersionCode` | Versión más reciente disponible | `25` |
+| Supabase `version.json` → `published` | Si notificar a usuarios | `true` / `false` |
+
+### Lógica del banner de actualización
+
+La app muestra el banner cuando se cumplen **ambas** condiciones:
+1. `published === true` en Supabase
+2. La versión instalada (`versionCode` local) es menor a `androidVersionCode` en Supabase
+
+Esto permite controlar cuándo notificar independientemente de cuándo se sube el APK.
 
 ---
 

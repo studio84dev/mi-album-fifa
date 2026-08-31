@@ -23,6 +23,7 @@
     "test:mobile": "vitest run --config apps/mobile/vitest.config.ts",
     "release": "npm run export --workspace=apps/mobile && npm run bump-version && npm run build:mobile:android && npm run release:commit",
     "release:commit": "git add apps/mobile/app.json && git commit -m \"Bump version to $(node -e \"console.log(require('./apps/mobile/app.json').expo.version)\")\" && git push",
+    "publish-update": "npm run publish-update --workspace=apps/mobile",
     "format": "prettier --write ."
   },
   "devDependencies": {
