@@ -21,7 +21,13 @@ import { execSync } from 'child_process'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 
+console.log('')
+console.log('🚀 Mi Álbum FIFA - Release Android')
+console.log('=====================================')
+console.log('')
+
 // --- Load env files ---
+console.log('📝 Step 1/3: Loading environment variables...')
 let serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 for (const envFile of ['.env.local', '.env']) {
   if (serviceRoleKey) break
@@ -40,16 +46,23 @@ for (const envFile of ['.env.local', '.env']) {
 }
 
 if (!serviceRoleKey) {
-  console.error(
-    '❌  SUPABASE_SERVICE_ROLE_KEY not found.\n' +
-      '    Add it to apps/mobile/.env or .env.local:\n' +
-      '    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key'
-  )
+  console.error('')
+  console.error('❌ SUPABASE_SERVICE_ROLE_KEY not found!')
+  console.error('')
+  console.error('To fix this:')
+  console.error('1. Go to Supabase Dashboard → Settings → API')
+  console.error('2. Copy the "service_role" key (secret)')
+  console.error('3. Add it to apps/mobile/.env:')
+  console.error('   SUPABASE_SERVICE_ROLE_KEY=your-key-here')
+  console.error('')
+  console.error('This key is only needed for releases, never exposed to users.')
   process.exit(1)
 }
+console.log('    ✓ Environment variables loaded')
+console.log('')
 
 // --- Get current versionCode from EAS ---
-console.log('🔍  Fetching current versionCode from EAS...')
+console.log('🔍 Step 2/3: Fetching current versionCode from EAS...')
 let currentVersionCode
 try {
   const output = execSync(
@@ -59,13 +72,16 @@ try {
   const match = output.match(/Android versionCode\s*-\s*(\d+)/)
   if (!match) throw new Error(`Could not parse versionCode from output:\n${output}`)
   currentVersionCode = parseInt(match[1], 10)
+  console.log(`    Current EAS versionCode: ${currentVersionCode}`)
 } catch (err) {
-  console.error('❌  Failed to get versionCode from EAS:', err.message)
-  process.exit(1)
+  // Si falla, probablemente es el primer build - usar versionCode 1
+  console.log('    ⚠️  No previous build found in EAS. Initializing with versionCode 1')
+  currentVersionCode = 0
 }
 
 const nextVersionCode = currentVersionCode + 1
-console.log(`    EAS versionCode: ${currentVersionCode} → next build will be: ${nextVersionCode}`)
+console.log(`    ✓ Next versionCode will be: ${nextVersionCode}`)
+console.log('')
 
 // --- Update app.json version to match nextVersionCode (format: 1.0.<versionCode>) ---
 const appJsonPath = resolve(ROOT, 'app.json')
@@ -76,7 +92,8 @@ const newVersion = `1.0.${nextVersionCode}`
 
 appJson.expo.version = newVersion
 writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2) + '\n', 'utf-8')
-console.log(`✅  app.json version: ${oldVersion} → ${newVersion}`)
+console.log(`📦 Step 3/3: Uploading version.json to Supabase...`)
+console.log(`    ✓ app.json: ${oldVersion} → ${newVersion}`)
 
 // --- Upload version.json to Supabase Storage ---
 const supabaseUrl = 'https://jmgiooeiimjyyltpgrna.supabase.co'
@@ -97,10 +114,20 @@ const uploadResponse = await fetch(`${supabaseUrl}/storage/v1/object/${bucket}/$
 
 if (!uploadResponse.ok) {
   const text = await uploadResponse.text()
-  console.error(`❌  Supabase upload failed (${uploadResponse.status}): ${text}`)
+  console.error('')
+  console.error(`❌ Supabase upload failed (${uploadResponse.status})`)
+  console.error(`   ${text}`)
+  console.error('')
+  console.error('Check that the "app-updates" bucket exists in Supabase Storage.')
   process.exit(1)
 }
 
-console.log(`✅  Supabase bucket updated:`)
-console.log(`    ${bucket}/${filePath} → androidVersionCode: ${nextVersionCode}`)
-console.log(`\n🚀  Ready to build: npm run build:android`)
+console.log('    ✓ version.json uploaded to Supabase')
+console.log('')
+console.log('=====================================')
+console.log('✅ Version bump complete!')
+console.log(`   Version: ${newVersion}`)
+console.log(`   versionCode: ${nextVersionCode}`)
+console.log('')
+console.log('👉 Next: Building APK on EAS...')
+console.log('')

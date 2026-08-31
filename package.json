@@ -21,6 +21,7 @@
     "test": "vitest run --config packages/shared/vitest.config.ts && vitest run --config apps/mobile/vitest.config.ts",
     "test:shared": "vitest run --config packages/shared/vitest.config.ts",
     "test:mobile": "vitest run --config apps/mobile/vitest.config.ts",
+    "release": "npm run export --workspace=apps/mobile && npm run bump-version && npm run build:mobile:android",
     "format": "prettier --write ."
   },
   "devDependencies": {
