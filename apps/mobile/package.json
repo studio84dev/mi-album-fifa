@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eas-cli": "^23.0.0",
     "eslint": "^9.38.0",
     "typescript": "~6.0.3",
     "vitest": "^3.2.4"

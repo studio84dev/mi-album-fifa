@@ -61,22 +61,34 @@ if (!serviceRoleKey) {
 console.log('    ✓ Environment variables loaded')
 console.log('')
 
-// --- Get current versionCode from EAS ---
-console.log('🔍 Step 2/3: Fetching current versionCode from EAS...')
+// --- Get current versionCode from EAS or Supabase ---
+console.log('🔍 Step 2/3: Fetching current versionCode...')
 let currentVersionCode
 try {
   const output = execSync(
-    'eas build:version:get --platform android --profile production --non-interactive 2>&1',
+    'npx eas build:version:get --platform android --profile production --non-interactive 2>&1',
     { cwd: ROOT, encoding: 'utf-8' }
   )
   const match = output.match(/Android versionCode\s*-\s*(\d+)/)
   if (!match) throw new Error(`Could not parse versionCode from output:\n${output}`)
   currentVersionCode = parseInt(match[1], 10)
-  console.log(`    Current EAS versionCode: ${currentVersionCode}`)
+  console.log(`    ✓ Current versionCode from EAS: ${currentVersionCode}`)
 } catch (err) {
-  // Si falla, probablemente es el primer build - usar versionCode 1
-  console.log('    ⚠️  No previous build found in EAS. Initializing with versionCode 1')
-  currentVersionCode = 0
+  console.log('    ⚠️  EAS has no build history. Checking Supabase...')
+  try {
+    const supabaseUrl = 'https://jmgiooeiimjyyltpgrna.supabase.co'
+    const res = await fetch(`${supabaseUrl}/storage/v1/object/public/app-updates/version.json`)
+    if (res.ok) {
+      const data = await res.json()
+      currentVersionCode = data.androidVersionCode ?? 0
+      console.log(`    ✓ Current versionCode from Supabase: ${currentVersionCode}`)
+    } else {
+      throw new Error('Supabase version.json not found')
+    }
+  } catch {
+    console.log('    ⚠️  No version found in Supabase either. Initializing with versionCode 1')
+    currentVersionCode = 0
+  }
 }
 
 const nextVersionCode = currentVersionCode + 1
