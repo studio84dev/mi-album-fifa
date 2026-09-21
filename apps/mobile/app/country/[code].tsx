@@ -33,7 +33,7 @@ const GoogleIcon = () => (
   </Svg>
 )
 
-function CountryScreen() {
+export function CountryScreen() {
   const { code, highlight } = useLocalSearchParams<{ code: string; highlight?: string }>()
   const highlightNumber = highlight ? parseInt(highlight, 10) : null
   const router = useRouter()

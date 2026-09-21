@@ -6,10 +6,11 @@ import {
   detectQRType,
   encodeTradeQR,
   decodeTradeQR,
+  buildTradeUpdates,
   buildStickerList,
   CARD_CODES,
 } from './qrCodec'
-import type { CollectionMap } from '@mi-album-fifa/shared'
+import { decodeExternalQR, type CollectionMap } from '@mi-album-fifa/shared'
 
 // ---------------------------------------------------------------------------
 // Sticker list structure
@@ -311,6 +312,75 @@ describe('encodeTradeQR / decodeTradeQR', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Flujo completo de intercambio entre dos usuarios de AlbumFan
+// ---------------------------------------------------------------------------
+
+describe('flujo completo de intercambio local', () => {
+  function applyUpdates(
+    collection: CollectionMap,
+    updates: ReturnType<typeof buildTradeUpdates>
+  ): CollectionMap {
+    const next: CollectionMap = structuredClone(collection)
+    for (const update of updates) {
+      if (!next[update.code]) next[update.code] = {}
+      next[update.code][update.number] = {
+        collected: update.collected,
+        repeated: update.repeated,
+      }
+    }
+    return next
+  }
+
+  it('actualiza correctamente ambos álbumes después de compartir y escanear el trade QR', () => {
+    const collectionA: CollectionMap = {
+      FWC: { 0: { collected: true, repeated: 2 } },
+    }
+    const collectionB: CollectionMap = {
+      FWC: { 2: { collected: true, repeated: 3 } },
+    }
+
+    const qrB = encodeQR(collectionB)
+    const decodedB = decodeQR(qrB)
+    expect(decodedB).not.toBeNull()
+    if (!decodedB) return
+
+    const matchForA = computeMatch(collectionA, decodedB)
+    expect(matchForA.iCanGive.map((item) => item.key)).toContain('FWC|0')
+    expect(matchForA.theyCanGive.map((item) => item.key)).toContain('FWC|2')
+
+    const giving = matchForA.iCanGive.filter((item) => item.key === 'FWC|0')
+    const receiving = matchForA.theyCanGive.filter((item) => item.key === 'FWC|2')
+    const tradeQr = encodeTradeQR(giving, receiving)
+    const scannedByB = decodeTradeQR(tradeQr)
+
+    expect(scannedByB).not.toBeNull()
+    if (!scannedByB) return
+
+    const nextA = applyUpdates(collectionA, buildTradeUpdates(collectionA, receiving, giving))
+    const nextB = applyUpdates(
+      collectionB,
+      buildTradeUpdates(collectionB, scannedByB.giving, scannedByB.receiving)
+    )
+
+    expect(nextA.FWC[0]).toEqual({ collected: true, repeated: 1 })
+    expect(nextA.FWC[2]).toEqual({ collected: true, repeated: 0 })
+    expect(nextB.FWC[0]).toEqual({ collected: true, repeated: 0 })
+    expect(nextB.FWC[2]).toEqual({ collected: true, repeated: 2 })
+  })
+
+  it('nunca deja un contador de repetidas negativo', () => {
+    const collection: CollectionMap = {
+      FWC: { 0: { collected: true, repeated: 0 } },
+    }
+    const item = { key: 'FWC|0', code: 'FWC', number: 0 }
+
+    expect(buildTradeUpdates(collection, [], [item])).toEqual([
+      { code: 'FWC', number: 0, collected: true, repeated: 0 },
+    ])
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Compatibilidad con formato externo
 // ---------------------------------------------------------------------------
 
@@ -364,5 +434,51 @@ describe('compatibilidad con formato externo', () => {
 
     // MEX 1 está missing
     expect(decoded.missing.has('MEX|1')).toBe(true)
+  })
+
+  it('un QR generado por AlbumFan conserva las repetidas al decodificarlo como externo', () => {
+    const collection: CollectionMap = {
+      FWC: { 0: { collected: true, repeated: 3 } },
+      MEX: { 1: { collected: true, repeated: 1 } },
+    }
+
+    const decoded = decodeExternalQR(encodeQR(collection))
+
+    expect(decoded.FWC).toEqual({ owned: [0], repeated: [3] })
+    expect(decoded.MEX).toEqual({ owned: [1], repeated: [1] })
+  })
+
+  it('AlbumFan conserva las repetidas de un QR con formato externo', () => {
+    // FWC 0 pegada con 3 repetidas. El tercer bloque contiene 4 copias totales.
+    const externalQrWithRepeated =
+      '⋋^H4sIAMiYsGoAA/v3fwABAInKQCR9AAAA;' +
+      'H4sIAMiYsGoAA2NkGEAAAJkVsFt9AAAA;' +
+      'H4sIAMiYsGoAA2MBAJQrb9UBAAAA'
+
+    const decoded = decodeQR(externalQrWithRepeated)
+
+    expect(decoded).not.toBeNull()
+    expect(decoded?.missing.has('FWC|0')).toBe(false)
+    expect(decoded?.repeated.get('FWC|0')).toBe(3)
+  })
+
+  it('un QR externo alimenta el matching de intercambio con la cantidad correcta', () => {
+    const externalQrWithRepeated =
+      '⋋^H4sIAMiYsGoAA/v3fwABAInKQCR9AAAA;' +
+      'H4sIAMiYsGoAA2NkGEAAAJkVsFt9AAAA;' +
+      'H4sIAMiYsGoAA2MBAJQrb9UBAAAA'
+    const externalCollection = decodeQR(externalQrWithRepeated)
+
+    expect(externalCollection).not.toBeNull()
+    if (!externalCollection) return
+
+    const match = computeMatch({}, externalCollection)
+    expect(match.theyCanGive).toContainEqual({
+      key: 'FWC|0',
+      code: 'FWC',
+      number: 0,
+      label: 'FWC 0',
+      count: 3,
+    })
   })
 })

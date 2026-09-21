@@ -213,7 +213,7 @@ export default function HomeScreen() {
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   const { collection, totals, loading: collectionLoading } = useCollectionState()
-  const { updateEntry, refresh } = useCollectionDispatch()
+  const { updateEntry, resetCollection, refresh } = useCollectionDispatch()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
@@ -293,7 +293,7 @@ export default function HomeScreen() {
     (code: string) => {
       Keyboard.dismiss()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      router.push(`/country/${code}` as any)
+      router.push({ pathname: '/(tabs)/country/[code]', params: { code } } as any)
     },
     [router]
   )
@@ -322,7 +322,10 @@ export default function HomeScreen() {
         onPress={() => {
           Keyboard.dismiss()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          router.push(`/country/${item.country_code}?highlight=${item.number}` as any)
+          router.push({
+            pathname: '/(tabs)/country/[code]',
+            params: { code: item.country_code, highlight: String(item.number) },
+          } as any)
         }}
         style={{
           flexDirection: 'row',
@@ -432,6 +435,7 @@ export default function HomeScreen() {
           onSignOut={signOut}
           onImport={handleShowImport}
           onImportQR={handleShowImportQR}
+          onResetCollection={resetCollection}
           onWhatsNew={openWhatsNew}
           whatsNewUnread={hasUnread}
           updateAvailable={updateAvailable}

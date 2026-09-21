@@ -1,8 +1,8 @@
-# Mi Álbum FIFA — World Cup 2026
+# Album Fan — World Cup 2026
 
 Tracker digital del álbum de figuritas FIFA World Cup 2026. Web app + mobile app (Expo).
 
-**Web:** https://mialbumfifa.com (Vercel)
+**Web:** https://albumfan.com (Vercel)
 **Mobile:** Android via EAS Build
 
 ---
@@ -51,7 +51,8 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key   # solo para bump-version
 
 ```bash
 npm run dev:web            # Vite dev server
-npm run dev:mobile         # Expo dev server → QR para Expo Go
+npm run dev:mobile         # Expo dev server
+npm run build:mobile:android:development # Development build para Android (requerido para OAuth)
 
 npm run test               # Vitest (shared + mobile, 33 tests)
 npm run test:shared        # Solo tests del shared package
@@ -64,6 +65,45 @@ npm run format             # Prettier
 npm run build:web          # Build producción web
 npm run build:mobile:android   # EAS Build Android
 ```
+
+### Desarrollo móvil con Google OAuth
+
+En Expo Go, el login usa `https://albumfan.com/mobile-callback.html` como intermediario.
+Después de completar Google OAuth, pulsa **Volver a Album Fan** para regresar a la app y
+guardar la sesión. Este mecanismo solo se activa cuando Expo genera una URL `exp://` o
+`exps://`.
+
+En Supabase deben estar permitidas estas Redirect URLs:
+
+```text
+https://albumfan.com/mobile-callback.html?*
+mi-album-fifa://auth/callback
+```
+
+La página `apps/web/public/mobile-callback.html` debe estar desplegada antes de probar el
+flujo. Luego puedes iniciar Expo Go normalmente:
+
+```bash
+npm run dev:mobile -- --clear
+```
+
+Expo no garantiza OAuth dentro de Expo Go. Si el navegador o una futura versión vuelve a
+bloquear este mecanismo, genera e instala una vez el development build:
+
+```bash
+npm run build:mobile:android:development
+```
+
+En Supabase, agrega `mi-album-fifa://auth/callback` a **Authentication → URL
+Configuration → Redirect URLs**. Instala el APK generado por EAS en el teléfono y luego
+levanta Metro con:
+
+```bash
+npm run dev:mobile -- --dev-client --clear
+```
+
+Abre **Album Fan** (el development build), no Expo Go. Producción y los development builds
+usan directamente `mi-album-fifa://auth/callback`; no pasan por la página intermediaria.
 
 ---
 

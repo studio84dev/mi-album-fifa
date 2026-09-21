@@ -31,7 +31,7 @@ export default function ShareMenu({ shareText, shareTitle }: ShareMenuProps) {
 
   const handleShare = async () => {
     try {
-      const url = 'https://mialbumfifa.com'
+      const url = 'https://albumfan.com'
       await Share.share({
         message: `${shareTitle}\n${shareText}\n${url}`,
         title: shareTitle,

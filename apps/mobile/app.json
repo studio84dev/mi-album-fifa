@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Albumista",
+    "name": "Album Fan",
     "slug": "mi-album-fifa",
     "version": "1.0.30",
     "owner": "studio84dev",
@@ -29,6 +29,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-web-browser",
+        {
+          "experimentalLauncherActivity": false
+        }
+      ],
       [
         "expo-camera",
         {

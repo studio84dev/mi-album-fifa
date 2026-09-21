@@ -77,6 +77,12 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <QrTabIcon color={color as string} />,
           }}
         />
+        <Tabs.Screen
+          name="country/[code]"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
       {Platform.OS === 'android' && (
         <View

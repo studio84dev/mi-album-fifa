@@ -163,10 +163,12 @@ export function decodeQR(raw: string): OtherCollectionData | null {
         if (bit === 1) {
           let count = 1
           if (countBytes && repeatedIndex < countBytes.length) {
-            count = countBytes[repeatedIndex]
+            // El formato externo guarda copias totales; repeated excluye la
+            // copia pegada en el álbum.
+            count = Math.max(0, countBytes[repeatedIndex] - 1)
             repeatedIndex++
           }
-          repeated.set(key, count)
+          if (count > 0) repeated.set(key, count)
         }
       }
     })
@@ -199,7 +201,8 @@ export function encodeQR(collection: CollectionMap): string {
 
     if ((entry?.repeated ?? 0) > 0) {
       repeatedBits[byteIdx] |= 1 << bitIdx
-      repeatedCounts.push(entry!.repeated)
+      // El tercer bloque usa copias totales (pegada + repetidas).
+      repeatedCounts.push(entry!.repeated + 1)
     }
   })
 
@@ -213,6 +216,51 @@ export function encodeQR(collection: CollectionMap): string {
 export interface MatchResult {
   theyCanGive: Array<{ key: string; code: string; number: number; label: string; count: number }>
   iCanGive: Array<{ key: string; code: string; number: number; label: string; count: number }>
+}
+
+export interface TradeCollectionItem {
+  code: string
+  number: number
+  key: string
+}
+
+export interface TradeCollectionUpdate {
+  code: string
+  number: number
+  collected: boolean
+  repeated: number
+}
+
+/**
+ * Calcula los cambios locales/persistibles de un intercambio confirmado.
+ * Recibir una faltante la agrega; entregar una repetida descuenta una copia.
+ */
+export function buildTradeUpdates(
+  collection: CollectionMap,
+  receiveItems: TradeCollectionItem[],
+  giveItems: TradeCollectionItem[]
+): TradeCollectionUpdate[] {
+  const updates: TradeCollectionUpdate[] = []
+
+  for (const item of receiveItems) {
+    const currentEntry = collection[item.code]?.[item.number]
+    if (!currentEntry?.collected) {
+      updates.push({ code: item.code, number: item.number, collected: true, repeated: 0 })
+    }
+  }
+
+  for (const item of giveItems) {
+    const currentEntry = collection[item.code]?.[item.number]
+    const currentRepeated = currentEntry?.repeated ?? 0
+    updates.push({
+      code: item.code,
+      number: item.number,
+      collected: true,
+      repeated: Math.max(0, currentRepeated - 1),
+    })
+  }
+
+  return updates
 }
 
 export function computeMatch(myCollection: CollectionMap, other: OtherCollectionData): MatchResult {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import * as WebBrowser from 'expo-web-browser'
 import * as Linking from 'expo-linking'
+import { makeRedirectUri } from 'expo-auth-session'
 import type { User } from '@supabase/supabase-js'
 import { supabase, invokeFunction } from '../lib/supabaseClient'
 
@@ -42,8 +43,15 @@ export function useAuth() {
   }, [])
 
   const signInWithGoogle = async () => {
-    const returnUrl = Linking.createURL('auth/callback')
-    const redirectTo = `https://mialbumfifa.com/mobile-callback.html?return=${encodeURIComponent(returnUrl)}`
+    const returnUrl = makeRedirectUri({
+      scheme: 'mi-album-fifa',
+      path: 'auth/callback',
+    })
+    const useExpoGoCallback =
+      __DEV__ && (returnUrl.startsWith('exp://') || returnUrl.startsWith('exps://'))
+    const redirectTo = useExpoGoCallback
+      ? `https://albumfan.com/mobile-callback.html?return=${encodeURIComponent(returnUrl)}`
+      : returnUrl
     console.log('returnUrl:', returnUrl) // eslint-disable-line no-console
     console.log('redirectTo:', redirectTo) // eslint-disable-line no-console
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -57,8 +65,6 @@ export function useAuth() {
       console.error('OAuth error:', error) // eslint-disable-line no-console
       return
     }
-    console.log('OAuth URL:', data.url) // eslint-disable-line no-console
-
     const result = await WebBrowser.openAuthSessionAsync(data.url, returnUrl)
     console.log('result type:', result.type) // eslint-disable-line no-console
     if (result.type === 'success') {
@@ -73,12 +79,18 @@ export function useAuth() {
       const accessToken = params['access_token'] ?? hashParams['access_token']
       const refreshToken = params['refresh_token'] ?? hashParams['refresh_token']
       // eslint-disable-next-line no-console
-      console.log('callback url:', url, {
+      console.log('callback received:', {
         accessToken: !!accessToken,
         refreshToken: !!refreshToken,
       })
       if (accessToken && refreshToken) {
-        await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        })
+        if (sessionError) {
+          console.error('Session error:', sessionError) // eslint-disable-line no-console
+        }
       }
     }
   }
