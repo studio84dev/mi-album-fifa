@@ -293,7 +293,7 @@ export default function HomeScreen() {
     (code: string) => {
       Keyboard.dismiss()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      router.push(`/country/${code}` as any)
+      router.push({ pathname: '/(tabs)/country/[code]', params: { code } } as any)
     },
     [router]
   )
@@ -322,7 +322,10 @@ export default function HomeScreen() {
         onPress={() => {
           Keyboard.dismiss()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          router.push(`/country/${item.country_code}?highlight=${item.number}` as any)
+          router.push({
+            pathname: '/(tabs)/country/[code]',
+            params: { code: item.country_code, highlight: String(item.number) },
+          } as any)
         }}
         style={{
           flexDirection: 'row',
