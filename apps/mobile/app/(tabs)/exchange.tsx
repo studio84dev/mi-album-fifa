@@ -26,6 +26,7 @@ import {
   detectQRType,
   encodeTradeQR,
   decodeTradeQR,
+  buildTradeUpdates,
 } from '@/src/lib/qrCodec'
 import type { MatchResult, TradeData, TradeStickerRef } from '@/src/lib/qrCodec'
 
@@ -403,22 +404,7 @@ export default function ExchangeScreen() {
         data: { session },
       } = await supabase.auth.getSession()
 
-      // Preparar actualizaciones de estado local primero
-      const localUpdates: Array<{ code: string; number: number; collected: boolean; repeated: number }> = []
-
-      for (const item of receiveItems) {
-        const currentEntry = collection[item.code]?.[item.number]
-        if (!currentEntry?.collected) {
-          localUpdates.push({ code: item.code, number: item.number, collected: true, repeated: 0 })
-        }
-      }
-
-      for (const item of giveItems) {
-        const currentEntry = collection[item.code]?.[item.number]
-        const currentRepeated = currentEntry?.repeated ?? 0
-        const newRepeated = Math.max(0, currentRepeated - 1)
-        localUpdates.push({ code: item.code, number: item.number, collected: true, repeated: newRepeated })
-      }
+      const localUpdates = buildTradeUpdates(collection, receiveItems, giveItems)
 
       // Aplicar actualizaciones al estado local
       for (const update of localUpdates) {
