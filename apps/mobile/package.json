@@ -54,6 +54,7 @@
     "export": "npx expo export --platform android",
     "bump-version": "node scripts/bump-version.mjs",
     "build": "eas build",
+    "build:android:development": "npx eas build --platform android --profile development",
     "build:android": "npx eas build --platform android --profile production",
     "build:ios": "npx eas build --platform ios --profile production",
     "test": "vitest run",
