@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import QRCode from 'react-native-qrcode-svg'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Svg, { Path, Rect } from 'react-native-svg'
 import { useCollectionState, useCollectionDispatch } from '@/src/context/CollectionContext'
 import { useAuth } from '@/src/hooks/useAuth'
@@ -29,6 +30,12 @@ import {
   buildTradeUpdates,
 } from '@/src/lib/qrCodec'
 import type { MatchResult, TradeData, TradeStickerRef } from '@/src/lib/qrCodec'
+import {
+  getTradeHistoryStorageKey,
+  parseTradeHistory,
+  serializeTradeHistory,
+  type TradeHistoryEntry,
+} from '@/src/lib/tradeHistory'
 
 type Screen = 'home' | 'scanner' | 'match' | 'trade_qr' | 'finalize' | 'trade_confirm' | 'success'
 
@@ -285,9 +292,38 @@ export default function ExchangeScreen() {
   const [scanError, setScanError] = useState<string | null>(null)
   const [tradeQrValue, setTradeQrValue] = useState('')
   const [incomingTrade, setIncomingTrade] = useState<TradeData | null>(null)
+  const [lastTrade, setLastTrade] = useState<TradeHistoryEntry | null>(null)
+  const [lastTradeUserId, setLastTradeUserId] = useState<string | null>(null)
+  const [showLastTrade, setShowLastTrade] = useState(false)
 
   const [permission, requestPermission] = useCameraPermissions()
   const scannedRef = useRef(false)
+  const userId = user?.id
+  const visibleLastTrade = userId === lastTradeUserId ? lastTrade : null
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (!userId) return undefined
+
+    AsyncStorage.getItem(getTradeHistoryStorageKey(userId))
+      .then((raw) => {
+        if (!cancelled) {
+          setLastTrade(parseTradeHistory(raw))
+          setLastTradeUserId(userId)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLastTrade(null)
+          setLastTradeUserId(userId)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [userId])
 
   const myQrValue = useMemo(() => {
     if (!user) return ''
@@ -408,7 +444,10 @@ export default function ExchangeScreen() {
 
       // Aplicar actualizaciones al estado local
       for (const update of localUpdates) {
-        updateEntry(update.code, update.number, { collected: update.collected, repeated: update.repeated })
+        updateEntry(update.code, update.number, {
+          collected: update.collected,
+          repeated: update.repeated,
+        })
       }
 
       // Batch insert a Supabase (una sola request)
@@ -431,7 +470,11 @@ export default function ExchangeScreen() {
         }
       }
 
-      console.log('✅ Intercambio aplicado exitosamente (1 batch request para', localUpdates.length, 'stickers)')
+      console.log(
+        '✅ Intercambio aplicado exitosamente (1 batch request para',
+        localUpdates.length,
+        'stickers)'
+      )
     },
     [collection, updateEntry]
   )
@@ -447,10 +490,24 @@ export default function ExchangeScreen() {
       .map((i) => ({ key: i.key, code: i.code, number: i.number, label: i.label }))
 
     const qr = encodeTradeQR(givingItems, receivingItems)
+    const historyEntry: TradeHistoryEntry = {
+      qrValue: qr,
+      giving: givingItems,
+      receiving: receivingItems,
+      createdAt: new Date().toISOString(),
+    }
+    setLastTrade(historyEntry)
+    setLastTradeUserId(userId ?? null)
+    if (userId) {
+      AsyncStorage.setItem(
+        getTradeHistoryStorageKey(userId),
+        serializeTradeHistory(historyEntry)
+      ).catch(() => {})
+    }
     setTradeQrValue(qr)
     setShowConfirm(false)
     setScreen('trade_qr')
-  }, [match, selectedGive, selectedReceive])
+  }, [match, selectedGive, selectedReceive, userId])
 
   const handleFinalize = useCallback(async () => {
     if (!match) return
@@ -625,6 +682,18 @@ export default function ExchangeScreen() {
               {t('exchangeMyQrBtn')}
             </Text>
           </TouchableOpacity>
+
+          {visibleLastTrade && (
+            <TouchableOpacity
+              onPress={() => setShowLastTrade(true)}
+              style={{ paddingVertical: 4, paddingHorizontal: 12 }}
+              accessibilityRole="link"
+            >
+              <Text style={{ color: colors.accentBlue, fontSize: 14, fontWeight: '600' }}>
+                {t('exchangeHistoryLink')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       )}
 
@@ -1035,6 +1104,42 @@ export default function ExchangeScreen() {
             <ActivityIndicator color={colors.accentBlue} />
           )}
         </View>
+      </ScrollableModal>
+
+      {/* Latest trade history QR */}
+      <ScrollableModal
+        visible={showLastTrade}
+        onClose={() => setShowLastTrade(false)}
+        title={t('exchangeHistoryTitle')}
+        scrollable
+        contentPadding={24}
+      >
+        {visibleLastTrade && (
+          <View style={{ alignItems: 'center', gap: 16 }}>
+            <Text
+              style={{ color: theme.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 19 }}
+            >
+              {t('exchangeHistorySubtitle')}
+            </Text>
+            <View style={{ backgroundColor: '#fff', padding: 16, borderRadius: 12 }}>
+              <QRCode value={visibleLastTrade.qrValue} size={Math.min(width - 120, 240)} />
+            </View>
+            <View style={{ width: '100%', gap: 8 }}>
+              <Text style={{ color: theme.textSecondary, fontSize: 14, lineHeight: 20 }}>
+                <Text style={{ color: colors.accentOrange, fontWeight: '700' }}>
+                  {t('exchangeHistoryGive')}:
+                </Text>{' '}
+                {visibleLastTrade.giving.map((item) => item.label).join(', ')}
+              </Text>
+              <Text style={{ color: theme.textSecondary, fontSize: 14, lineHeight: 20 }}>
+                <Text style={{ color: colors.accentBlue, fontWeight: '700' }}>
+                  {t('exchangeHistoryReceive')}:
+                </Text>{' '}
+                {visibleLastTrade.receiving.map((item) => item.label).join(', ')}
+              </Text>
+            </View>
+          </View>
+        )}
       </ScrollableModal>
 
       {/* Confirm trade Modal */}
