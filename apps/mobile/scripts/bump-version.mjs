@@ -22,7 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 
 console.log('')
-console.log('🚀 Mi Álbum FIFA - Release Android')
+console.log('🚀 Album Fan - Release Android')
 console.log('=====================================')
 console.log('')
 

@@ -10,10 +10,10 @@ function RedirectBanner({ onDismiss, t }: RedirectBannerProps) {
         {t('redirectBanner')}{' '}
         <strong>
           <a
-            href="https://mialbumfifa.com"
+            href="https://albumfan.com"
             className="text-accent-blue font-semibold underline underline-offset-2"
           >
-            mialbumfifa.com
+            albumfan.com
           </a>
         </strong>
       </span>

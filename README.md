@@ -1,8 +1,8 @@
-# Mi Álbum FIFA — World Cup 2026
+# Album Fan — World Cup 2026
 
 Tracker digital del álbum de figuritas FIFA World Cup 2026. Web app + mobile app (Expo).
 
-**Web:** https://mialbumfifa.com (Vercel)
+**Web:** https://albumfan.com (Vercel)
 **Mobile:** Android via EAS Build
 
 ---
@@ -68,15 +68,15 @@ npm run build:mobile:android   # EAS Build Android
 
 ### Desarrollo móvil con Google OAuth
 
-En Expo Go, el login usa `https://mialbumfifa.com/mobile-callback.html` como intermediario.
-Después de completar Google OAuth, pulsa **Volver a AlbumFan** para regresar a la app y
+En Expo Go, el login usa `https://albumfan.com/mobile-callback.html` como intermediario.
+Después de completar Google OAuth, pulsa **Volver a Album Fan** para regresar a la app y
 guardar la sesión. Este mecanismo solo se activa cuando Expo genera una URL `exp://` o
 `exps://`.
 
 En Supabase deben estar permitidas estas Redirect URLs:
 
 ```text
-https://mialbumfifa.com/mobile-callback.html?*
+https://albumfan.com/mobile-callback.html?*
 mi-album-fifa://auth/callback
 ```
 
@@ -102,7 +102,7 @@ levanta Metro con:
 npm run dev:mobile -- --dev-client --clear
 ```
 
-Abre **AlbumFan** (el development build), no Expo Go. Producción y los development builds
+Abre **Album Fan** (el development build), no Expo Go. Producción y los development builds
 usan directamente `mi-album-fifa://auth/callback`; no pasan por la página intermediaria.
 
 ---

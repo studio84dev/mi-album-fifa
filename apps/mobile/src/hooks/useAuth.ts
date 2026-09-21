@@ -50,7 +50,7 @@ export function useAuth() {
     const useExpoGoCallback =
       __DEV__ && (returnUrl.startsWith('exp://') || returnUrl.startsWith('exps://'))
     const redirectTo = useExpoGoCallback
-      ? `https://mialbumfifa.com/mobile-callback.html?return=${encodeURIComponent(returnUrl)}`
+      ? `https://albumfan.com/mobile-callback.html?return=${encodeURIComponent(returnUrl)}`
       : returnUrl
     console.log('returnUrl:', returnUrl) // eslint-disable-line no-console
     console.log('redirectTo:', redirectTo) // eslint-disable-line no-console
