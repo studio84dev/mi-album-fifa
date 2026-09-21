@@ -227,5 +227,12 @@
   "exchangeFinalizeBtn": "Finalizar",
   "exchangeTradeCancel": "Cancelar",
   "exchangeYouReceive": "Vas a recibir",
-  "exchangeYouGive": "Vas a entregar"
+  "exchangeYouGive": "Vas a entregar",
+  "resetCollectionMenuItem": "Resetear mi álbum",
+  "resetCollectionTitle": "¿Resetear mi álbum?",
+  "resetCollectionMessage": "Se eliminarán todas las figuritas y repetidas de tu colección. Esta acción no se puede deshacer.",
+  "resetCollectionCancel": "Cancelar",
+  "resetCollectionConfirm": "Resetear",
+  "resetCollectionErrorTitle": "No se pudo resetear",
+  "resetCollectionErrorMessage": "Ocurrió un error al borrar tu colección. Intenta nuevamente."
 }

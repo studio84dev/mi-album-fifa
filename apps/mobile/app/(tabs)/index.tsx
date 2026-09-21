@@ -213,7 +213,7 @@ export default function HomeScreen() {
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   const { collection, totals, loading: collectionLoading } = useCollectionState()
-  const { updateEntry, refresh } = useCollectionDispatch()
+  const { updateEntry, resetCollection, refresh } = useCollectionDispatch()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
@@ -432,6 +432,7 @@ export default function HomeScreen() {
           onSignOut={signOut}
           onImport={handleShowImport}
           onImportQR={handleShowImportQR}
+          onResetCollection={resetCollection}
           onWhatsNew={openWhatsNew}
           whatsNewUnread={hasUnread}
           updateAvailable={updateAvailable}

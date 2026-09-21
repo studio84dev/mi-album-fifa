@@ -227,5 +227,12 @@
   "exchangeFinalizeBtn": "Finalize",
   "exchangeTradeCancel": "Cancel",
   "exchangeYouReceive": "You will receive",
-  "exchangeYouGive": "You will give"
+  "exchangeYouGive": "You will give",
+  "resetCollectionMenuItem": "Reset my album",
+  "resetCollectionTitle": "Reset my album?",
+  "resetCollectionMessage": "All stickers and duplicates in your collection will be deleted. This action cannot be undone.",
+  "resetCollectionCancel": "Cancel",
+  "resetCollectionConfirm": "Reset",
+  "resetCollectionErrorTitle": "Could not reset album",
+  "resetCollectionErrorMessage": "There was an error deleting your collection. Please try again."
 }

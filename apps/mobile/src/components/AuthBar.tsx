@@ -34,6 +34,7 @@ interface AuthBarProps {
   onSignOut: () => void
   onImport?: () => void
   onImportQR?: () => void
+  onResetCollection?: () => Promise<void>
   onWhatsNew?: () => void
   whatsNewUnread?: boolean
   updateAvailable?: boolean
@@ -53,6 +54,7 @@ export default function AuthBar({
   onSignOut,
   onImport,
   onImportQR,
+  onResetCollection,
   onWhatsNew,
   whatsNewUnread = false,
   updateAvailable = false,
@@ -113,6 +115,7 @@ export default function AuthBar({
             onSignOut={onSignOut}
             onImport={onImport || (() => {})}
             onImportQR={onImportQR || (() => {})}
+            onResetCollection={onResetCollection || (async () => {})}
             t={t}
             totals={
               totals || {
