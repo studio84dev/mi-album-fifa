@@ -1,6 +1,16 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+export async function resetUserCollection(
+  supabase: SupabaseClient,
+  userId: string | null | undefined
+): Promise<void> {
+  if (!userId) return
+
+  const { error } = await supabase.from('sticker_collection').delete().eq('user_id', userId)
+  if (error) throw error
+}
+
 export interface CollectionEntry {
   collected: boolean
   repeated: number
@@ -86,6 +96,13 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       []
     )
 
+    const resetCollection = useCallback(async (): Promise<void> => {
+      if (!userId) return
+
+      await resetUserCollection(supabase, userId)
+      setCollection({})
+    }, [userId])
+
     const totals = useMemo(() => {
       const SPECIAL_CODES = new Set(['FWC', 'CC'])
       const TEAM_CODES = new Set(Object.keys(collection).filter((c) => !SPECIAL_CODES.has(c)))
@@ -107,6 +124,6 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       return { teamCollected, fwcCollected, ccCollected, totalRepeated }
     }, [collection])
 
-    return { collection, loading, updateEntry, totals, refresh }
+    return { collection, loading, updateEntry, resetCollection, totals, refresh }
   }
 }

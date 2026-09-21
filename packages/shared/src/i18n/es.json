@@ -198,6 +198,11 @@
   "exchangeMyQrBtn": "Mi código QR",
   "exchangeMyQrTitle": "Mi código QR",
   "exchangeMyQrSubtitle": "Muéstraselo a otra persona para que lo escanee",
+  "exchangeHistoryLink": "Ver último intercambio",
+  "exchangeHistoryTitle": "Último intercambio",
+  "exchangeHistorySubtitle": "Este QR es informativo para ti. La otra persona puede escanearlo para actualizar su álbum.",
+  "exchangeHistoryGive": "Doy",
+  "exchangeHistoryReceive": "Recibo",
   "exchangeTheyCanGive": "Él/Ella me puede dar",
   "exchangeICanGive": "Yo le puedo dar",
   "exchangeSelectedCount": "{selected} / {total} seleccionados",
@@ -227,5 +232,12 @@
   "exchangeFinalizeBtn": "Finalizar",
   "exchangeTradeCancel": "Cancelar",
   "exchangeYouReceive": "Vas a recibir",
-  "exchangeYouGive": "Vas a entregar"
+  "exchangeYouGive": "Vas a entregar",
+  "resetCollectionMenuItem": "Resetear mi álbum",
+  "resetCollectionTitle": "¿Resetear mi álbum?",
+  "resetCollectionMessage": "Se eliminarán todas las figuritas y repetidas de tu colección. Esta acción no se puede deshacer.",
+  "resetCollectionCancel": "Cancelar",
+  "resetCollectionConfirm": "Resetear",
+  "resetCollectionErrorTitle": "No se pudo resetear",
+  "resetCollectionErrorMessage": "Ocurrió un error al borrar tu colección. Intenta nuevamente."
 }
