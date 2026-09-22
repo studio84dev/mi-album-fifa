@@ -28,12 +28,15 @@ import WelcomeModal from './components/WelcomeModal.tsx'
 import AboutModal from './components/AboutModal.tsx'
 import ViewToggle from './components/ViewToggle.tsx'
 import AllPanelsView from './components/AllPanelsView.tsx'
+import AlbumSelector from './components/AlbumSelector.tsx'
+import { useAlbums } from './hooks/useAlbums.ts'
 
 function App() {
   const { locale, t, toggleLocale } = useI18n()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   useTheme()
-  const { collection, totals, loading: collectionLoading, updateEntry } = useGlobalCollection(user)
+  const { albums, activeAlbumId, setActiveAlbumId, createAlbum } = useAlbums(user?.id)
+  const { collection, totals, loading: collectionLoading, updateEntry } = useGlobalCollection(user, activeAlbumId)
   const { showScrollTop, isAtBottom, scrollToTop } = useScroll()
   const { share, shareOptions } = useShare(t)
   const {
@@ -165,6 +168,7 @@ function App() {
 
       {/* {showAndroidBanner && <AndroidBanner onDismiss={dismissAndroidBanner} t={t} />} */}
       {showRedirectBanner && <RedirectBanner onDismiss={dismissRedirectBanner} t={t} />}
+      <AlbumSelector albums={albums} activeAlbumId={activeAlbumId} onChange={setActiveAlbumId} onCreate={createAlbum} t={t} />
 
       {showWelcomeModal && <WelcomeModal onClose={dismissWelcomeModal} t={t} />}
 
@@ -225,6 +229,7 @@ function App() {
       {activeCountry && user && (
         <StickerPanel
           countryCode={activeCountry.code}
+          albumId={activeAlbumId}
           user={user}
           stickerCount={activeCountry.count ?? 20}
           stickerNumbers={countryDetails[activeCountry.code]?.stickerNumbers}

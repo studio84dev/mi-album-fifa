@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { sourceEmail, preview } = await req.json()
+    const { sourceEmail, preview, albumId = 'fifa-world-cup-2026' } = await req.json()
     if (!sourceEmail) {
       return new Response(JSON.stringify({ error: 'sourceEmail is required' }), {
         status: 400,
@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
       .from('sticker_collection')
       .select('country_code, sticker_number, repeated')
       .eq('user_id', sourceUserId)
+      .eq('album_id', albumId)
 
     if (fetchError) {
       return new Response(JSON.stringify({ error: 'Failed to fetch source collection' }), {
@@ -99,6 +100,7 @@ Deno.serve(async (req) => {
       .from('sticker_collection')
       .select('country_code, sticker_number, repeated')
       .eq('user_id', targetUserId)
+      .eq('album_id', albumId)
 
     if (backupError) {
       return new Response(JSON.stringify({ error: 'Failed to backup current collection' }), {
@@ -112,6 +114,7 @@ Deno.serve(async (req) => {
       .from('sticker_collection')
       .delete()
       .eq('user_id', targetUserId)
+      .eq('album_id', albumId)
 
     if (deleteError) {
       return new Response(JSON.stringify({ error: 'Failed to clear target collection' }), {
@@ -124,6 +127,7 @@ Deno.serve(async (req) => {
     if (sourceStickers && sourceStickers.length > 0) {
       const rowsToInsert = sourceStickers.map(({ country_code, sticker_number, repeated }) => ({
         user_id: targetUserId,
+        album_id: albumId,
         country_code,
         sticker_number,
         repeated,
@@ -140,6 +144,7 @@ Deno.serve(async (req) => {
         if (backupStickers && backupStickers.length > 0) {
           const restoreRows = backupStickers.map(({ country_code, sticker_number, repeated }) => ({
             user_id: targetUserId,
+            album_id: albumId,
             country_code,
             sticker_number,
             repeated,

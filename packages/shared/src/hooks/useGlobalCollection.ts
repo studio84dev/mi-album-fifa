@@ -3,11 +3,12 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 export async function resetUserCollection(
   supabase: SupabaseClient,
-  userId: string | null | undefined
+  userId: string | null | undefined,
+  albumId: string
 ): Promise<void> {
   if (!userId) return
 
-  const { error } = await supabase.from('sticker_collection').delete().eq('user_id', userId)
+  const { error } = await supabase.from('sticker_collection').delete().eq('user_id', userId).eq('album_id', albumId)
   if (error) throw error
 }
 
@@ -23,7 +24,7 @@ export interface CollectionMap {
 }
 
 export function createUseGlobalCollection(supabase: SupabaseClient) {
-  return function useGlobalCollection(user: { id?: string } | null) {
+  return function useGlobalCollection(user: { id?: string } | null, albumId = 'fifa-world-cup-2026') {
     const [collection, setCollection] = useState<CollectionMap>({})
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -40,6 +41,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
         .from('sticker_collection')
         .select('country_code, sticker_number, repeated')
         .eq('user_id', userId)
+        .eq('album_id', albumId)
         .then(({ data, error }) => {
           if (error) {
             console.error('Error loading global collection:', error) // eslint-disable-line no-console
@@ -66,7 +68,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
           setCollection(map)
           setLoading(false)
         })
-    }, [userId])
+    }, [userId, albumId])
 
     useEffect(() => {
       refresh()
@@ -99,9 +101,9 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
     const resetCollection = useCallback(async (): Promise<void> => {
       if (!userId) return
 
-      await resetUserCollection(supabase, userId)
+      await resetUserCollection(supabase, userId, albumId)
       setCollection({})
-    }, [userId])
+    }, [userId, albumId])
 
     const totals = useMemo(() => {
       const SPECIAL_CODES = new Set(['FWC', 'CC'])

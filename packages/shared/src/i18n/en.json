@@ -239,5 +239,10 @@
   "resetCollectionCancel": "Cancel",
   "resetCollectionConfirm": "Reset",
   "resetCollectionErrorTitle": "Could not reset album",
-  "resetCollectionErrorMessage": "There was an error deleting your collection. Please try again."
+  "resetCollectionErrorMessage": "There was an error deleting your collection. Please try again.",
+  "albumsTitle": "My albums",
+  "albumsSubtitle": "View all",
+  "albumsSelect": "Select album"
+  ,"albumsNew": "Add album",
+  "albumsNewPrompt": "Name of the new album"
 }

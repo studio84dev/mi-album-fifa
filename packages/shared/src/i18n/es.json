@@ -239,5 +239,10 @@
   "resetCollectionCancel": "Cancelar",
   "resetCollectionConfirm": "Resetear",
   "resetCollectionErrorTitle": "No se pudo resetear",
-  "resetCollectionErrorMessage": "Ocurrió un error al borrar tu colección. Intenta nuevamente."
+  "resetCollectionErrorMessage": "Ocurrió un error al borrar tu colección. Intenta nuevamente.",
+  "albumsTitle": "Mis álbumes",
+  "albumsSubtitle": "Ver todos",
+  "albumsSelect": "Seleccionar álbum"
+  ,"albumsNew": "Agregar álbum",
+  "albumsNewPrompt": "Nombre del nuevo álbum"
 }
