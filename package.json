@@ -9,7 +9,7 @@
   "scripts": {
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
-    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "dev:mobile": "npm exec --workspace=apps/mobile -- expo start",
     "build:mobile": "npm run build --workspace=apps/mobile",
     "build:mobile:android:development": "npm run build:android:development --workspace=apps/mobile",
     "build:mobile:android": "npm run build:android --workspace=apps/mobile",
@@ -27,6 +27,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "expo": "^57.0.24",
     "prettier": "^3.8.3"
   }
 }
