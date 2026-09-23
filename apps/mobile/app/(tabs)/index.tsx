@@ -322,10 +322,10 @@ export default function HomeScreen() {
       <TouchableOpacity
         onPress={() => {
           Keyboard.dismiss()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           router.push({
             pathname: '/(tabs)/country/[code]',
             params: { code: item.country_code, highlight: String(item.number) },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any)
         }}
         style={{

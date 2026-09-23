@@ -336,7 +336,7 @@ export default function ExchangeScreen() {
       scannedRef.current = true
 
       const type = detectQRType(data)
-      console.log('🔍 QR escaneado:', { type, dataLength: data.length })
+      console.log('🔍 QR escaneado:', { type, dataLength: data.length }) // eslint-disable-line no-console
 
       if (type === 'trade') {
         const tradeData = decodeTradeQR(data)
@@ -345,7 +345,7 @@ export default function ExchangeScreen() {
           scannedRef.current = false
           return
         }
-        console.log('🤝 Trade QR decodificado:', tradeData)
+        console.log('🤝 Trade QR decodificado:', tradeData) // eslint-disable-line no-console
         setIncomingTrade(tradeData)
         setScreen('trade_confirm')
         return
@@ -358,12 +358,14 @@ export default function ExchangeScreen() {
           scannedRef.current = false
           return
         }
+        // eslint-disable-next-line no-console
         console.log('📦 Collection QR decodificado:', {
           missingCount: result.missing.size,
           repeatedCount: result.repeated.size,
           sample: Array.from(result.missing).slice(0, 5),
         })
         const matchResult = computeMatch(collection, result)
+        // eslint-disable-next-line no-console
         console.log('✨ Match result:', {
           theyCanGive: matchResult.theyCanGive.length,
           iCanGive: matchResult.iCanGive.length,
@@ -435,7 +437,7 @@ export default function ExchangeScreen() {
       receiveItems: Array<{ code: string; number: number; key: string }>,
       giveItems: Array<{ code: string; number: number; key: string }>
     ) => {
-      console.log('🔄 Aplicando intercambio a Supabase:', { receiveItems, giveItems })
+      console.log('🔄 Aplicando intercambio a Supabase:', { receiveItems, giveItems }) // eslint-disable-line no-console
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -466,11 +468,12 @@ export default function ExchangeScreen() {
           .upsert(upsertData, { onConflict: 'user_id,album_id,country_code,sticker_number' })
 
         if (error) {
-          console.error('Error en batch upsert:', error)
+          console.error('Error en batch upsert:', error) // eslint-disable-line no-console
           throw error
         }
       }
 
+      // eslint-disable-next-line no-console
       console.log(
         '✅ Intercambio aplicado exitosamente (1 batch request para',
         localUpdates.length,
@@ -516,6 +519,7 @@ export default function ExchangeScreen() {
     try {
       const givingItems = match.iCanGive.filter((i) => selectedGive.has(i.key))
       const receivingItems = match.theyCanGive.filter((i) => selectedReceive.has(i.key))
+      // eslint-disable-next-line no-console
       console.log('✅ Confirmando intercambio:', {
         giving: givingItems,
         receiving: receivingItems,
@@ -534,6 +538,7 @@ export default function ExchangeScreen() {
     if (!incomingTrade) return
     setConfirming(true)
     try {
+      // eslint-disable-next-line no-console
       console.log('✅ Confirmando trade QR:', {
         receiving: incomingTrade.giving, // Lo que el otro me da
         giving: incomingTrade.receiving, // Lo que yo le doy al otro

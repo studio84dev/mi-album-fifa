@@ -42,7 +42,7 @@ export default function ImportQRModal({
       setDecodedResult(result)
       setError(null)
       setScreen('input')
-      console.log('QR Externo Escaneado:', result)
+      console.log('QR Externo Escaneado:', result) // eslint-disable-line no-console
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error al decodificar QR'
       setError(errorMsg)
