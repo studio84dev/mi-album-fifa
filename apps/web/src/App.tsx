@@ -28,12 +28,19 @@ import WelcomeModal from './components/WelcomeModal.tsx'
 import AboutModal from './components/AboutModal.tsx'
 import ViewToggle from './components/ViewToggle.tsx'
 import AllPanelsView from './components/AllPanelsView.tsx'
+import { useAlbums } from './hooks/useAlbums.ts'
 
 function App() {
   const { locale, t, toggleLocale } = useI18n()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   useTheme()
-  const { collection, totals, loading: collectionLoading, updateEntry } = useGlobalCollection(user)
+  const { albums, activeAlbumId, setActiveAlbumId } = useAlbums(user?.id)
+  const {
+    collection,
+    totals,
+    loading: collectionLoading,
+    updateEntry,
+  } = useGlobalCollection(user, activeAlbumId)
   const { showScrollTop, isAtBottom, scrollToTop } = useScroll()
   const { share, shareOptions } = useShare(t)
   const {
@@ -52,7 +59,7 @@ function App() {
     countryDetails,
     panelMatchedCountryCodes,
     panelHighlightByCountry,
-  } = useSearchResults()
+  } = useSearchResults(activeAlbumId)
 
   const [viewMode, setViewMode] = useState<'cards' | 'panels'>('cards')
   const {
@@ -130,6 +137,9 @@ function App() {
           onSignIn={signInWithGoogle}
           onSignOut={signOut}
           onImport={() => setShowImportModal(true)}
+          albums={albums}
+          activeAlbumId={activeAlbumId}
+          onChangeAlbum={setActiveAlbumId}
           totals={totals}
           collectionLoading={collectionLoading}
         />
@@ -210,6 +220,8 @@ function App() {
 
       {!activeCountry && viewMode === 'panels' && (
         <AllPanelsView
+          key={activeAlbumId}
+          albumId={activeAlbumId}
           allCountries={teamsData}
           countryDetails={countryDetails}
           collection={collection}
@@ -224,7 +236,9 @@ function App() {
 
       {activeCountry && user && (
         <StickerPanel
+          key={activeAlbumId}
           countryCode={activeCountry.code}
+          albumId={activeAlbumId}
           user={user}
           stickerCount={activeCountry.count ?? 20}
           stickerNumbers={countryDetails[activeCountry.code]?.stickerNumbers}

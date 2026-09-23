@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native'
-import { supabase } from '../lib/supabaseClient'
+import { useAlbumStickerMutation } from '../hooks/useAlbumStickerMutation'
 import { useTheme, colors } from '../hooks/useTheme'
 import { useI18n } from '../hooks/useI18n'
 import ScrollableModal from './ScrollableModal'
 import StickerCard from './StickerCard'
+import { useCollectionState } from '../context/CollectionContext'
 
 const LONG_PRESS_MS = 500
 
@@ -114,6 +115,8 @@ function StickerPanel({
   highlightNumber = null,
   onCollectionChange,
 }: StickerPanelProps) {
+  const { activeAlbumId } = useCollectionState()
+  const saveSticker = useAlbumStickerMutation()
   const { theme } = useTheme()
   const { t } = useI18n()
   const { width: screenWidth } = useWindowDimensions()
@@ -150,37 +153,22 @@ function StickerPanel({
 
   const closeModal = useCallback(() => setModal(null), [])
 
-  const syncSupabase = useCallback(async (number: number, collected: boolean, repeated: number) => {
-    const currentUser = userRef.current
-    const currentCountryCode = countryCodeRef.current
-    if (!currentUser) return
-    if (collected) {
-      const existing = stateRef.current.collected[number]
-      if (existing) {
-        await supabase
-          .from('sticker_collection')
-          .update({ repeated, updated_at: new Date().toISOString() })
-          .eq('user_id', currentUser.id)
-          .eq('country_code', currentCountryCode)
-          .eq('sticker_number', number)
-      } else {
-        await supabase.from('sticker_collection').insert({
-          user_id: currentUser.id,
-          country_code: currentCountryCode,
-          sticker_number: number,
-          repeated,
-          updated_at: new Date().toISOString(),
-        })
-      }
-    } else {
-      await supabase
-        .from('sticker_collection')
-        .delete()
-        .eq('user_id', currentUser.id)
-        .eq('country_code', currentCountryCode)
-        .eq('sticker_number', number)
-    }
-  }, [])
+  const syncSupabase = useCallback(
+    async (number: number, collected: boolean, repeated: number) => {
+      const currentUser = userRef.current
+      const currentCountryCode = countryCodeRef.current
+      if (!currentUser) return
+      await saveSticker(
+        currentUser.id,
+        activeAlbumId,
+        currentCountryCode,
+        number,
+        collected,
+        repeated
+      )
+    },
+    [activeAlbumId, saveSticker]
+  )
 
   const handleStickerPress = useCallback(
     async (number: number) => {

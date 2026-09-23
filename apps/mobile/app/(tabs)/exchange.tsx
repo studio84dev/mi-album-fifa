@@ -277,7 +277,7 @@ export default function ExchangeScreen() {
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
   const { user } = useAuth()
-  const { collection } = useCollectionState()
+  const { collection, activeAlbumId } = useCollectionState()
   const { updateEntry } = useCollectionDispatch()
   const { width } = useWindowDimensions()
 
@@ -454,6 +454,7 @@ export default function ExchangeScreen() {
       if (session?.user?.id && localUpdates.length > 0) {
         const upsertData = localUpdates.map((update) => ({
           user_id: session.user.id,
+          album_id: activeAlbumId,
           country_code: update.code === 'null' ? null : update.code,
           sticker_number: update.number,
           repeated: update.repeated,
@@ -462,7 +463,7 @@ export default function ExchangeScreen() {
 
         const { error } = await supabase
           .from('sticker_collection')
-          .upsert(upsertData, { onConflict: 'user_id,country_code,sticker_number' })
+          .upsert(upsertData, { onConflict: 'user_id,album_id,country_code,sticker_number' })
 
         if (error) {
           console.error('Error en batch upsert:', error)
@@ -476,7 +477,7 @@ export default function ExchangeScreen() {
         'stickers)'
       )
     },
-    [collection, updateEntry]
+    [activeAlbumId, collection, updateEntry]
   )
 
   const handleConfirm = useCallback(() => {
@@ -563,6 +564,15 @@ export default function ExchangeScreen() {
   }, [])
 
   const bgColor = theme.bgPrimary
+
+  // The legacy QR bitmap has fixed FIFA 2026 positions and no album identifier.
+  if (activeAlbumId !== 'fifa-world-cup-2026') {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: bgColor, padding: 24 }}>
+        <Text style={{ color: theme.textPrimary }}>{t('albumsQrUnavailable')}</Text>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bgColor }}>

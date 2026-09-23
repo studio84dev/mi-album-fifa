@@ -5,6 +5,7 @@ import { decodeExternalQR } from '@mi-album-fifa/shared'
 import type { AlbumState } from '@mi-album-fifa/shared'
 import { useTheme, colors } from '../hooks/useTheme'
 import { supabase } from '../lib/supabaseClient'
+import { useCollectionState } from '../context/CollectionContext'
 
 interface ImportQRModalProps {
   visible: boolean
@@ -28,30 +29,28 @@ export default function ImportQRModal({
   const [screen, setScreen] = useState<Screen>('input')
   const [importing, setImporting] = useState(false)
   const { theme } = useTheme()
+  const { activeAlbumId } = useCollectionState()
   const [permission, requestPermission] = useCameraPermissions()
   const scannedRef = useRef(false)
 
-  const handleBarCodeScanned = useCallback(
-    ({ data }: { data: string }) => {
-      if (scannedRef.current) return
-      scannedRef.current = true
+  const handleBarCodeScanned = useCallback(({ data }: { data: string }) => {
+    if (scannedRef.current) return
+    scannedRef.current = true
 
-      try {
-        const result = decodeExternalQR(data)
-        setDecodedResult(result)
-        setError(null)
-        setScreen('input')
-        console.log('QR Externo Escaneado:', result)
-      } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Error al decodificar QR'
-        setError(errorMsg)
-        setDecodedResult(null)
-        setScreen('input')
-        scannedRef.current = false
-      }
-    },
-    []
-  )
+    try {
+      const result = decodeExternalQR(data)
+      setDecodedResult(result)
+      setError(null)
+      setScreen('input')
+      console.log('QR Externo Escaneado:', result)
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Error al decodificar QR'
+      setError(errorMsg)
+      setDecodedResult(null)
+      setScreen('input')
+      scannedRef.current = false
+    }
+  }, [])
 
   const handleScanPress = useCallback(async () => {
     setError(null)
@@ -68,6 +67,10 @@ export default function ImportQRModal({
   }, [permission, requestPermission])
 
   const handleImport = useCallback(() => {
+    if (activeAlbumId !== 'fifa-world-cup-2026') {
+      Alert.alert(t('albumsMenu'), t('albumsQrUnavailable'))
+      return
+    }
     if (!decodedResult || !user) return
 
     Alert.alert(
@@ -91,6 +94,7 @@ export default function ImportQRModal({
                 .from('sticker_collection')
                 .select('country_code, sticker_number, repeated')
                 .eq('user_id', user.id)
+                .eq('album_id', activeAlbumId)
 
               if (backupError) {
                 setError('Error al crear backup')
@@ -103,6 +107,7 @@ export default function ImportQRModal({
                 .from('sticker_collection')
                 .delete()
                 .eq('user_id', user.id)
+                .eq('album_id', activeAlbumId)
 
               if (deleteError) {
                 setError('Error al limpiar colección')
@@ -113,6 +118,7 @@ export default function ImportQRModal({
               // 3. Construir filas a insertar desde el AlbumState
               const rowsToInsert: Array<{
                 user_id: string
+                album_id: string
                 country_code: string
                 sticker_number: number
                 repeated: number
@@ -123,6 +129,7 @@ export default function ImportQRModal({
                 owned.forEach((stickerNumber, i) => {
                   rowsToInsert.push({
                     user_id: user.id,
+                    album_id: activeAlbumId,
                     country_code: countryCode,
                     sticker_number: stickerNumber,
                     repeated: repeated[i] ?? 0,
@@ -143,6 +150,7 @@ export default function ImportQRModal({
                     const restoreRows = backupStickers.map(
                       ({ country_code, sticker_number, repeated }) => ({
                         user_id: user.id,
+                        album_id: activeAlbumId,
                         country_code,
                         sticker_number,
                         repeated,
@@ -170,7 +178,7 @@ export default function ImportQRModal({
         },
       ]
     )
-  }, [decodedResult, user, onImported, onClose])
+  }, [activeAlbumId, decodedResult, user, onImported, onClose, t])
 
   const handleClose = () => {
     setDecodedResult(null)
@@ -246,7 +254,9 @@ export default function ImportQRModal({
                     gap: 16,
                   }}
                 >
-                  <Text style={{ color: theme.textPrimary, fontWeight: '600', textAlign: 'center' }}>
+                  <Text
+                    style={{ color: theme.textPrimary, fontWeight: '600', textAlign: 'center' }}
+                  >
                     Permiso de cámara denegado
                   </Text>
                   <Pressable onPress={() => setScreen('input')}>
@@ -357,10 +367,7 @@ export default function ImportQRModal({
                     {t('importQrStickerCount').replace(
                       '{count}',
                       String(
-                        Object.values(decodedResult).reduce(
-                          (sum, s) => sum + s.owned.length,
-                          0
-                        )
+                        Object.values(decodedResult).reduce((sum, s) => sum + s.owned.length, 0)
                       )
                     )}
                   </Text>

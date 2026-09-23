@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
-import { allStickers } from '@mi-album-fifa/shared'
+import { getAlbumStickers, DEFAULT_ALBUM_ID } from '@mi-album-fifa/shared'
 import type { Sticker, CardType } from '@mi-album-fifa/shared'
 
 /* ── Static helpers ────────────────────────────────────────── */
@@ -99,7 +99,8 @@ function buildSearchData(allStickers: Sticker[]) {
 
 /* ── Hook ─────────────────────────────────────────────────── */
 
-export function useSearchResults() {
+export function useSearchResults(albumId = DEFAULT_ALBUM_ID) {
+  const allStickers = getAlbumStickers(albumId)
   const [search, setSearch] = useState('')
   const [selectedCode, setSelectedCode] = useState<string | null>(null)
   const [searchFocused, setSearchFocused] = useState(false)
@@ -107,7 +108,7 @@ export function useSearchResults() {
 
   const { teamsData, countryDetails, stickerByCode } = useMemo(
     () => buildSearchData(allStickers),
-    []
+    [allStickers]
   )
 
   /* ── Search results (list view) ─────────────────────────── */
@@ -153,7 +154,7 @@ export function useSearchResults() {
       ...matchedTeams.map((t): TeamCardResult => ({ ...t, kind: 'teamCard' })),
       ...matchedStickerCards,
     ]
-  }, [search, teamsData])
+  }, [search, teamsData, allStickers])
 
   /* ── Exact code match (auto-open) ───────────────────────── */
   const exactMatch = useMemo(() => {
@@ -238,7 +239,7 @@ export function useSearchResults() {
     }
 
     return { panelMatchedCountryCodes: codes, panelHighlightByCountry: highlightByCountry }
-  }, [search, teamsData, exactMatch])
+  }, [search, teamsData, exactMatch, allStickers])
 
   /* ── Handlers ───────────────────────────────────────────── */
   const clearSearch = useCallback(() => {

@@ -13,6 +13,7 @@ import { useTheme, colors } from '../hooks/useTheme'
 import { supabase } from '../lib/supabaseClient'
 import Svg, { Path } from 'react-native-svg'
 import ScrollableModal from './ScrollableModal'
+import { useCollectionState } from '../context/CollectionContext'
 
 const CONFIRM_WORD = 'IMPORTAR'
 
@@ -58,6 +59,7 @@ export default function ImportCollectionModal({
   t,
 }: ImportCollectionModalProps) {
   const { theme } = useTheme()
+  const { activeAlbumId } = useCollectionState()
   const [step, setStep] = useState(1)
   const [email, setEmail] = useState('')
   const [confirmText, setConfirmText] = useState('')
@@ -97,7 +99,11 @@ export default function ImportCollectionModal({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ sourceEmail: email.trim().toLowerCase(), preview: true }),
+          body: JSON.stringify({
+            sourceEmail: email.trim().toLowerCase(),
+            preview: true,
+            albumId: activeAlbumId,
+          }),
         }
       )
       const data = await res.json()
@@ -144,7 +150,7 @@ export default function ImportCollectionModal({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ sourceEmail: email.trim().toLowerCase() }),
+          body: JSON.stringify({ sourceEmail: email.trim().toLowerCase(), albumId: activeAlbumId }),
         }
       )
       const data = await res.json()

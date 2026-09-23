@@ -10,6 +10,7 @@ interface CountryDetails {
 }
 
 interface AllPanelsViewProps {
+  albumId: string
   allCountries: TeamSummary[]
   countryDetails: Record<string, CountryDetails>
   collection: CollectionMap
@@ -26,6 +27,7 @@ interface AllPanelsViewProps {
 }
 
 function CountrySection({
+  albumId,
   team,
   details,
   collection,
@@ -34,6 +36,7 @@ function CountrySection({
   highlightNumber,
   t,
 }: {
+  albumId: string
   team: TeamSummary
   details: CountryDetails
   collection: CollectionMap
@@ -67,6 +70,7 @@ function CountrySection({
       </div>
 
       <StickerPanel
+        albumId={albumId}
         countryCode={team.code}
         user={user}
         stickerCount={details.stickerCount}
@@ -82,6 +86,7 @@ function CountrySection({
 }
 
 function AllPanelsView({
+  albumId,
   allCountries,
   countryDetails,
   collection,
@@ -116,6 +121,7 @@ function AllPanelsView({
         if (!details) return null
         return (
           <CountrySection
+            albumId={albumId}
             key={team.code}
             team={team}
             details={details}

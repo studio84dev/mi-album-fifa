@@ -1,4 +1,11 @@
 import UserMenu from './UserMenu.tsx'
+import AlbumMenu from './AlbumMenu.tsx'
+
+interface Album {
+  id: string
+  name: string
+  description: string | null
+}
 
 interface HeaderProps {
   t: (_key: string) => string
@@ -13,6 +20,9 @@ interface HeaderProps {
   onSignIn: () => void
   onSignOut: () => void
   onImport: () => void
+  albums: Album[]
+  activeAlbumId: string
+  onChangeAlbum: (_id: string) => void
   totals: {
     teamCollected: number
     fwcCollected: number
@@ -30,12 +40,16 @@ function Header({
   onOpenWhatsNew,
   onSignOut,
   onImport,
+  albums,
+  activeAlbumId,
+  onChangeAlbum,
   totals,
   collectionLoading,
 }: HeaderProps) {
   return (
-    <div className="flex justify-end items-center w-full mb-4 pt-3 gap-2">
-      <div className="flex gap-2 items-center mr-auto">
+    <div className="flex justify-between items-center w-full mb-4 pt-3 gap-2">
+      <div className="flex gap-2 items-center">
+        <AlbumMenu albums={albums} activeAlbumId={activeAlbumId} onChange={onChangeAlbum} t={t} />
         {whatsNewUnread && (
           <button
             className="relative bg-transparent border-none text-text-muted text-sm font-medium cursor-pointer px-3 py-[0.4rem] transition-[color] duration-base rounded-md font-[inherit] hover:text-text-primary hover:bg-bg-tertiary"

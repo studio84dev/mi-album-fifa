@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { allStickers } from '@mi-album-fifa/shared'
+import { getAlbumStickers } from '@mi-album-fifa/shared'
 import { useAuth } from '@/src/hooks/useAuth'
 import { useCollectionState, useCollectionDispatch } from '@/src/context/CollectionContext'
 import { useTheme, colors } from '@/src/hooks/useTheme'
@@ -38,27 +38,24 @@ export function CountryScreen() {
   const highlightNumber = highlight ? parseInt(highlight, 10) : null
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle } = useAuth()
-  const { collection } = useCollectionState()
+  const { collection, activeAlbumId } = useCollectionState()
   const { updateEntry } = useCollectionDispatch()
   const { theme, isDark } = useTheme()
   const { t } = useI18n()
 
   const countryStickers = useMemo(
     () =>
-      allStickers.filter(
+      getAlbumStickers(activeAlbumId).filter(
         (s) => s.country_code === code || (s.country_code == null && s.code === code)
       ),
-    [code]
+    [activeAlbumId, code]
   )
   const stickerCount = countryStickers.length
   const teamName = countryStickers[0]?.team_name ?? code
   const page = countryStickers[0]?.page ?? null
   const isoCode = countryStickers[0]?.iso ?? null
 
-  const stickerNumbers = useMemo(
-    () => countryStickers.map((s) => s.number!),
-    [countryStickers]
-  )
+  const stickerNumbers = useMemo(() => countryStickers.map((s) => s.number!), [countryStickers])
 
   const {
     collectedData,

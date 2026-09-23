@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import { View, Text, Animated } from 'react-native'
 import { useTheme, colors } from '../hooks/useTheme'
+import { getAlbumStickers } from '@mi-album-fifa/shared'
+import { useCollectionState } from '../context/CollectionContext'
 
 interface StatValueProps {
   collected: number
@@ -88,13 +90,17 @@ export default function GlobalStatsBar({
   const { theme } = useTheme()
   const { teamCollected, fwcCollected, ccCollected, totalRepeated } = totals
 
-  const TEAM_TOTAL = 960
-  const FWC_TOTAL = 20
-  const CC_TOTAL = 14
+  const { activeAlbumId } = useCollectionState()
+  const stickers = getAlbumStickers(activeAlbumId)
+  const TEAM_TOTAL = stickers.filter(
+    (s) => !['FWC', 'CC', '00'].includes(s.country_code ?? s.code)
+  ).length
+  const FWC_TOTAL = stickers.filter((s) => s.country_code === 'FWC').length
+  const CC_TOTAL = stickers.filter((s) => s.country_code === 'CC').length
 
   const overallCollected = teamCollected + fwcCollected + ccCollected
   const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL
-  const pct = Math.round((overallCollected / overallTotal) * 100)
+  const pct = overallTotal ? Math.round((overallCollected / overallTotal) * 100) : 0
 
   const progressAnim = useMemo(() => new Animated.Value(0), [])
   useEffect(() => {

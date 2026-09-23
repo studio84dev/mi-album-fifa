@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRouter } from 'expo-router'
-import { allStickers } from '@mi-album-fifa/shared'
+import { getAlbumStickers } from '@mi-album-fifa/shared'
 import type { CardType, Sticker } from '@mi-album-fifa/shared'
 import TeamCard from '@/src/components/TeamCard'
 import type { TeamItem } from '@/src/components/TeamCard'
@@ -74,13 +74,13 @@ interface CountryDetails {
   stickerNumbers: number[]
 }
 
-function buildSearchData() {
+function buildSearchData(stickers: Sticker[]) {
   const teamsObj: Record<string, SearchableTeam> = {}
   const stickerByCode = new Map<string, Sticker>()
   const searchableStickers: SearchableSticker[] = []
   const countryDetails: Record<string, CountryDetails> = {}
 
-  for (const sticker of allStickers) {
+  for (const sticker of stickers) {
     const key = sticker.country_code ?? sticker.code
     const isSpecial = sticker.card_type === 'fwc_special' || sticker.card_type === 'cc'
 
@@ -212,14 +212,15 @@ export default function HomeScreen() {
   const [showImportQR, setShowImportQR] = useState(false)
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
-  const { collection, totals, loading: collectionLoading } = useCollectionState()
+  const { collection, totals, loading: collectionLoading, activeAlbumId } = useCollectionState()
   const { updateEntry, resetCollection, refresh } = useCollectionDispatch()
   const { t, locale, toggleLocale: toggleI18nLocale } = useI18n()
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
+  const albumStickers = useMemo(() => getAlbumStickers(activeAlbumId), [activeAlbumId])
   const { allCountries, stickerByCode, searchableStickers, countryDetails } = useMemo(
-    () => buildSearchData(),
-    []
+    () => buildSearchData(albumStickers),
+    [albumStickers]
   )
 
   const { teamCollected, fwcCollected, ccCollected } = totals

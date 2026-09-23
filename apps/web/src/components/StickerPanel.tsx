@@ -10,6 +10,7 @@ interface InitialDataEntry {
 
 interface StickerPanelProps {
   countryCode: string
+  albumId?: string
   user: { id: string } | null
   stickerCount?: number
   stickerNumbers?: number[]
@@ -38,6 +39,7 @@ function buildMaps(data: Record<string, InitialDataEntry>) {
 
 function StickerPanel({
   countryCode,
+  albumId = 'fifa-world-cup-2026',
   user,
   stickerCount = 20,
   stickerNumbers,
@@ -120,6 +122,7 @@ function StickerPanel({
     if (next) {
       ;({ error } = await supabase.from('sticker_collection').insert({
         user_id: user!.id,
+        album_id: albumId,
         country_code: countryCode,
         sticker_number: number,
         repeated: 0,
@@ -130,6 +133,7 @@ function StickerPanel({
         .from('sticker_collection')
         .delete()
         .eq('user_id', user!.id)
+        .eq('album_id', albumId)
         .eq('country_code', countryCode)
         .eq('sticker_number', number))
     }
@@ -190,6 +194,7 @@ function StickerPanel({
         .from('sticker_collection')
         .delete()
         .eq('user_id', user!.id)
+        .eq('album_id', albumId)
         .eq('country_code', countryCode)
         .eq('sticker_number', number)
       return
@@ -205,11 +210,13 @@ function StickerPanel({
         .from('sticker_collection')
         .update({ repeated: rep, updated_at: new Date().toISOString() })
         .eq('user_id', user!.id)
+        .eq('album_id', albumId)
         .eq('country_code', countryCode)
         .eq('sticker_number', number)
     } else {
       await supabase.from('sticker_collection').insert({
         user_id: user!.id,
+        album_id: albumId,
         country_code: countryCode,
         sticker_number: number,
         repeated: rep,

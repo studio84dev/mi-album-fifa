@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import { useI18n } from '../hooks/useI18n'
 import { useTheme } from '../hooks/useTheme'
 import Svg, { Path } from 'react-native-svg'
+import AlbumMenu from './AlbumMenu'
 import UserMenu from './UserMenu'
 import UpdateBanner from './UpdateBanner'
 
@@ -54,7 +55,6 @@ export default function AuthBar({
   onSignOut,
   onImport,
   onImportQR,
-  onResetCollection,
   onWhatsNew,
   whatsNewUnread = false,
   updateAvailable = false,
@@ -86,7 +86,9 @@ export default function AuthBar({
             paddingVertical: 8,
           }}
         >
-          <View style={{ flex: 1 }}>
+          <AlbumMenu />
+
+          <View style={{ flex: 1, minWidth: 0, marginHorizontal: 8 }}>
             {whatsNewUnread && (
               <Pressable
                 onPress={onWhatsNew}
@@ -115,7 +117,6 @@ export default function AuthBar({
             onSignOut={onSignOut}
             onImport={onImport || (() => {})}
             onImportQR={onImportQR || (() => {})}
-            onResetCollection={onResetCollection || (async () => {})}
             t={t}
             totals={
               totals || {

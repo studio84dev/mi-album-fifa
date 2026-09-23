@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Text, Image, Modal, Pressable, Alert } from 'react-native'
+import { View, Text, Image, Modal, Pressable } from 'react-native'
 import type { User } from '@supabase/supabase-js'
 import { useTheme, colors } from '../hooks/useTheme'
 import GlobalStatsBar from './GlobalStatsBar'
@@ -27,7 +27,6 @@ interface UserMenuProps {
   onSignOut: () => void
   onImport: () => void
   onImportQR: () => void
-  onResetCollection: () => Promise<void>
   t: (_key: string) => string
   totals: {
     teamCollected: number
@@ -43,7 +42,6 @@ export default function UserMenu({
   onSignOut,
   onImport,
   onImportQR,
-  onResetCollection,
   t,
   totals,
   collectionLoading,
@@ -51,29 +49,12 @@ export default function UserMenu({
   const [showMenu, setShowMenu] = useState(false)
   const [imgError, setImgError] = useState(false)
   const { theme } = useTheme()
-
   if (!user) return null
 
   const displayName = (user.user_metadata?.full_name as string) || user.email || ''
   const initial = displayName.charAt(0).toUpperCase()
   const avatarUrl = user.user_metadata?.avatar_url as string | undefined
   const showAvatar = avatarUrl && !imgError
-
-  const handleResetCollection = () => {
-    Alert.alert(t('resetCollectionTitle'), t('resetCollectionMessage'), [
-      { text: t('resetCollectionCancel'), style: 'cancel' },
-      {
-        text: t('resetCollectionConfirm'),
-        style: 'destructive',
-        onPress: () => {
-          onResetCollection().catch(() => {
-            Alert.alert(t('resetCollectionErrorTitle'), t('resetCollectionErrorMessage'))
-          })
-          setShowMenu(false)
-        },
-      },
-    ])
-  }
 
   return (
     <>
@@ -119,7 +100,6 @@ export default function UserMenu({
             />
           )}
         </View>
-        <Text style={{ color: theme.textMuted, fontSize: 12 }}>▼</Text>
       </Pressable>
 
       {/* Modal Menu */}
@@ -229,14 +209,6 @@ export default function UserMenu({
             </Pressable>
 
             {/* Sign Out Button */}
-            <Pressable
-              onPress={handleResetCollection}
-              style={{ paddingHorizontal: 8, paddingVertical: 12, borderRadius: 8 }}
-            >
-              <Text style={{ fontSize: 14, color: '#ef4444' }}>
-                {t('resetCollectionMenuItem')}
-              </Text>
-            </Pressable>
 
             <Pressable
               onPress={() => {
