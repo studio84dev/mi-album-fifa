@@ -240,6 +240,10 @@
   "resetCollectionConfirm": "Reset",
   "resetCollectionErrorTitle": "Could not reset album",
   "resetCollectionErrorMessage": "There was an error deleting your collection. Please try again.",
+  "completeCollectionTitle": "Mark album as complete?",
+  "completeCollectionConfirm": "Complete",
+  "completeCollectionErrorTitle": "Could not complete album",
+  "completeCollectionErrorMessage": "There was an error completing your collection. Please try again.",
   "albumsTitle": "My albums",
   "albumsSubtitle": "View all",
   "albumsSelect": "Select album",
@@ -267,5 +271,7 @@
   "albumsResetBody": "Your stickers and duplicates in {album} will be deleted. Your other albums will be kept.",
   "albumsResetAction": "Reset album",
   "albumsAddConfirmTitle": "Add album",
-  "albumsAddConfirmBody": "Add {album} to your albums? It will become your active album."
+  "albumsAddConfirmBody": "Add {album} to your albums? It will become your active album.",
+  "albumsCompleteAction": "Mark as complete",
+  "albumsCompleteBody": "All stickers in {album} will be marked as collected, with no duplicates. This action cannot be undone."
 }

@@ -49,6 +49,7 @@ interface CollectionDispatch {
     _data: { collected: boolean; repeated?: number }
   ) => void
   resetCollection: () => Promise<void>
+  completeCollection: () => Promise<void>
   refresh: () => void
   selectAlbum: (_albumId: string) => Promise<void>
   addAlbum: (_albumId: string) => Promise<void>
@@ -75,7 +76,7 @@ function UserCollectionProvider({ user, children }: { user: User | null; childre
   const [myAlbumIds, setMyAlbumIds] = useState<string[]>([])
   const [albumsError, setAlbumsError] = useState(false)
   const [activeAlbumId, setActiveAlbumId] = useState(user ? '' : DEFAULT_ALBUM_ID)
-  const { collection, loading, updateEntry, resetCollection, totals, refresh } =
+  const { collection, loading, updateEntry, resetCollection, completeCollection, totals, refresh } =
     useGlobalCollection(user, activeAlbumId)
 
   const refreshAlbums = useCallback(async () => {
@@ -204,13 +205,23 @@ function UserCollectionProvider({ user, children }: { user: User | null; childre
     () => ({
       updateEntry,
       resetCollection,
+      completeCollection,
       refresh,
       selectAlbum,
       addAlbum,
       removeAlbum,
       refreshAlbums,
     }),
-    [updateEntry, resetCollection, refresh, selectAlbum, addAlbum, removeAlbum, refreshAlbums]
+    [
+      updateEntry,
+      resetCollection,
+      completeCollection,
+      refresh,
+      selectAlbum,
+      addAlbum,
+      removeAlbum,
+      refreshAlbums,
+    ]
   )
 
   return (

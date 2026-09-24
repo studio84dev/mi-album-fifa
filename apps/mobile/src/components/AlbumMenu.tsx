@@ -100,11 +100,29 @@ function ResetIcon({ color, size = 16 }: { color: string; size?: number }) {
   )
 }
 
+function CheckCircleIcon({ color, size = 16 }: { color: string; size?: number }) {
+  return (
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <Path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+      <Path d="m8 12.5 2.5 2.5L16 9.5" />
+    </Svg>
+  )
+}
+
 export default function AlbumMenu() {
   const { theme } = useTheme()
   const { t } = useI18n()
   const { albums, myAlbumIds, albumsLoading, albumsError, activeAlbumId } = useCollectionState()
-  const { addAlbum, selectAlbum, removeAlbum, resetCollection, refreshAlbums } =
+  const { addAlbum, selectAlbum, removeAlbum, resetCollection, completeCollection, refreshAlbums } =
     useCollectionDispatch()
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<'mine' | 'all'>('mine')
@@ -169,6 +187,29 @@ export default function AlbumMenu() {
               setOpen(false)
             } catch {
               Alert.alert(t('resetCollectionErrorTitle'), t('resetCollectionErrorMessage'))
+            } finally {
+              setBusy(false)
+            }
+          },
+        },
+      ]
+    )
+
+  const complete = () =>
+    Alert.alert(
+      t('completeCollectionTitle'),
+      t('albumsCompleteBody').replace('{album}', name(activeAlbumId)),
+      [
+        { text: t('resetCollectionCancel'), style: 'cancel' },
+        {
+          text: t('completeCollectionConfirm'),
+          onPress: async () => {
+            setBusy(true)
+            try {
+              await completeCollection()
+              setOpen(false)
+            } catch {
+              Alert.alert(t('completeCollectionErrorTitle'), t('completeCollectionErrorMessage'))
             } finally {
               setBusy(false)
             }
@@ -428,24 +469,44 @@ export default function AlbumMenu() {
                       </Pressable>
 
                       {tab === 'mine' && isActive && (
-                        <Pressable
-                          disabled={busy}
-                          accessibilityRole="button"
-                          onPress={reset}
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            gap: 6,
-                            alignSelf: 'flex-start',
-                            paddingVertical: 8,
-                            marginBottom: 6,
-                          }}
-                        >
-                          <ResetIcon color={colors.errorRed} size={14} />
-                          <Text style={{ color: colors.errorRed, fontSize: 13 }}>
-                            {t('albumsResetAction')}
-                          </Text>
-                        </Pressable>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+                          <Pressable
+                            disabled={busy}
+                            accessibilityRole="button"
+                            onPress={complete}
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 6,
+                              paddingVertical: 8,
+                              paddingRight: 12,
+                              marginBottom: 6,
+                            }}
+                          >
+                            <CheckCircleIcon color={colors.successGreen} size={14} />
+                            <Text style={{ color: colors.successGreen, fontSize: 13 }}>
+                              {t('albumsCompleteAction')}
+                            </Text>
+                          </Pressable>
+
+                          <Pressable
+                            disabled={busy}
+                            accessibilityRole="button"
+                            onPress={reset}
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 6,
+                              paddingVertical: 8,
+                              marginBottom: 6,
+                            }}
+                          >
+                            <ResetIcon color={colors.errorRed} size={14} />
+                            <Text style={{ color: colors.errorRed, fontSize: 13 }}>
+                              {t('albumsResetAction')}
+                            </Text>
+                          </Pressable>
+                        </View>
                       )}
                     </View>
                   )

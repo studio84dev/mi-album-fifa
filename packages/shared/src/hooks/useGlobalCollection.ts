@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getAlbumStickers } from '../data/albums'
 
 export async function resetUserCollection(
   supabase: SupabaseClient,
@@ -13,6 +14,32 @@ export async function resetUserCollection(
     .delete()
     .eq('user_id', userId)
     .eq('album_id', albumId)
+  if (error) throw error
+}
+
+export async function completeUserCollection(
+  supabase: SupabaseClient,
+  userId: string | null | undefined,
+  albumId: string
+): Promise<void> {
+  if (!userId || !albumId) return
+
+  const stickers = getAlbumStickers(albumId)
+  if (stickers.length === 0) return
+
+  const now = new Date().toISOString()
+  const rows = stickers.map((sticker) => ({
+    user_id: userId,
+    album_id: albumId,
+    country_code: sticker.country_code ?? sticker.code,
+    sticker_number: sticker.number,
+    repeated: 0,
+    updated_at: now,
+  }))
+
+  const { error } = await supabase
+    .from('sticker_collection')
+    .upsert(rows, { onConflict: 'user_id,album_id,country_code,sticker_number' })
   if (error) throw error
 }
 
@@ -123,6 +150,20 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       setCollection({})
     }, [userId, albumId])
 
+    const completeCollection = useCallback(async (): Promise<void> => {
+      if (!userId) return
+
+      await completeUserCollection(supabase, userId, albumId)
+      const map: CollectionMap = {}
+      getAlbumStickers(albumId).forEach((sticker) => {
+        const code = sticker.country_code ?? sticker.code
+        const number = sticker.number as number
+        if (!map[code]) map[code] = {}
+        map[code][number] = { collected: true, repeated: 0 }
+      })
+      setCollection(map)
+    }, [userId, albumId])
+
     const totals = useMemo(() => {
       const SPECIAL_CODES = new Set(['FWC', 'CC', '00'])
       const TEAM_CODES = new Set(Object.keys(collection).filter((c) => !SPECIAL_CODES.has(c)))
@@ -150,6 +191,7 @@ export function createUseGlobalCollection(supabase: SupabaseClient) {
       loading: loading || (!!userId && !ready),
       updateEntry,
       resetCollection,
+      completeCollection,
       totals: ready
         ? totals
         : { teamCollected: 0, fwcCollected: 0, ccCollected: 0, totalRepeated: 0 },

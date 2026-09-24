@@ -240,6 +240,10 @@
   "resetCollectionConfirm": "Resetear",
   "resetCollectionErrorTitle": "No se pudo resetear",
   "resetCollectionErrorMessage": "Ocurrió un error al borrar tu colección. Intenta nuevamente.",
+  "completeCollectionTitle": "¿Marcar álbum como completo?",
+  "completeCollectionConfirm": "Completar",
+  "completeCollectionErrorTitle": "No se pudo completar",
+  "completeCollectionErrorMessage": "Ocurrió un error al completar tu colección. Intenta nuevamente.",
   "albumsTitle": "Mis álbumes",
   "albumsSubtitle": "Ver todos",
   "albumsSelect": "Seleccionar álbum",
@@ -267,5 +271,7 @@
   "albumsResetBody": "Se eliminarán tus figuritas y repetidas de {album}. Tus otros álbumes se conservarán.",
   "albumsResetAction": "Restablecer álbum",
   "albumsAddConfirmTitle": "Agregar álbum",
-  "albumsAddConfirmBody": "¿Agregar {album} a tus álbumes? Se convertirá en tu álbum activo."
+  "albumsAddConfirmBody": "¿Agregar {album} a tus álbumes? Se convertirá en tu álbum activo.",
+  "albumsCompleteAction": "Marcar como completo",
+  "albumsCompleteBody": "Se marcarán como conseguidas todas las figuritas de {album}, sin repetidas. Esta acción no se puede deshacer."
 }

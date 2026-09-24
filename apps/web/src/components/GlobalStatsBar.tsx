@@ -80,7 +80,11 @@ function GlobalStatsBar({ totals, loading, t, compact = false }: GlobalStatsBarP
   const overallCollected = teamCollected + fwcCollected + ccCollected
   const overallTotal = TEAM_TOTAL + FWC_TOTAL + CC_TOTAL
 
-  const pct = Math.round((overallCollected / overallTotal) * 100)
+  // Redondea siempre hacia abajo (99.9% no es 100% si falta algo), pero sin
+  // mostrar 0% cuando ya se coleccionó al menos una figurita.
+  const pct = overallTotal
+    ? Math.max(Math.floor((overallCollected / overallTotal) * 100), overallCollected > 0 ? 1 : 0)
+    : 0
 
   const [displayPct, setDisplayPct] = useState(0)
 
