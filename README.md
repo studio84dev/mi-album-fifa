@@ -125,41 +125,49 @@ CI: `.github/workflows/ci.yml` corre tests + typecheck + lint + build web en cad
 
 ### Proceso completo
 
-El release tiene dos fases: **build** y **publicación**.
+#### Fase 1 — Preparar la versión
 
-#### Fase 1 — Build y release automático
+Con el working tree limpio, ejecutar:
 
-Ejecutar **un solo comando**:
+```bash
+npm run release:prepare
+```
+
+Este comando valida el export Android, incrementa la versión, sube `version.json` a Supabase con `published: false` y hace commit y push de `app.json`.
+
+#### Fase 2 — Lanzar el build
+
+```bash
+npm run release:build
+```
+
+El comando comprime y sube el proyecto a EAS con `--no-wait`. Cuando vuelve el prompt de la terminal, el build queda ejecutándose en la nube y ya se puede cerrar la terminal o apagar el equipo.
+
+También se pueden ejecutar las dos primeras fases juntas:
 
 ```bash
 npm run release
 ```
 
-Este comando ejecuta en orden:
-
-1. **`export`** — Valida que la app compila correctamente (`npx expo export --platform android`). Si falla, se detiene aquí.
-2. **`bump-version`** — Lee el `versionCode` actual desde EAS (o Supabase como fallback), lo incrementa en 1, actualiza `app.json` (ej: `1.0.24` → `1.0.25`) y sube `version.json` al bucket `app-updates` de Supabase con `published: false`.
-3. **`build:mobile:android`** — EAS Build genera el APK/AAB en la nube usando el `versionCode` recién seteado. Esto tarda varios minutos.
-4. **`release:commit`** — Automáticamente commitea y pushea el cambio en `app.json` con el mensaje `Bump version to 1.0.XX`.
-
 El resultado es:
-- Un archivo `.aab` disponible en [Expo Dashboard](https://expo.dev/accounts/studio84dev/projects/mi-album-fifa/builds) para subir a Play Store
+- Un build de producción en EAS que continúa aunque el equipo local se apague
 - `app.json` con la nueva versión commiteada y pusheada a `master`
 - `version.json` en Supabase con `published: false`
+- Un archivo `.aab` disponible al finalizar en [Expo Dashboard](https://expo.dev/accounts/studio84dev/projects/mi-album-fifa/builds)
 
-#### Fase 2 — Subir a Play Store
+#### Fase 3 — Subir a Play Store
 
 1. Ir a [Google Play Console](https://play.google.com/console) → **Producción** → **Crear release nuevo**
 2. Subir el `.aab` generado por EAS
 3. Completar notas de release (si aplica)
 4. Enviar para revisión
 
-#### Fase 3 — Publicar actualización in-app
+#### Fase 4 — Publicar actualización in-app
 
 Una vez que la nueva versión está disponible en Play Store (o cuando quieras que los usuarios vean el banner de actualización):
 
 ```bash
-npm run publish-update
+npm run release:publish
 ```
 
 Este comando cambia `published: false` → `published: true` en el `version.json` de Supabase. A partir de ese momento, cualquier usuario con una versión instalada menor a la publicada verá el banner de actualización.

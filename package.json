@@ -22,8 +22,11 @@
     "test": "vitest run --config packages/shared/vitest.config.ts && vitest run --config apps/mobile/vitest.config.ts",
     "test:shared": "vitest run --config packages/shared/vitest.config.ts",
     "test:mobile": "vitest run --config apps/mobile/vitest.config.ts",
-    "release": "node scripts/release.mjs",
-    "publish-update": "npm run publish-update --workspace=apps/mobile",
+    "release": "npm run release:prepare && npm run release:build",
+    "release:prepare": "node scripts/release.mjs",
+    "release:build": "npm run build:android:async --workspace=apps/mobile",
+    "release:publish": "npm run publish-update --workspace=apps/mobile",
+    "publish-update": "npm run release:publish",
     "format": "prettier --write ."
   },
   "devDependencies": {
