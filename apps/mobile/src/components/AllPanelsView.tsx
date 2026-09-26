@@ -44,11 +44,11 @@ interface AllPanelsViewProps {
   stickerFilter: StickerFilterMode
 }
 
+const EMPTY_COLLECTION: Record<string, CollectionEntry> = {}
+
 function getCountryCollection(collection: CollectionMap, code: string) {
-  return {
-    ...(code === '00' ? (collection['null'] ?? {}) : {}),
-    ...(collection[code] ?? {}),
-  }
+  if (code !== '00') return collection[code] ?? EMPTY_COLLECTION
+  return { ...(collection['null'] ?? {}), ...(collection[code] ?? {}) }
 }
 
 function filterVisibleStickers(
@@ -259,7 +259,7 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
       data={visibleItems}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
-      extraData={[collection, theme]}
+      extraData={collection}
       onScroll={onScroll}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}

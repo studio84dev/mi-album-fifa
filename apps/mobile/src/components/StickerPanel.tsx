@@ -123,9 +123,12 @@ function StickerPanel({
   // 16px paddingH each side + 4 gaps of 5px between 5 columns
   const cardWidth = Math.floor((screenWidth - 32 - 20) / 5)
 
-  // Derive collected/repeated directly from initialData (source of truth is the context).
-  // updateEntry already does an optimistic setCollection, so initialData is always current.
-  const state = useMemo(() => buildState(initialData), [initialData])
+  const derivedState = useMemo(() => buildState(initialData), [initialData])
+  const [localState, setLocalState] = useState(() => ({ source: initialData, value: derivedState }))
+  if (localState.source !== initialData) {
+    setLocalState({ source: initialData, value: derivedState })
+  }
+  const state = localState.source === initialData ? localState.value : derivedState
 
   const [modal, setModal] = useState<number | null>(null)
   const [modalRepeated, setModalRepeated] = useState(0)
@@ -144,6 +147,16 @@ function StickerPanel({
   const userRef = useRef(user)
   // eslint-disable-next-line react-hooks/refs
   userRef.current = user
+
+  const updateLocalEntry = useCallback((number: number, collected: boolean, repeated: number) => {
+    setLocalState((previous) => ({
+      source: previous.source,
+      value: {
+        collected: { ...previous.value.collected, [number]: collected },
+        repeated: { ...previous.value.repeated, [number]: repeated },
+      },
+    }))
+  }, [])
 
   const openModal = useCallback((number: number) => {
     const current = stateRef.current.repeated[number] ?? 0
@@ -171,7 +184,7 @@ function StickerPanel({
   )
 
   const handleStickerPress = useCallback(
-    async (number: number) => {
+    (number: number) => {
       if (longPressTimer.current) {
         clearTimeout(longPressTimer.current)
         longPressTimer.current = null
@@ -183,39 +196,42 @@ function StickerPanel({
       }
       const current = !!currentState.collected[number]
       const next = !current
+      updateLocalEntry(number, next, 0)
       onCollectionChangeRef.current(countryCodeRef.current, number, {
         collected: next,
         repeated: 0,
       })
-      await syncSupabase(number, next, 0)
+      void syncSupabase(number, next, 0)
     },
-    [openModal, syncSupabase]
+    [openModal, syncSupabase, updateLocalEntry]
   )
 
   const handleStickerLongPress = useCallback((number: number) => openModal(number), [openModal])
 
   const applyModalAction = useCallback(
-    async (action: string) => {
+    (action: string) => {
       const number = modal!
       const rep = modalRepeated
       closeModal()
 
       if (action === 'none') {
+        updateLocalEntry(number, false, 0)
         onCollectionChangeRef.current(countryCodeRef.current, number, {
           collected: false,
           repeated: 0,
         })
-        await syncSupabase(number, false, 0)
+        void syncSupabase(number, false, 0)
         return
       }
 
+      updateLocalEntry(number, true, rep)
       onCollectionChangeRef.current(countryCodeRef.current, number, {
         collected: true,
         repeated: rep,
       })
-      await syncSupabase(number, true, rep)
+      void syncSupabase(number, true, rep)
     },
-    [modal, modalRepeated, closeModal, syncSupabase]
+    [modal, modalRepeated, closeModal, syncSupabase, updateLocalEntry]
   )
 
   const handleLongPressIn = useCallback(

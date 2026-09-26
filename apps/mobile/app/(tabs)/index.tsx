@@ -98,7 +98,7 @@ function buildSearchData(stickers: Sticker[]) {
 export default function HomeScreen() {
   const searchInputRef = useRef<TextInputType>(null)
   const flatListRef = useRef<FlatList>(null)
-  const panelRefs = useRef<Record<string, FlatList | null>>({})
+  const panelRef = useRef<FlatList>(null)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [viewMode, setViewMode] = useState<'cards' | 'panels'>('cards')
   const [viewModeLoaded, setViewModeLoaded] = useState(false)
@@ -123,14 +123,6 @@ export default function HomeScreen() {
     countryCode: string
     highlightNumber: number | null
   } | null>(null)
-  const searchMode = search.trim().length > 0 ? 'search' : 'noSearch'
-  const activeViewKey =
-    viewMode === 'cards' ? `${searchMode}-cards` : `${searchMode}-${stickerFilter}`
-  const [mountedViews, setMountedViews] = useState<Set<string>>(() => new Set([activeViewKey]))
-  if (!mountedViews.has(activeViewKey)) {
-    setMountedViews(new Set(mountedViews).add(activeViewKey))
-  }
-
   const handleChange = useCallback((text: string) => {
     setSelectedPanel(null)
     setInputValue(text)
@@ -139,10 +131,8 @@ export default function HomeScreen() {
   const handleClearSearch = useCallback(() => {
     setSelectedPanel(null)
     setInputValue('')
-    setTimeout(() => {
-      setSearch('')
-      searchInputRef.current?.focus()
-    }, 0)
+    setSearch('')
+    searchInputRef.current?.focus()
   }, [])
 
   const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -154,10 +144,9 @@ export default function HomeScreen() {
     if (viewMode === 'cards') {
       flatListRef.current?.scrollToOffset({ offset: 0, animated: true })
     } else {
-      const activeKey = `${searchMode}-${stickerFilter}`
-      panelRefs.current[activeKey]?.scrollToOffset({ offset: 0, animated: true })
+      panelRef.current?.scrollToOffset({ offset: 0, animated: true })
     }
-  }, [search, viewMode, searchMode, stickerFilter])
+  }, [search, viewMode])
   const { showWhatsNew, setShowWhatsNew, hasUnread, openWhatsNew } = useWhatsNew()
   const [showAbout, setShowAbout] = useState(false)
   const [showSuggestion, setShowSuggestion] = useState(false)
@@ -335,13 +324,11 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (viewMode !== 'panels') return
-    const activeKey = `${searchMode}-${stickerFilter}`
-    const targetRef = panelRefs.current[activeKey]
     const id = requestAnimationFrame(() => {
-      targetRef?.scrollToOffset({ offset: 0, animated: false })
+      panelRef.current?.scrollToOffset({ offset: 0, animated: false })
     })
     return () => cancelAnimationFrame(id)
-  }, [stickerFilter, viewMode, searchMode])
+  }, [stickerFilter, viewMode, selectedPanel])
 
   const renderSearchCountry = useCallback(
     (item: AlbumSearchCountry) => {
@@ -422,221 +409,46 @@ export default function HomeScreen() {
         </View>
 
         <View style={{ flex: 1 }}>
-          {isSearching && !selectedPanel && (
+          {isSearching && !selectedPanel ? (
             <SearchResults
               countries={searchResults.countries}
               players={searchResults.players}
               renderCountry={renderSearchCountry}
               renderPlayer={renderSearchPlayer}
             />
-          )}
-
-          {/* Cards view — no search */}
-          {mountedViews.has('noSearch-cards') && (
-            <View
-              style={{
-                flex: 1,
-                display: searchMode === 'noSearch' && viewMode === 'cards' ? 'flex' : 'none',
-              }}
-            >
-              <FlatList
-                ref={flatListRef}
-                data={allCountries}
-                extraData={effectiveTheme}
-                keyExtractor={(item) => item.code}
-                renderItem={renderTeamItem}
-                ListFooterComponent={listFooter}
-                onScroll={handleScroll}
-                scrollEventThrottle={16}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingBottom: 32 }}
-                initialNumToRender={15}
-                maxToRenderPerBatch={10}
-                windowSize={5}
-                removeClippedSubviews={true}
-              />
-            </View>
-          )}
-
-          {/* Panels view — no search, all */}
-          {mountedViews.has('noSearch-all') && (
-            <View
-              style={{
-                flex: 1,
-                display:
-                  searchMode === 'noSearch' && viewMode === 'panels' && stickerFilter === 'all'
-                    ? 'flex'
-                    : 'none',
-              }}
-            >
-              <AllPanelsView
-                ref={(ref) => {
-                  panelRefs.current['noSearch-all'] = ref
-                }}
-                allCountries={allCountries}
-                countryDetails={countryDetails}
-                collection={collection}
-                user={user}
-                updateEntry={updateEntry}
-                stickerFilter="all"
-                onScroll={handleScroll}
-                ListFooterComponent={listFooter}
-              />
-            </View>
-          )}
-
-          {/* Panels view — no search, missing */}
-          {mountedViews.has('noSearch-missing') && (
-            <View
-              style={{
-                flex: 1,
-                display:
-                  searchMode === 'noSearch' && viewMode === 'panels' && stickerFilter === 'missing'
-                    ? 'flex'
-                    : 'none',
-              }}
-            >
-              <AllPanelsView
-                ref={(ref) => {
-                  panelRefs.current['noSearch-missing'] = ref
-                }}
-                allCountries={allCountries}
-                countryDetails={countryDetails}
-                collection={collection}
-                user={user}
-                updateEntry={updateEntry}
-                stickerFilter="missing"
-                onScroll={handleScroll}
-                ListFooterComponent={listFooter}
-              />
-            </View>
-          )}
-
-          {/* Panels view — no search, repeated */}
-          {mountedViews.has('noSearch-repeated') && (
-            <View
-              style={{
-                flex: 1,
-                display:
-                  searchMode === 'noSearch' && viewMode === 'panels' && stickerFilter === 'repeated'
-                    ? 'flex'
-                    : 'none',
-              }}
-            >
-              <AllPanelsView
-                ref={(ref) => {
-                  panelRefs.current['noSearch-repeated'] = ref
-                }}
-                allCountries={allCountries}
-                countryDetails={countryDetails}
-                collection={collection}
-                user={user}
-                updateEntry={updateEntry}
-                stickerFilter="repeated"
-                onScroll={handleScroll}
-                ListFooterComponent={listFooter}
-              />
-            </View>
-          )}
-
-          {/* Panels view — search, all */}
-          {mountedViews.has('search-all') && (
-            <View
-              style={{
-                flex: 1,
-                display:
-                  searchMode === 'search' &&
-                  viewMode === 'panels' &&
-                  stickerFilter === 'all' &&
-                  selectedPanel
-                    ? 'flex'
-                    : 'none',
-              }}
-            >
-              <AllPanelsView
-                ref={(ref) => {
-                  panelRefs.current['search-all'] = ref
-                }}
-                allCountries={allCountries}
-                countryDetails={countryDetails}
-                collection={collection}
-                user={user}
-                updateEntry={updateEntry}
-                searchQuery={search}
-                matchedCountryCodes={selectedCountryCodes}
-                highlightByCountry={selectedHighlight}
-                stickerFilter="all"
-                onScroll={handleScroll}
-                ListFooterComponent={listFooter}
-              />
-            </View>
-          )}
-
-          {/* Panels view — search, missing */}
-          {mountedViews.has('search-missing') && (
-            <View
-              style={{
-                flex: 1,
-                display:
-                  searchMode === 'search' &&
-                  viewMode === 'panels' &&
-                  stickerFilter === 'missing' &&
-                  selectedPanel
-                    ? 'flex'
-                    : 'none',
-              }}
-            >
-              <AllPanelsView
-                ref={(ref) => {
-                  panelRefs.current['search-missing'] = ref
-                }}
-                allCountries={allCountries}
-                countryDetails={countryDetails}
-                collection={collection}
-                user={user}
-                updateEntry={updateEntry}
-                searchQuery={search}
-                matchedCountryCodes={selectedCountryCodes}
-                highlightByCountry={selectedHighlight}
-                stickerFilter="missing"
-                onScroll={handleScroll}
-                ListFooterComponent={listFooter}
-              />
-            </View>
-          )}
-
-          {/* Panels view — search, repeated */}
-          {mountedViews.has('search-repeated') && (
-            <View
-              style={{
-                flex: 1,
-                display:
-                  searchMode === 'search' &&
-                  viewMode === 'panels' &&
-                  stickerFilter === 'repeated' &&
-                  selectedPanel
-                    ? 'flex'
-                    : 'none',
-              }}
-            >
-              <AllPanelsView
-                ref={(ref) => {
-                  panelRefs.current['search-repeated'] = ref
-                }}
-                allCountries={allCountries}
-                countryDetails={countryDetails}
-                collection={collection}
-                user={user}
-                updateEntry={updateEntry}
-                searchQuery={search}
-                matchedCountryCodes={selectedCountryCodes}
-                highlightByCountry={selectedHighlight}
-                stickerFilter="repeated"
-                onScroll={handleScroll}
-                ListFooterComponent={listFooter}
-              />
-            </View>
+          ) : viewMode === 'cards' ? (
+            <FlatList
+              ref={flatListRef}
+              data={allCountries}
+              extraData={effectiveTheme}
+              keyExtractor={(item) => item.code}
+              renderItem={renderTeamItem}
+              ListFooterComponent={listFooter}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: 32 }}
+              initialNumToRender={12}
+              maxToRenderPerBatch={8}
+              windowSize={5}
+              removeClippedSubviews
+            />
+          ) : (
+            <AllPanelsView
+              ref={panelRef}
+              allCountries={allCountries}
+              countryDetails={countryDetails}
+              collection={collection}
+              user={user}
+              updateEntry={updateEntry}
+              searchQuery={selectedPanel ? search : undefined}
+              matchedCountryCodes={selectedCountryCodes}
+              highlightByCountry={selectedHighlight}
+              stickerFilter={stickerFilter}
+              onScroll={handleScroll}
+              ListFooterComponent={listFooter}
+            />
           )}
         </View>
 
