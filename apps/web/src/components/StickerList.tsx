@@ -9,9 +9,17 @@ interface StickerListProps {
   collection: Record<string, Record<string, { collected: boolean; repeated: number }>>
   selectedCode: string | null
   t: (_key: string) => string
+  categorized?: boolean
 }
 
-function StickerList({ results, onSelect, collection, selectedCode, t }: StickerListProps) {
+function StickerList({
+  results,
+  onSelect,
+  collection,
+  selectedCode,
+  t,
+  categorized = false,
+}: StickerListProps) {
   const { completedCodes, statsMap } = useMemo(() => {
     const completed = new Set<string>()
     const stats: Record<string, { collected: number; total: number; repeated: number }> = {}
@@ -44,9 +52,9 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
     )
   }
 
-  return (
+  const renderGrid = (items: SearchResult[]) => (
     <div className={gridClass}>
-      {results.map((result) =>
+      {items.map((result) =>
         result.kind === 'teamCard' ? (
           <TeamCard
             key={result.code}
@@ -66,6 +74,31 @@ function StickerList({ results, onSelect, collection, selectedCode, t }: Sticker
             single={isSingle}
           />
         )
+      )}
+    </div>
+  )
+
+  if (!categorized) return renderGrid(results)
+
+  const countries = results.filter((result) => result.kind === 'teamCard')
+  const players = results.filter((result) => result.kind === 'stickerCard')
+  return (
+    <div className="w-full flex flex-col gap-6">
+      {countries.length > 0 && (
+        <section className="w-full">
+          <h2 className="text-sm font-bold text-text-muted mb-3">
+            {t('searchCountries')} · {countries.length}
+          </h2>
+          {renderGrid(countries)}
+        </section>
+      )}
+      {players.length > 0 && (
+        <section className="w-full">
+          <h2 className="text-sm font-bold text-text-muted mb-3">
+            {t('searchPlayers')} · {players.length}
+          </h2>
+          {renderGrid(players)}
+        </section>
       )}
     </div>
   )

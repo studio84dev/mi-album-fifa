@@ -13,13 +13,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRouter } from 'expo-router'
-import { getAlbumStickers } from '@mi-album-fifa/shared'
-import type { CardType, Sticker } from '@mi-album-fifa/shared'
+import { createAlbumSearchIndex, getAlbumStickers, searchAlbum } from '@mi-album-fifa/shared'
+import type { AlbumSearchCountry, AlbumSearchPlayer, CardType, Sticker } from '@mi-album-fifa/shared'
 import TeamCard from '@/src/components/TeamCard'
 import type { TeamItem } from '@/src/components/TeamCard'
 import AuthBar from '@/src/components/AuthBar'
 import Footer from '@/src/components/Footer'
 import SearchBar from '@/src/components/SearchBar'
+import SearchResults from '@/src/components/SearchResults'
 import ScrollTopButton from '@/src/components/ScrollTopButton'
 import ViewToggle from '@/src/components/ViewToggle'
 import StickerFilter, { type StickerFilterMode } from '@/src/components/StickerFilter'
@@ -36,38 +37,7 @@ import { useTheme } from '@/src/hooks/useTheme'
 import { useWhatsNew } from '@/src/hooks/useWhatsNew'
 import { useUpdateAvailability } from '@/src/hooks/useUpdateAvailability'
 
-const EXACT_CODE_RE = /^([A-Z0-9]+?)(\.?\d+)$/i
-
-function parseExactCode(query: string): { prefix: string; number: number } | null {
-  const noSpaces = query.replace(/\s+/g, '')
-  const match = noSpaces.match(EXACT_CODE_RE)
-  if (!match) return null
-  return { prefix: match[1].toUpperCase(), number: parseInt(match[2], 10) }
-}
-
-interface StickerResult {
-  _kind: 'sticker'
-  code: string
-  country_code: string
-  number: number
-  description: string
-  iso: string | null
-}
-
-interface SearchableSticker {
-  _kind: 'sticker'
-  code: string
-  country_code: string
-  number: number
-  description: string
-  descriptionUpper: string
-  iso: string | null
-}
-
-interface SearchableTeam extends TeamItem {
-  teamNameUpper: string
-  pageStr: string
-}
+type StickerResult = AlbumSearchPlayer
 
 interface CountryDetails {
   stickerCount: number
@@ -75,9 +45,7 @@ interface CountryDetails {
 }
 
 function buildSearchData(stickers: Sticker[]) {
-  const teamsObj: Record<string, SearchableTeam> = {}
-  const stickerByCode = new Map<string, Sticker>()
-  const searchableStickers: SearchableSticker[] = []
+  const teamsObj: Record<string, TeamItem> = {}
   const countryDetails: Record<string, CountryDetails> = {}
 
   for (const sticker of stickers) {
@@ -89,11 +57,9 @@ function buildSearchData(stickers: Sticker[]) {
         teamsObj[key] = {
           code: key,
           team_name: sticker.team_name,
-          teamNameUpper: sticker.team_name?.toUpperCase() ?? '',
           group: sticker.group,
           iso: sticker.iso,
           page: sticker.page,
-          pageStr: sticker.page.toString(),
           card_type: sticker.card_type as CardType,
           count: 0,
         }
@@ -104,11 +70,9 @@ function buildSearchData(stickers: Sticker[]) {
         teamsObj[key] = {
           code: key,
           team_name: null,
-          teamNameUpper: '',
           group: null,
           iso: null,
           page: sticker.page,
-          pageStr: sticker.page.toString(),
           card_type: sticker.card_type as CardType,
           count: 0,
         }
@@ -123,27 +87,10 @@ function buildSearchData(stickers: Sticker[]) {
     if (sticker.number != null) {
       countryDetails[key].stickerNumbers.push(sticker.number)
     }
-
-    if (sticker.number != null && sticker.country_code != null) {
-      stickerByCode.set(`${sticker.country_code}-${sticker.number}`, sticker)
-      if (sticker.card_type !== 'team_logo' && sticker.card_type !== 'team_photo') {
-        searchableStickers.push({
-          _kind: 'sticker',
-          code: sticker.code,
-          country_code: sticker.country_code,
-          number: sticker.number,
-          description: sticker.description,
-          descriptionUpper: sticker.description.toUpperCase(),
-          iso: sticker.iso,
-        })
-      }
-    }
   }
 
   return {
-    allCountries: Object.values(teamsObj) as SearchableTeam[],
-    stickerByCode,
-    searchableStickers,
+    allCountries: Object.values(teamsObj),
     countryDetails,
   }
 }
@@ -172,6 +119,10 @@ export default function HomeScreen() {
   }, [viewMode, viewModeLoaded])
   const [inputValue, setInputValue] = useState('')
   const [search, setSearch] = useState('')
+  const [selectedPanel, setSelectedPanel] = useState<{
+    countryCode: string
+    highlightNumber: number | null
+  } | null>(null)
   const searchMode = search.trim().length > 0 ? 'search' : 'noSearch'
   const activeViewKey =
     viewMode === 'cards' ? `${searchMode}-cards` : `${searchMode}-${stickerFilter}`
@@ -181,10 +132,12 @@ export default function HomeScreen() {
   }
 
   const handleChange = useCallback((text: string) => {
+    setSelectedPanel(null)
     setInputValue(text)
     setSearch(text)
   }, [])
   const handleClearSearch = useCallback(() => {
+    setSelectedPanel(null)
     setInputValue('')
     setTimeout(() => {
       setSearch('')
@@ -218,77 +171,23 @@ export default function HomeScreen() {
   const { theme, isDark, effectiveTheme, toggleTheme } = useTheme()
   const { updateAvailable } = useUpdateAvailability()
   const albumStickers = useMemo(() => getAlbumStickers(activeAlbumId), [activeAlbumId])
-  const { allCountries, stickerByCode, searchableStickers, countryDetails } = useMemo(
-    () => buildSearchData(albumStickers),
-    [albumStickers]
+  const { allCountries, countryDetails } = useMemo(() => buildSearchData(albumStickers), [albumStickers])
+  const searchIndex = useMemo(() => createAlbumSearchIndex(albumStickers), [albumStickers])
+  const searchResults = useMemo(() => searchAlbum(searchIndex, search), [searchIndex, search])
+  const selectedCountryCodes = useMemo(
+    () => (selectedPanel ? new Set([selectedPanel.countryCode]) : null),
+    [selectedPanel]
+  )
+  const selectedHighlight = useMemo(
+    () =>
+      selectedPanel?.highlightNumber == null
+        ? null
+        : { [selectedPanel.countryCode]: selectedPanel.highlightNumber },
+    [selectedPanel]
   )
 
   const { teamCollected, fwcCollected, ccCollected } = totals
   const totalCollected = teamCollected + fwcCollected + ccCollected
-
-  const exactMatch = useMemo(() => {
-    if (!search.trim()) return null
-    const parsed = parseExactCode(search.trim())
-    if (!parsed) return null
-    return stickerByCode.get(`${parsed.prefix}-${parsed.number}`) ?? null
-  }, [search, stickerByCode])
-
-  // Panel search: countries only (+ exact sticker highlight). Never shows StickerResult cards.
-  const { matchedCountryCodes, panelHighlightByCountry } = useMemo(() => {
-    if (!search.trim()) {
-      return { matchedCountryCodes: null, panelHighlightByCountry: null }
-    }
-    const q = search.trim().toUpperCase()
-
-    const matchedTeams = allCountries.filter(
-      (c) => c.code.includes(q) || c.teamNameUpper.includes(q) || c.pageStr.includes(q)
-    )
-
-    const matchedCountryCodes = new Set<string>(matchedTeams.map((c) => c.code))
-    if (exactMatch?.country_code) {
-      matchedCountryCodes.add(exactMatch.country_code)
-    }
-
-    const panelHighlightByCountry: Record<string, number> = {}
-    if (exactMatch?.country_code && exactMatch.number != null) {
-      panelHighlightByCountry[exactMatch.country_code] = exactMatch.number
-    }
-
-    return { matchedCountryCodes, panelHighlightByCountry }
-  }, [search, allCountries, exactMatch])
-
-  // Card search: countries + individual sticker results.
-  const cardSearchResults = useMemo((): (TeamItem | StickerResult)[] => {
-    if (!search.trim()) return allCountries
-    const q = search.trim().toUpperCase()
-
-    const matchedTeams = allCountries.filter(
-      (c) => c.code.includes(q) || c.teamNameUpper.includes(q) || c.pageStr.includes(q)
-    )
-    const matchedTeamCodes = new Set(matchedTeams.map((t) => t.code))
-
-    const matchedStickers: StickerResult[] = []
-    for (const sticker of searchableStickers) {
-      if (sticker.descriptionUpper.includes(q) && !matchedTeamCodes.has(sticker.country_code)) {
-        matchedStickers.push(sticker)
-      }
-    }
-
-    if (matchedTeams.length === 0 && matchedStickers.length === 0 && exactMatch) {
-      return [
-        {
-          _kind: 'sticker' as const,
-          code: exactMatch.code,
-          country_code: exactMatch.country_code!,
-          number: exactMatch.number!,
-          description: exactMatch.description,
-          iso: exactMatch.iso,
-        },
-      ]
-    }
-
-    return [...matchedTeams, ...matchedStickers]
-  }, [search, allCountries, searchableStickers, exactMatch])
 
   const handleCountryPress = useCallback(
     (code: string) => {
@@ -297,6 +196,38 @@ export default function HomeScreen() {
       router.push({ pathname: '/(tabs)/country/[code]', params: { code } } as any)
     },
     [router]
+  )
+
+  const handleSearchCountryPress = useCallback(
+    (country: AlbumSearchCountry) => {
+      Keyboard.dismiss()
+      if (viewMode === 'panels') {
+        setInputValue(country.code)
+        setSearch(country.code)
+        setSelectedPanel({ countryCode: country.code, highlightNumber: null })
+        return
+      }
+      handleCountryPress(country.code)
+    },
+    [viewMode, handleCountryPress]
+  )
+
+  const handleSearchPlayerPress = useCallback(
+    (player: AlbumSearchPlayer) => {
+      Keyboard.dismiss()
+      if (viewMode === 'panels') {
+        setInputValue(player.code)
+        setSearch(player.code)
+        setSelectedPanel({ countryCode: player.country_code, highlightNumber: player.number })
+        return
+      }
+      router.push({
+        pathname: '/(tabs)/country/[code]',
+        params: { code: player.country_code, highlight: String(player.number) },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+    },
+    [viewMode, router]
   )
 
   const renderTeamItem = useCallback(
@@ -320,14 +251,7 @@ export default function HomeScreen() {
   const renderStickerItem = useCallback(
     ({ item }: { item: StickerResult }) => (
       <TouchableOpacity
-        onPress={() => {
-          Keyboard.dismiss()
-          router.push({
-            pathname: '/(tabs)/country/[code]',
-            params: { code: item.country_code, highlight: String(item.number) },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any)
-        }}
+        onPress={() => handleSearchPlayerPress(item)}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -366,10 +290,15 @@ export default function HomeScreen() {
         <Text style={{ color: theme.textMuted, fontSize: 12 }}>›</Text>
       </TouchableOpacity>
     ),
-    [theme, router]
+    [theme, handleSearchPlayerPress]
   )
 
   const isSearching = search.trim().length > 0
+
+  const handleViewModeChange = useCallback((mode: 'cards' | 'panels') => {
+    setSelectedPanel(null)
+    setViewMode(mode)
+  }, [])
 
   const handleShowAbout = useCallback(() => setShowAbout(true), [])
   const handleShowSuggestion = useCallback(() => setShowSuggestion(true), [])
@@ -414,12 +343,24 @@ export default function HomeScreen() {
     return () => cancelAnimationFrame(id)
   }, [stickerFilter, viewMode, searchMode])
 
-  const renderSearchItem = useCallback(
-    ({ item }: { item: TeamItem | StickerResult }) => {
-      if ('_kind' in item) return renderStickerItem({ item })
-      return renderTeamItem({ item })
+  const renderSearchCountry = useCallback(
+    (item: AlbumSearchCountry) => {
+      const entries = Object.values(collection[item.code] ?? {})
+      return (
+        <TeamCard
+          item={item}
+          collectedCount={entries.filter((entry) => entry.collected).length}
+          repeatedCount={entries.reduce((total, entry) => total + (entry.repeated ?? 0), 0)}
+          onPress={() => handleSearchCountryPress(item)}
+        />
+      )
     },
-    [renderTeamItem, renderStickerItem]
+    [collection, handleSearchCountryPress]
+  )
+
+  const renderSearchPlayer = useCallback(
+    (item: AlbumSearchPlayer) => renderStickerItem({ item }),
+    [renderStickerItem]
   )
 
   return (
@@ -450,9 +391,7 @@ export default function HomeScreen() {
             value={inputValue}
             onChangeText={handleChange}
             onClear={handleClearSearch}
-            placeholder={
-              viewMode === 'panels' ? t('searchPlaceholderPanels') : t('searchPlaceholder')
-            }
+            placeholder={t('searchPlaceholder')}
           />
           <View
             style={{
@@ -465,7 +404,7 @@ export default function HomeScreen() {
           >
             <ViewToggle
               mode={viewMode}
-              onChange={setViewMode}
+              onChange={handleViewModeChange}
               cardsLabel={t('viewModeCards')}
               panelsLabel={t('viewModePanels')}
               style={{ alignSelf: 'center' }}
@@ -483,6 +422,15 @@ export default function HomeScreen() {
         </View>
 
         <View style={{ flex: 1 }}>
+          {isSearching && !selectedPanel && (
+            <SearchResults
+              countries={searchResults.countries}
+              players={searchResults.players}
+              renderCountry={renderSearchCountry}
+              renderPlayer={renderSearchPlayer}
+            />
+          )}
+
           {/* Cards view — no search */}
           {mountedViews.has('noSearch-cards') && (
             <View
@@ -503,30 +451,6 @@ export default function HomeScreen() {
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{ paddingBottom: 32 }}
-                initialNumToRender={15}
-                maxToRenderPerBatch={10}
-                windowSize={5}
-                removeClippedSubviews={true}
-              />
-            </View>
-          )}
-
-          {/* Cards view — search */}
-          {mountedViews.has('search-cards') && (
-            <View
-              style={{
-                flex: 1,
-                display: searchMode === 'search' && viewMode === 'cards' ? 'flex' : 'none',
-              }}
-            >
-              <FlatList<TeamItem | StickerResult>
-                data={cardSearchResults}
-                extraData={effectiveTheme}
-                keyExtractor={(item) => ('_kind' in item ? `sticker-${item.code}` : item.code)}
-                renderItem={renderSearchItem}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingBottom: 32, paddingTop: 8 }}
                 initialNumToRender={15}
                 maxToRenderPerBatch={10}
                 windowSize={5}
@@ -622,7 +546,10 @@ export default function HomeScreen() {
               style={{
                 flex: 1,
                 display:
-                  searchMode === 'search' && viewMode === 'panels' && stickerFilter === 'all'
+                  searchMode === 'search' &&
+                  viewMode === 'panels' &&
+                  stickerFilter === 'all' &&
+                  selectedPanel
                     ? 'flex'
                     : 'none',
               }}
@@ -637,8 +564,8 @@ export default function HomeScreen() {
                 user={user}
                 updateEntry={updateEntry}
                 searchQuery={search}
-                matchedCountryCodes={matchedCountryCodes}
-                highlightByCountry={panelHighlightByCountry}
+                matchedCountryCodes={selectedCountryCodes}
+                highlightByCountry={selectedHighlight}
                 stickerFilter="all"
                 onScroll={handleScroll}
                 ListFooterComponent={listFooter}
@@ -652,7 +579,10 @@ export default function HomeScreen() {
               style={{
                 flex: 1,
                 display:
-                  searchMode === 'search' && viewMode === 'panels' && stickerFilter === 'missing'
+                  searchMode === 'search' &&
+                  viewMode === 'panels' &&
+                  stickerFilter === 'missing' &&
+                  selectedPanel
                     ? 'flex'
                     : 'none',
               }}
@@ -667,8 +597,8 @@ export default function HomeScreen() {
                 user={user}
                 updateEntry={updateEntry}
                 searchQuery={search}
-                matchedCountryCodes={matchedCountryCodes}
-                highlightByCountry={panelHighlightByCountry}
+                matchedCountryCodes={selectedCountryCodes}
+                highlightByCountry={selectedHighlight}
                 stickerFilter="missing"
                 onScroll={handleScroll}
                 ListFooterComponent={listFooter}
@@ -682,7 +612,10 @@ export default function HomeScreen() {
               style={{
                 flex: 1,
                 display:
-                  searchMode === 'search' && viewMode === 'panels' && stickerFilter === 'repeated'
+                  searchMode === 'search' &&
+                  viewMode === 'panels' &&
+                  stickerFilter === 'repeated' &&
+                  selectedPanel
                     ? 'flex'
                     : 'none',
               }}
@@ -697,8 +630,8 @@ export default function HomeScreen() {
                 user={user}
                 updateEntry={updateEntry}
                 searchQuery={search}
-                matchedCountryCodes={matchedCountryCodes}
-                highlightByCountry={panelHighlightByCountry}
+                matchedCountryCodes={selectedCountryCodes}
+                highlightByCountry={selectedHighlight}
                 stickerFilter="repeated"
                 onScroll={handleScroll}
                 ListFooterComponent={listFooter}

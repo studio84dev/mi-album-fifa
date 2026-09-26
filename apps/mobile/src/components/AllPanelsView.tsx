@@ -197,12 +197,17 @@ const AllPanelsView = forwardRef<FlatList, AllPanelsViewProps>(function AllPanel
         initialData,
         stickerFilter
       )
+      const highlightNumber = highlightByCountry?.[c.code]
+      if (highlightNumber != null && !filteredNumbers.includes(highlightNumber)) {
+        filteredNumbers.push(highlightNumber)
+        filteredNumbers.sort((a, b) => a - b)
+      }
       if (filteredNumbers.length > 0) {
         items.push({ country: c, initialData, filteredNumbers })
       }
     }
     return items
-  }, [filteredCountries, countryDetails, countryInitialData, stickerFilter])
+  }, [filteredCountries, countryDetails, countryInitialData, stickerFilter, highlightByCountry])
 
   const renderItem = useCallback(
     ({ item }: { item: VisiblePanelItem }) => {

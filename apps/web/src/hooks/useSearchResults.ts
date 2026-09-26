@@ -1,5 +1,10 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
-import { getAlbumStickers, DEFAULT_ALBUM_ID } from '@mi-album-fifa/shared'
+import {
+  createAlbumSearchIndex,
+  getAlbumStickers,
+  searchAlbum,
+  DEFAULT_ALBUM_ID,
+} from '@mi-album-fifa/shared'
 import type { Sticker, CardType } from '@mi-album-fifa/shared'
 
 /* ── Static helpers ────────────────────────────────────────── */
@@ -111,50 +116,25 @@ export function useSearchResults(albumId = DEFAULT_ALBUM_ID) {
     [allStickers]
   )
 
-  /* ── Search results (list view) ─────────────────────────── */
+  const searchIndex = useMemo(() => createAlbumSearchIndex(allStickers), [allStickers])
+  const groupedSearchResults = useMemo(() => searchAlbum(searchIndex, search), [searchIndex, search])
   const searchResults = useMemo((): SearchResult[] => {
-    if (!search.trim()) return teamsData.map((s): TeamCardResult => ({ ...s, kind: 'teamCard' }))
-    const query = search.trim().toUpperCase()
-
-    const matchedTeams = teamsData.filter(
-      (s) =>
-        s.code.includes(query) ||
-        (s.team_name && s.team_name.toUpperCase().includes(query)) ||
-        s.page.toString().includes(query)
-    )
-
-    const matchedStickerCards: StickerCardResult[] = allStickers
-      .filter((sticker): sticker is Sticker & { country_code: string; number: number } => {
-        const descMatch = sticker.description.toUpperCase().includes(query)
-        const notInTeamResults = !matchedTeams.some((t) => t.code === sticker.country_code)
-        const isHiddenType = sticker.card_type === 'team_logo' || sticker.card_type === 'team_photo'
-        return (
-          descMatch &&
-          notInTeamResults &&
-          !isHiddenType &&
-          sticker.number != null &&
-          sticker.country_code != null
-        )
-      })
-      .map(
-        (sticker): StickerCardResult => ({
-          kind: 'stickerCard',
-          code: sticker.code,
-          country_code: sticker.country_code,
-          number: sticker.number,
-          description: sticker.description,
-          page: sticker.page,
-          group: sticker.group,
-          iso: sticker.iso,
-          card_type: sticker.card_type,
-        })
-      )
-
+    if (!search.trim()) {
+      return teamsData.map((team): TeamCardResult => ({ ...team, kind: 'teamCard' }))
+    }
     return [
-      ...matchedTeams.map((t): TeamCardResult => ({ ...t, kind: 'teamCard' })),
-      ...matchedStickerCards,
+      ...groupedSearchResults.countries.map(
+        (country): TeamCardResult => ({
+          ...country,
+          kind: 'teamCard',
+          description: country.team_name ?? country.code,
+        })
+      ),
+      ...groupedSearchResults.players.map(
+        (player): StickerCardResult => ({ ...player, kind: 'stickerCard' })
+      ),
     ]
-  }, [search, teamsData, allStickers])
+  }, [search, teamsData, groupedSearchResults])
 
   /* ── Exact code match (auto-open) ───────────────────────── */
   const exactMatch = useMemo(() => {
@@ -166,18 +146,10 @@ export function useSearchResults(albumId = DEFAULT_ALBUM_ID) {
 
   /* ── Which country panel to open ────────────────────────── */
   const activeCountry = useMemo(() => {
-    // 1. Auto-open from exact sticker code (e.g. "ARG 17")
-    if (exactMatch) {
-      const item = teamsData.find((s) => s.code === exactMatch.country_code)
-      return item ? { ...item, kind: 'teamCard' } : null
-    }
-    // 2. Persist from explicit click
-    if (selectedCode) {
-      const item = teamsData.find((s) => s.code === selectedCode)
-      return item ? { ...item, kind: 'teamCard' } : null
-    }
-    return null
-  }, [exactMatch, selectedCode, teamsData])
+    if (!selectedCode) return null
+    const item = teamsData.find((team) => team.code === selectedCode)
+    return item ? { ...item, kind: 'teamCard' as const } : null
+  }, [selectedCode, teamsData])
 
   /* ── Matched sticker info for highlight + badge ──────────────── */
   const matchedStickerInfo = useMemo(() => {
@@ -191,55 +163,19 @@ export function useSearchResults(albumId = DEFAULT_ALBUM_ID) {
   const matchedNumber = matchedStickerInfo ? matchedStickerInfo.number : null
   const matchedSticker = matchedStickerInfo
 
-  /* ── Panel view search data (filter + highlight) ─────────── */
   const { panelMatchedCountryCodes, panelHighlightByCountry } = useMemo(() => {
-    if (!search.trim()) {
+    if (!selectedCode) {
       return { panelMatchedCountryCodes: null, panelHighlightByCountry: null }
     }
-    const query = search.trim().toUpperCase()
-
-    const matchedTeams = teamsData.filter(
-      (s) =>
-        s.code.includes(query) ||
-        (s.team_name && s.team_name.toUpperCase().includes(query)) ||
-        s.page.toString().includes(query)
-    )
-
-    const matchedStickerCards = allStickers.filter((sticker) => {
-      const descMatch = sticker.description.toUpperCase().includes(query)
-      const notInTeamResults = !matchedTeams.some((t) => t.code === sticker.country_code)
-      const isHiddenType = sticker.card_type === 'team_logo' || sticker.card_type === 'team_photo'
-      return (
-        descMatch &&
-        notInTeamResults &&
-        !isHiddenType &&
-        sticker.number != null &&
-        sticker.country_code != null
-      )
-    })
-
-    const codes = new Set<string>([
-      ...matchedTeams.map((t) => t.code),
-      ...matchedStickerCards.map((s) => s.country_code).filter((c): c is string => c != null),
-    ])
-    if (exactMatch) {
-      codes.add(exactMatch.country_code!)
-    }
-
     const highlightByCountry: Record<string, number> = {}
-    if (exactMatch) {
-      highlightByCountry[exactMatch.country_code!] = exactMatch.number!
-    } else {
-      for (const sticker of matchedStickerCards) {
-        const code = sticker.country_code as string
-        if (!highlightByCountry[code]) {
-          highlightByCountry[code] = sticker.number as number
-        }
-      }
+    if (exactMatch?.country_code === selectedCode && exactMatch.number != null) {
+      highlightByCountry[selectedCode] = exactMatch.number
     }
-
-    return { panelMatchedCountryCodes: codes, panelHighlightByCountry: highlightByCountry }
-  }, [search, teamsData, exactMatch, allStickers])
+    return {
+      panelMatchedCountryCodes: new Set([selectedCode]),
+      panelHighlightByCountry: highlightByCountry,
+    }
+  }, [selectedCode, exactMatch])
 
   /* ── Handlers ───────────────────────────────────────────── */
   const clearSearch = useCallback(() => {
@@ -273,6 +209,7 @@ export function useSearchResults(albumId = DEFAULT_ALBUM_ID) {
     setSearchFocused,
     searchInputRef,
     searchResults,
+    groupedSearchResults,
     activeCountry,
     matchedNumber,
     matchedSticker,

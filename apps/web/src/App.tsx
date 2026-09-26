@@ -156,16 +156,11 @@ function App() {
           t={t}
         />
 
-        {!activeCountry && !search && (
+        {!activeCountry && (
           <div className="self-start mb-4 transition-[margin,opacity,max-height] duration-slow">
             <ViewToggle
               mode={viewMode}
-              onChange={(mode) => {
-                setViewMode(mode)
-                if (mode === 'panels') {
-                  selectCountry('')
-                }
-              }}
+              onChange={setViewMode}
               cardsLabel={t('viewModeCards')}
               panelsLabel={t('viewModePanels')}
             />
@@ -205,20 +200,31 @@ function App() {
         />
       )}
 
-      {!activeCountry && viewMode === 'cards' && (
+      {!activeCountry && search && (
         <>
-          {search && <ResultsCount count={searchResults.length} t={t} />}
+          <ResultsCount count={searchResults.length} t={t} />
           <StickerList
             results={searchResults}
             onSelect={handleSelectCountry}
             collection={collection}
             selectedCode={selectedCode}
             t={t}
+            categorized
           />
         </>
       )}
 
-      {!activeCountry && viewMode === 'panels' && (
+      {!activeCountry && !search && viewMode === 'cards' && (
+        <StickerList
+          results={searchResults}
+          onSelect={handleSelectCountry}
+          collection={collection}
+          selectedCode={selectedCode}
+          t={t}
+        />
+      )}
+
+      {viewMode === 'panels' && (!search || activeCountry) && (
         <AllPanelsView
           key={activeAlbumId}
           albumId={activeAlbumId}
@@ -234,7 +240,7 @@ function App() {
         />
       )}
 
-      {activeCountry && user && (
+      {activeCountry && viewMode === 'cards' && user && (
         <StickerPanel
           key={activeAlbumId}
           countryCode={activeCountry.code}
@@ -252,7 +258,7 @@ function App() {
         />
       )}
 
-      {activeCountry && !user && !authLoading && (
+      {activeCountry && viewMode === 'cards' && !user && !authLoading && (
         <PromoBanner
           icon="🏆"
           title={t('promoBannerCountryTitle')}
@@ -264,7 +270,9 @@ function App() {
         />
       )}
 
-      {activeCountry && <CuriosityCarousel countryCode={activeCountry.code} locale={locale} />}
+      {activeCountry && viewMode === 'cards' && (
+        <CuriosityCarousel countryCode={activeCountry.code} locale={locale} />
+      )}
 
       <Footer
         t={t}
