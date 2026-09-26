@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { Tabs } from 'expo-router'
-import { Platform, useColorScheme, View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import * as NavigationBar from 'expo-navigation-bar'
 import Svg, { Path, Rect } from 'react-native-svg'
+import { useTheme } from '@/src/hooks/useTheme'
 
 const LIGHT = { bg: '#ffffff', border: '#e2e8f0', active: '#3b82f6', inactive: '#94a3b8' }
 const DARK = { bg: '#111827', border: '#1e293b', active: '#3b82f6', inactive: '#64748b' }
@@ -36,8 +37,8 @@ function QrTabIcon({ color }: { color: string }) {
 const TAB_BAR_BASE_HEIGHT = 60
 
 export default function TabLayout() {
-  const scheme = useColorScheme()
-  const c = scheme === 'dark' ? DARK : LIGHT
+  const { isDark } = useTheme()
+  const c = isDark ? DARK : LIGHT
   const insets = useSafeAreaInsets()
 
   useEffect(() => {
