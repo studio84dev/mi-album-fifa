@@ -8,6 +8,7 @@ Monorepo npm workspaces. Tracker del álbum FIFA World Cup 2026.
 - **`apps/mobile`** — Expo SDK 56 + RN 0.85 + expo-router. Alias `@/*` → raíz de `apps/mobile`. Compatible con Expo Go
 - **`packages/shared`** — `@mi-album-fifa/shared`. Sin build step: `main` → `src/index.ts`. Metro `watchFolders` + `paths` en tsconfig
 - **`supabase/`** — `schema.sql` + Edge Functions Deno (`upsert-user`, `import-collection`)
+- **`promo-video/`** — Video promocional en Remotion (NO es workspace, `npm i` propio, React 19). `npm run dev` (Studio), `npm run render:vertical` / `render:play`. Verificar con `npx tsc --noEmit && npx eslint src`. Las pantallas en `src/components/app/*` replican estilos de `apps/mobile`: si cambia la UI real, actualizarlas
 
 ## Datos e i18n
 
