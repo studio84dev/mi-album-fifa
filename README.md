@@ -123,6 +123,15 @@ CI: `.github/workflows/ci.yml` corre tests + typecheck + lint + build web en cad
 
 ## Release Android
 
+Comandos desde la raíz del proyecto:
+
+| Comando | Cuándo usarlo |
+|---------|---------------|
+| `npm run release` | Preparar una nueva versión y lanzar su build Android. |
+| `npm run release:prepare` | Solo preparar la versión, sin lanzar el build. |
+| `npm run release:build` | Compilar una versión ya preparada o reintentar su build. |
+| `npm run release:publish` | Cuando la versión ya está disponible en Play Store, activar el aviso de actualización. |
+
 ### Proceso completo
 
 #### Fase 1 — Preparar la versión

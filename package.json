@@ -26,7 +26,6 @@
     "release:prepare": "node scripts/release.mjs",
     "release:build": "npm run build:android:async --workspace=apps/mobile",
     "release:publish": "npm run publish-update --workspace=apps/mobile",
-    "publish-update": "npm run release:publish",
     "format": "prettier --write ."
   },
   "devDependencies": {
