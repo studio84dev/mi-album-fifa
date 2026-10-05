@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AndroidInstallModal from './AndroidInstallModal.tsx'
+import { useAppPromotion } from '../hooks/useAppPromotion.ts'
 
 interface AndroidBannerProps {
   onDismiss: () => void
@@ -8,6 +9,7 @@ interface AndroidBannerProps {
 
 function AndroidBanner({ onDismiss, t }: AndroidBannerProps) {
   const [showModal, setShowModal] = useState(false)
+  const { acceptAppPromotion } = useAppPromotion()
 
   return (
     <>
@@ -30,7 +32,16 @@ function AndroidBanner({ onDismiss, t }: AndroidBannerProps) {
         </div>
       </div>
 
-      {showModal && <AndroidInstallModal onClose={() => setShowModal(false)} t={t} />}
+      {showModal && (
+        <AndroidInstallModal
+          onClose={() => setShowModal(false)}
+          onInstall={() => {
+            acceptAppPromotion()
+            setShowModal(false)
+          }}
+          t={t}
+        />
+      )}
     </>
   )
 }

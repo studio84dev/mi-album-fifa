@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useI18n } from './hooks/useI18n.ts'
 import { useAuth } from './hooks/useAuth.ts'
 import { useGlobalCollection } from './hooks/useGlobalCollection.ts'
@@ -29,9 +29,13 @@ import AboutModal from './components/AboutModal.tsx'
 import ViewToggle from './components/ViewToggle.tsx'
 import AllPanelsView from './components/AllPanelsView.tsx'
 import { useAlbums } from './hooks/useAlbums.ts'
+import { useAppPromotion } from './hooks/useAppPromotion.ts'
+
+const AndroidInstallModal = lazy(() => import('./components/AndroidInstallModal.tsx'))
 
 function App() {
   const { locale, t, toggleLocale } = useI18n()
+  const { showAppPromotion, dismissAppPromotion, acceptAppPromotion } = useAppPromotion()
   const { user, loading: authLoading, signInWithGoogle, signOut } = useAuth()
   useTheme()
   const { albums, activeAlbumId, setActiveAlbumId } = useAlbums(user?.id)
@@ -171,9 +175,17 @@ function App() {
       {/* {showAndroidBanner && <AndroidBanner onDismiss={dismissAndroidBanner} t={t} />} */}
       {showRedirectBanner && <RedirectBanner onDismiss={dismissRedirectBanner} t={t} />}
 
-      {showWelcomeModal && <WelcomeModal onClose={dismissWelcomeModal} t={t} />}
+      {showAppPromotion && (
+        <Suspense fallback={null}>
+          <AndroidInstallModal onClose={dismissAppPromotion} onInstall={acceptAppPromotion} t={t} />
+        </Suspense>
+      )}
 
-      {showSharePrompt && (
+      {!showAppPromotion && showWelcomeModal && (
+        <WelcomeModal onClose={dismissWelcomeModal} t={t} />
+      )}
+
+      {!showAppPromotion && !showWelcomeModal && showSharePrompt && (
         <SharePrompt t={t} share={share} onDismiss={() => setShowSharePrompt(false)} />
       )}
 

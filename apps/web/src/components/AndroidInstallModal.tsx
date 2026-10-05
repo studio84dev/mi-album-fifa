@@ -1,47 +1,110 @@
+import { useEffect, useRef } from 'react'
+import AppPromoPreview from './app-promo/AppPromoPreview.tsx'
+import { PromoIcon } from './app-promo/PromoIcon.tsx'
+import appIcon from '../../public/favicon.png'
+import './app-promo/appPromo.css'
+
 interface AndroidInstallModalProps {
   onClose: () => void
+  onInstall: () => void
   t: (_key: string) => string
 }
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.studio84.mialbumfifa'
 
-function AndroidInstallModal({ onClose, t }: AndroidInstallModalProps) {
-  const overlayClass =
-    'fixed top-0 left-0 right-0 bottom-0 bg-overlay-bg flex items-center justify-center z-[1000] p-4 backdrop-blur-[6px]'
-  const modalClass =
-    'bg-modal-bg border border-border-color rounded-xl max-w-[420px] w-full max-h-[85vh] min-[601px]:max-h-[82vh] overflow-y-auto relative p-6 pt-12 animate-modal-fade-in shadow-xl mx-4 min-[601px]:mx-0'
-  const closeBtnClass =
-    'absolute top-[0.875rem] right-[0.875rem] w-7 h-7 rounded-full bg-bg-tertiary border border-border-color text-text-muted text-[1.25rem] min-[601px]:text-base cursor-pointer flex items-center justify-center transition-[background,color] duration-fast hover:bg-bg-quaternary hover:text-text-primary'
+function AndroidInstallModal({ onClose, onInstall, t }: AndroidInstallModalProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    const previousOverflow = document.body.style.overflow
+    dialog?.showModal()
+    document.body.style.overflow = 'hidden'
+    return () => {
+      dialog?.close()
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
 
   return (
-    <div className={overlayClass} onClick={onClose}>
-      <div className={modalClass} onClick={(e) => e.stopPropagation()}>
-        <button className={closeBtnClass} onClick={onClose} aria-label="Cerrar">
-          ×
+    <dialog
+      ref={dialogRef}
+      className="app-promo-modal"
+      aria-labelledby="app-promo-title"
+      aria-describedby="app-promo-description"
+      onCancel={(event) => {
+        event.preventDefault()
+        onClose()
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose()
+      }}
+    >
+      <div className="app-promo-layout">
+        <button className="app-promo-close" onClick={onClose} aria-label={t('closeAriaLabel')}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path
+              d="M3 3 11 11M11 3 3 11"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
         </button>
-
-        <h2 className="text-text-primary text-[1.1rem] font-bold mb-3 text-center tracking-[-0.02em]">
-          {t('androidModalTitle')}
-        </h2>
-
-        <p className="text-text-secondary text-sm leading-relaxed mb-4">{t('androidModalBody')}</p>
-
-        <a
-          href={PLAY_STORE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-center bg-accent-blue hover:bg-accent-blue-hover text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors duration-base mb-4"
-        >
-          {t('androidModalInstallBtn')}
-        </a>
-
-        <img
-          src="/linktoplaystoreimage.jpg"
-          alt="Instrucciones para llegar a la Play Store"
-          className="w-full rounded-lg border border-border-color"
-        />
+        <div className="app-promo-copy">
+          <div className="app-promo-eyebrow">
+            <img src={appIcon} alt="" width="32" height="32" />
+            {t('appPromoEyebrow')}
+          </div>
+          <h2 id="app-promo-title">{t('appPromoTitle')}</h2>
+          <p id="app-promo-description">{t('appPromoBody')}</p>
+          <ul className="app-promo-features">
+            {['appPromoQr', 'appPromoExchange', 'appPromoConfirm', 'appPromoHistory'].map(
+              (key, index) => (
+                <li key={key}>
+                  <span aria-hidden="true">
+                    <PromoIcon
+                      name={(['qr', 'swap', 'check', 'history'] as const)[index]}
+                      size={16}
+                    />
+                  </span>
+                  {t(key)}
+                </li>
+              )
+            )}
+          </ul>
+          <span className="app-promo-free">{t('appPromoFree')}</span>
+        </div>
+        <div className="app-promo-preview">
+          <AppPromoPreview t={t} />
+        </div>
+        <div className="app-promo-actions">
+          <a
+            href={PLAY_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onInstall}
+            onAuxClick={(event) => {
+              if (event.button === 1) onInstall()
+            }}
+          >
+            <svg aria-hidden="true" width="22" height="24" viewBox="0 0 22 24" fill="none">
+              <path
+                d="M2 2 20 12 2 22V2Z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+              <path d="m2 2 12 14M2 22 14 10" stroke="currentColor" strokeWidth="1.3" />
+            </svg>
+            {t('appPromoInstall')}
+            <span aria-hidden="true">↗</span>
+          </a>
+          <button onClick={onClose}>{t('appPromoLater')}</button>
+          <p>{t('appPromoSync')}</p>
+        </div>
       </div>
-    </div>
+    </dialog>
   )
 }
 
